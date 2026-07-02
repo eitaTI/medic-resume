@@ -29,8 +29,9 @@ ADMIN (login com email/senha)
 | ----------------- | ----------------------------------- |
 | Framework         | Next.js 15 (App Router)             |
 | Linguagem         | TypeScript                          |
-| Banco de dados    | SQLite via Prisma ORM               |
+| Banco de dados    | SQLite via Prisma ORM ^7            |
 | Autenticação      | Better Auth (Credentials)           |
+| Senhas            | bcryptjs (hash, pure JS)            |
 | Upload de arquivos| Web API FormData (nativo)           |
 | Integração Jira   | ofetch (REST API v3)                |
 | Estilização       | Tailwind CSS v4                     |
@@ -48,6 +49,7 @@ ADMIN (login com email/senha)
 ## Pré-requisitos
 
 - Node.js 18+
+- npm ou yarn
 - Docker e Docker Compose (para produção)
 
 ## Instalação
@@ -76,20 +78,90 @@ npm run dev
 
 Acesse: `http://localhost:3000`
 
+## Credenciais Padrão (Desenvolvimento)
+
+| Email | Senha |
+|-------|-------|
+| admin@zscan.com | admin123 |
+
+## Status do Projeto
+
+| Fase | Descrição | Status |
+|------|-----------|--------|
+| 1 | Setup do Projeto | ✅ Concluída |
+| 2 | Formulário Público | ⏳ Pendente |
+| 3 | Autenticação e Login | ⏳ Pendente |
+| 4 | Painel Admin | ⏳ Pendente |
+| 5 | Integração Jira | ⏳ Pendente |
+| 6 | Gerenciar Admins | ⏳ Pendente |
+| 7 | Sistema de Auditoria | ⏳ Pendente |
+| 8 | Sistema de Backup | ⏳ Pendente |
+| 9 | Deploy com Docker | ⏳ Pendente |
+
 ## Estrutura do Projeto
 
 ```
 medic-resume/
 ├── app/
-│   ├── formulario/        # Formulário público (wizard)
-│   ├── login/             # Tela de login admin
-│   └── admin/             # Painel administrativo
-├── components/            # Componentes React
-├── actions/               # Server Actions
-├── lib/                   # Utilitários (Prisma, Auth, Jira)
-├── prisma/                # Schema e migrations
-└── data/uploads/          # Arquivos enviados (fora de public/)
+│   ├── globals.css            # Tailwind CSS v4
+│   ├── layout.tsx             # Layout raiz
+│   ├── page.tsx               # Página inicial
+│   ├── formulario/            # Formulário público (wizard)
+│   ├── login/                 # Tela de login admin
+│   └── admin/                 # Painel administrativo
+├── components/                # Componentes React
+│   ├── wizard/                # Componentes do formulário
+│   ├── admin/                 # Componentes do painel admin
+│   └── ui/                    # Componentes genéricos (Button, Input, etc.)
+├── actions/                   # Server Actions
+├── lib/
+│   ├── prisma.ts              # Singleton PrismaClient
+│   └── auth.ts                # Configuração Better Auth
+├── prisma/
+│   ├── schema.prisma          # Schema do banco de dados
+│   ├── seed.ts                # Seed do admin padrão
+│   └── migrations/            # Migrações do banco
+├── prisma.config.ts           # Configuração do Prisma v7
+├── .env                       # Variáveis de ambiente (não commitar)
+├── .env.example               # Template de variáveis de ambiente
+├── next.config.ts             # Configuração do Next.js
+├── tsconfig.json              # Configuração do TypeScript
+└── package.json               # Dependências do projeto
 ```
+
+## Comandos Úteis
+
+```bash
+# Desenvolvimento
+npm run dev                    # Iniciar servidor de desenvolvimento
+npm run build                  # Build de produção
+npm start                      # Iniciar servidor de produção
+npm run lint                   # Verificar código
+
+# Prisma
+npx prisma migrate dev         # Rodar migrações
+npx prisma db seed             # Criar admin padrão
+npx prisma studio              # Interface web para ver o banco
+npx prisma generate            # Gerar cliente Prisma
+
+# Docker
+docker compose up -d           # Iniciar serviços
+docker compose logs -f         # Ver logs
+docker compose down            # Parar serviços
+
+# Backup
+./scripts/backup.sh            # Backup manual
+```
+
+## Documentação
+
+| Documento | Descrição |
+|-----------|-----------|
+| [Contribuição](CONTRIBUTING.md) | Guia de contribuição, fluxo de trabalho e convenções |
+| [Desenvolvimento](docs/dev/) | Guia de desenvolvimento do projeto em geral |
+| [Planejamento](docs/PLANO.md) | Plano completo de implementação com schema do banco e detalhes técnicos |
+| [Tarefas estipuladas](docs/projeto/TAREFAS.md) | Tarefas paralelizáveis organizadas por nível de dificuldade |
+| [Fases do projeto](docs/projeto/fases/) | Documentação detalhada de cada fase de implementação |
 
 ## Estimativa de Implementação
 
@@ -106,15 +178,6 @@ medic-resume/
 | 9 | Deploy com Docker | 2-3h |
 
 **Total estimado:** 4-5 dias de trabalho integral (30-40 horas)
-
-## Documentação
-
-| Documento | Descrição |
-|-----------|-----------|
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Guia de contribuição, fluxo de trabalho e convenções |
-| [docs/PLANO.md](PLANO.md) | Plano completo de implementação com schema do banco e detalhes técnicos |
-| [docs/TAREFAS.md](docs/TAREFAS.md) | Tarefas paralelizáveis organizadas por nível de dificuldade |
-| [docs/fases/](docs/fases/) | Documentação detalhada de cada fase de implementação |
 
 ## Licença
 

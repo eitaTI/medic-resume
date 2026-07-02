@@ -1,6 +1,6 @@
 # Fase 1: Setup do Projeto
 
-Configuração inicial do projeto Next.js com Prisma e TypeScript.
+Configuração inicial do projeto Next.js com Prisma v7 e TypeScript.
 
 ## Objetivo
 
@@ -38,7 +38,10 @@ O Tailwind CSS v4+ dispensa `tailwind.config.ts` — a configuração é feita v
 npm install @prisma/client better-auth bcryptjs ofetch zod
 
 # Dependências de desenvolvimento
-npm install -D prisma @types/bcryptjs
+npm install -D prisma @types/bcryptjs dotenv
+
+# Adapter SQLite para Prisma v7
+npm install better-sqlite3 @prisma/adapter-better-sqlite3
 ```
 
 ### 3. Configurar Prisma
@@ -46,6 +49,11 @@ npm install -D prisma @types/bcryptjs
 ```bash
 npx prisma init --datasource-provider sqlite
 ```
+
+Isso cria:
+- `prisma/schema.prisma`
+- `prisma.config.ts`
+- `.env`
 
 ### 4. Criar schema.prisma
 
@@ -58,7 +66,6 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
 }
 
 model Admin {
@@ -67,6 +74,7 @@ model Admin {
   email     String     @unique
   senha     String
   createdAt DateTime   @default(now())
+  auditLogs AuditLog[]
 }
 
 model Clinica {
@@ -117,25 +125,68 @@ model Dispositivo {
   modelo      String
   numeroSerie String
 }
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  adminId    Int?
+  admin      Admin?   @relation(fields: [adminId], references: [id])
+  acao       String
+  entidade   String
+  entidadeId Int?
+  detalhes   String?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+}
 ```
 
-### 5. Rodar migração
+**Nota:** O Prisma v7 não suporta `url` no datasource. A URL é configurada em `prisma.config.ts`.
+
+### 5. Configurar prisma.config.ts
+
+Atualize `prisma.config.ts` para incluir o seed:
+
+```typescript
+import "dotenv/config";
+import { defineConfig } from "prisma/config";
+
+export default defineConfig({
+  schema: "prisma/schema.prisma",
+  migrations: {
+    path: "prisma/migrations",
+    seed: "npx tsx prisma/seed.ts",
+  },
+  datasource: {
+    url: process.env["DATABASE_URL"],
+  },
+});
+```
+
+### 6. Rodar migração
 
 ```bash
 npx prisma migrate dev --name init
 ```
 
-### 6. Criar variáveis de ambiente
+### 7. Criar variáveis de ambiente
 
-Crie `.env` na raiz:
+Atualize `.env` na raiz:
 
 ```env
-DATABASE_URL=file:./dev.db
+# Better Auth
 BETTER_AUTH_SECRET=dev_secret_32_chars_minimum_len_example
 BETTER_AUTH_URL=http://localhost:3000
+
+# Jira (usado apenas na aprovação)
+JIRA_BASE_URL=https://sua-empresa.atlassian.net
+JIRA_EMAIL=seu-email@empresa.com
+JIRA_API_TOKEN=seu_token_aqui
+JIRA_PROJECT_KEY=ZSCAN
+
+# Database
+DATABASE_URL=file:./dev.db
 ```
 
-### 6.5 Criar .env.example
+### 7.5 Criar .env.example
 
 Crie `.env.example` na raiz (sem valores sensíveis):
 
@@ -154,15 +205,20 @@ JIRA_PROJECT_KEY=ZSCAN
 DATABASE_URL=file:./dev.db
 ```
 
-### 7. Criar seed do admin
+### 8. Criar seed do admin
 
 Crie `prisma/seed.ts`:
 
 ```typescript
 import { PrismaClient } from '@prisma/client';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient();
+const adapter = new PrismaBetterSqlite3({
+  url: process.env.DATABASE_URL || 'file:./prisma/dev.db',
+});
+
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   const senhaHash = await bcrypt.hash('admin123', 10);
@@ -183,24 +239,36 @@ async function main() {
 main();
 ```
 
-### 8. Rodar seed
+### 9. Gerar cliente Prisma e rodar seed
 
 ```bash
+# Gerar cliente Prisma
+npx prisma generate
+
+# Rodar seed
 npx prisma db seed
 ```
 
-### 8.5 Configurar Better Auth
+### 10. Configurar Better Auth
 
-Crie `lib/prisma.ts` (singleton):
+Crie `lib/prisma.ts` (singleton com adapter):
 
 ```typescript
 import { PrismaClient } from '@prisma/client'
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3'
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient()
+function createPrismaClient() {
+  const adapter = new PrismaBetterSqlite3({
+    url: process.env.DATABASE_URL || 'file:./prisma/dev.db',
+  })
+  return new PrismaClient({ adapter })
+}
+
+export const prisma = globalForPrisma.prisma ?? createPrismaClient()
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 ```
@@ -222,17 +290,22 @@ export const auth = betterAuth({
 })
 ```
 
+### 11. Atualizar package.json
+
 Adicione ao `package.json`:
 
 ```json
 {
   "scripts": {
     "postinstall": "prisma generate"
+  },
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
   }
 }
 ```
 
-### 9. Testar
+### 12. Testar
 
 ```bash
 npm run dev
@@ -246,7 +319,9 @@ Acesse `http://localhost:3000` e veja se o projeto carrega.
 medic-resume/
 ├── prisma/
 │   ├── schema.prisma
-│   └── seed.ts
+│   ├── seed.ts
+│   └── migrations/
+├── prisma.config.ts
 ├── lib/
 │   ├── prisma.ts
 │   └── auth.ts
@@ -268,6 +343,9 @@ npx prisma migrate reset
 
 # Gerar cliente Prisma
 npx prisma generate
+
+# Rodar seed novamente
+npx prisma db seed
 ```
 
 ## Problemas Comuns
@@ -278,3 +356,5 @@ npx prisma generate
 | Erro "admin already exists" | O seed usa `upsert`, é seguro rodar novamente |
 | Porta 3000 em uso | Use `npm run dev -- -p 3001` |
 | Better Auth não funciona | Verifique se `BETTER_AUTH_SECRET` tem 32+ caracteres no `.env` |
+| PrismaClient erro de construção | Verifique se `lib/prisma.ts` usa o adapter `PrismaBetterSqlite3` |
+| Seed falha | Execute `npx prisma generate` antes do seed |

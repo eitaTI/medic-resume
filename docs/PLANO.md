@@ -51,7 +51,6 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
 }
 
 model Admin {
@@ -188,8 +187,10 @@ medic-resume/
 │
 ├── prisma/
 │   ├── schema.prisma
-│   └── seed.ts
+│   ├── seed.ts
+│   └── migrations/
 │
+├── prisma.config.ts
 ├── data/
 │   └── uploads/                          # fora de public/ (segurança LGPD)
 │
@@ -227,6 +228,60 @@ medic-resume/
     "@types/bcryptjs": "^2"
   }
 }
+```
+
+---
+
+## Configuração Prisma v7
+
+O Prisma v7, mudanças importantes:
+
+### Arquivo `prisma.config.ts`
+
+```typescript
+import "dotenv/config";
+import { defineConfig } from "prisma/config";
+
+export default defineConfig({
+  schema: "prisma/schema.prisma",
+  migrations: {
+    path: "prisma/migrations",
+    seed: "npx tsx prisma/seed.ts",
+  },
+  datasource: {
+    url: process.env["DATABASE_URL"],
+  },
+});
+```
+
+### Adapter para SQLite
+
+O Prisma v7 requer um adapter para SQLite:
+
+```bash
+npm install better-sqlite3 @prisma/adapter-better-sqlite3
+```
+
+### `lib/prisma.ts` (singleton)
+
+```typescript
+import { PrismaClient } from '@prisma/client'
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3'
+
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined
+}
+
+function createPrismaClient() {
+  const adapter = new PrismaBetterSqlite3({
+    url: process.env.DATABASE_URL || 'file:./prisma/dev.db',
+  })
+  return new PrismaClient({ adapter })
+}
+
+export const prisma = globalForPrisma.prisma ?? createPrismaClient()
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 ```
 
 ---
@@ -271,9 +326,14 @@ DATABASE_URL=file:./dev.db
 ```typescript
 // prisma/seed.ts
 import { PrismaClient } from '@prisma/client';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient();
+const adapter = new PrismaBetterSqlite3({
+  url: process.env.DATABASE_URL || 'file:./prisma/dev.db',
+});
+
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   const senhaHash = await bcrypt.hash('admin123', 10);
@@ -537,16 +597,16 @@ Após criação, a chave do issue (ex: `ZSCAN-42`) é salva em `Clinica.jiraIssu
 
 ### Fase 1: Setup do Projeto
 
-- [ ] `npx create-next-app@latest medic-resume --ts --tailwind --app --src-dir=false`
-- [ ] Configurar `globals.css` com `@import "tailwindcss"` (Tailwind v4, sem `tailwind.config.ts`)
-- [ ] Instalar dependências: `prisma ^7`, `@prisma/client ^7`, `better-auth`, `bcryptjs`, `ofetch`, `zod`
-- [ ] `npx prisma init` com SQLite
-- [ ] Criar `schema.prisma` com modelos `Admin`, `Clinica`, `Medico`, `Exame`, `Dispositivo`
-- [ ] Rodar `npx prisma migrate dev --name init`
-- [ ] Criar `prisma/seed.ts` (admin padrão com bcryptjs)
-- [ ] Configurar `.env` e `.env.example`
-- [ ] Configurar Better Auth (`lib/auth.ts` com Credentials provider + Prisma adapter)
-- [ ] Rodar `npx prisma db seed`
+- [x] `npx create-next-app@latest medic-resume --ts --tailwind --app --src-dir=false`
+- [x] Configurar `globals.css` com `@import "tailwindcss"` (Tailwind v4, sem `tailwind.config.ts`)
+- [x] Instalar dependências: `prisma ^7`, `@prisma/client ^7`, `better-auth`, `bcryptjs`, `ofetch`, `zod`
+- [x] `npx prisma init` com SQLite
+- [x] Criar `schema.prisma` com modelos `Admin`, `Clinica`, `Medico`, `Exame`, `Dispositivo`
+- [x] Rodar `npx prisma migrate dev --name init`
+- [x] Criar `prisma/seed.ts` (admin padrão com bcryptjs)
+- [x] Configurar `.env` e `.env.example`
+- [x] Configurar Better Auth (`lib/auth.ts` com Credentials provider + Prisma adapter)
+- [x] Rodar `npx prisma db seed`
 
 ### Fase 2: Formulário Público
 
@@ -655,5 +715,5 @@ docker compose down
 
 # Backup
 ./scripts/backup.sh                      # backup manual
-sqlite3 prisma/dev.db .backup backup.db  # backup rápido do banco
+sqlite3 prisma/dev.db .backup backup.db  # backup rápido do banco 
 ```

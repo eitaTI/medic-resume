@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Admin {
+  id        Int        @id @default(autoincrement())
+  nome      String
+  email     String     @unique
+  senha     String
+  createdAt DateTime   @default(now())
+  auditLogs AuditLog[]
+}
+
+model Clinica {
+  id                Int       @id @default(autoincrement())
+  nomeEmpresa       String
+  nomeClinica       String
+  nomeTitular       String
+  emailTitular      String
+  quantidadeMedicos Int
+  logoPath          String?
+  cabecalhoLaudo    String?   @default("")
+  rodapeLaudo       String?   @default("")
+  status            String    @default("PENDENTE")
+  motivoRejeicao    String?
+  jiraIssueKey      String?
+  createdAt         DateTime  @default(now())
+  reviewedAt        DateTime?
+
+  medicos      Medico[]
+  exames       Exame[]
+  dispositivos Dispositivo[]
+}
+
+model Medico {
+  id             Int     @id @default(autoincrement())
+  clinicaId      Int
+  clinica        Clinica @relation(fields: [clinicaId], references: [id])
+  nome           String
+  documento      String
+  email          String
+  assinaturaPath String?
+}
+
+model Exame {
+  id         Int     @id @default(autoincrement())
+  clinicaId  Int
+  clinica    Clinica @relation(fields: [clinicaId], references: [id])
+  nome       String
+  laudoPath  String?
+}
+
+model Dispositivo {
+  id          Int     @id @default(autoincrement())
+  clinicaId   Int
+  clinica     Clinica @relation(fields: [clinicaId], references: [id])
+  tipo        String
+  marca       String
+  modelo      String
+  numeroSerie String
+}
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  adminId    Int?
+  admin      Admin?   @relation(fields: [adminId], references: [id])
+  acao       String
+  entidade   String
+  entidadeId Int?
+  detalhes   String?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+}

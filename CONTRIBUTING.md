@@ -17,9 +17,17 @@ npm install
 # Configure o ambiente
 cp .env.example .env
 
+# Rode migrações do banco
+npx prisma migrate dev
+
+# Crie o admin padrão
+npx prisma db seed
+
 # Rode o projeto
 npm run dev
 ```
+
+**Nota sobre Prisma v7:** O projeto usa Prisma v7 com adapter para SQLite. O `lib/prisma.ts` já está configurado com o adapter `PrismaBetterSqlite3`.
 
 ### 2. Criando uma Branch
 
@@ -107,6 +115,11 @@ medic-resume/
 ├── docs/             # Documentação detalhada por fase
 └── public/           # Arquivos estáticos (imagens públicas)
 ```
+
+**Arquivos importantes:**
+- `prisma.config.ts` — Configuração do Prisma v7
+- `lib/prisma.ts` — Singleton PrismaClient com adapter
+- `lib/auth.ts` — Configuração do Better Auth
 
 ## Componentes UI
 
