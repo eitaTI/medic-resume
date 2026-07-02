@@ -2,6 +2,7 @@
 
 Sistema de formulário para coleta de dados de clínicas médicas, facilitando o cadastro e implementação de sistemas ZScan.
 
+
 ## Visão Geral
 
 O sistema permite que clínicas preencham um formulário completo (empresa, médicos, exames, dispositivos) que passa por revisão administrativa antes de ser integrado ao Jira para implantação.
