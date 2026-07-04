@@ -6,6 +6,12 @@ Wizard de 4 etapas para coleta de dados de clínicas.
 
 Criar um formulário completo onde clínicas preenchem seus dados antes de enviar para revisão.
 
+### Concluido
+
+[x] Inicio de componentes para formulários: page.tsx | StepMedicos.tsx 
+
+
+
 ## Estrutura do Wizard
 
 ```
