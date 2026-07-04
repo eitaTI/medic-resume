@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Stepper } from '@/components/wizard/Stepper'
 import { StepClinica } from '@/components/wizard/StepClinica'
+import { StepMedicos } from '@/components/wizard/StepMedicos'
 import { Button } from '@/components/ui/Button'
 
 const LABELS = ['Clínica', 'Médicos', 'Exames', 'Dispositivos']
@@ -10,6 +11,7 @@ const LABELS = ['Clínica', 'Médicos', 'Exames', 'Dispositivos']
 export default function FormularioPage() {
   const [passoAtual, setPassoAtual] = useState(0)
   const [dadosClinica, setDadosClinica] = useState({})
+  const [dadosMedicos, setDadosMedicos] = useState([{ nome: '', documento: '', email: '' }])
 
   const proximoPasso = () => {
     if (passoAtual < 3) setPassoAtual(passoAtual + 1)
@@ -32,7 +34,14 @@ export default function FormularioPage() {
         />
       )}
 
-      {passoAtual >= 1 && (
+      {passoAtual === 1 && (
+        <StepMedicos
+          medicos={dadosMedicos}
+          onChange={setDadosMedicos}
+        />
+      )}
+
+      {passoAtual >= 2 && (
         <div className="p-8 text-center text-gray-400 border-2 border-dashed rounded-lg">
           Etapa {passoAtual + 1} — em desenvolvimento
         </div>
