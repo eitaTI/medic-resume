@@ -4,11 +4,18 @@ import { Input } from '@/components/ui/Input'
 import { FileUpload } from '@/components/ui/FileUpload'
 import { Button } from '@/components/ui/Button'
 
+let medicoIdCounter = 0
+
 export interface Medico {
+  id: string
   nome: string
   documento: string
   email: string
   assinatura?: File
+}
+
+export function criarMedicoVazio(): Medico {
+  return { id: `medico_${++medicoIdCounter}`, nome: '', documento: '', email: '' }
 }
 
 interface StepMedicosProps {
@@ -18,7 +25,7 @@ interface StepMedicosProps {
 
 export function StepMedicos({ medicos, onChange }: StepMedicosProps) {
   const adicionarMedico = () => {
-    onChange([...medicos, { nome: '', documento: '', email: '' }])
+    onChange([...medicos, criarMedicoVazio()])
   }
 
   const removerMedico = (index: number) => {
@@ -36,7 +43,7 @@ export function StepMedicos({ medicos, onChange }: StepMedicosProps) {
       <h2 className="text-xl font-bold">Médicos</h2>
 
       {medicos.map((medico, index) => (
-        <div key={index} className="p-4 border rounded-lg space-y-3">
+        <div key={medico.id} className="p-4 border rounded-lg space-y-3">
           <div className="flex justify-between items-center">
             <h3 className="font-medium">Médico {index + 1}</h3>
             <Button

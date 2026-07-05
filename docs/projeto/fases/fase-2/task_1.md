@@ -9,6 +9,10 @@ Criar `components/ui/Button.tsx`:
 - Desabilitado → `opacity-50`
 - Estender `React.ButtonHTMLAttributes<HTMLButtonElement>`
 
+## Correção aplicada
+
+Adicionado `disabled:cursor-not-allowed` — sem essa classe, o cursor não muda para "não permitido" quando o botão está desabilitado, dando a impressão de que o botão é clicável mesmo estando desabilitado.
+
 ## Commit
 
 ```

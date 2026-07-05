@@ -8,6 +8,10 @@ Criar `components/ui/Input.tsx`:
 - Input com borda arredondada, foco com ring azul (`focus:ring-2 focus:ring-blue-500`)
 - Estender `React.InputHTMLAttributes<HTMLInputElement>`
 
+## Correção aplicada
+
+Adicionado `htmlFor` no `<label>` e `id` no `<input>` (gerado via `useId()` do React) — sem essa associação, clicar no label não foca o input, violando diretrizes de acessibilidade (WCAG). O `useId()` garante IDs únicos mesmo com múltiplas instâncias do componente na mesma página.
+
 ## Commit
 
 ```

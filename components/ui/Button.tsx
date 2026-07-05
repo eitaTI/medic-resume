@@ -19,7 +19,7 @@ export function Button({ variante = 'primario', tamanho = 'normal', className, .
 
   return (
     <button
-      className={`rounded-lg font-medium transition-colors disabled:opacity-50 ${estilos[variante]} ${tamanhos[tamanho]} ${className || ''}`}
+      className={`rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${estilos[variante]} ${tamanhos[tamanho]} ${className || ''}`}
       {...props}
     />
   )

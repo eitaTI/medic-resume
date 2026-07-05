@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useId } from 'react'
 import Image from 'next/image'
 
 interface FileUploadProps {
@@ -12,6 +12,7 @@ interface FileUploadProps {
 export function FileUpload({ label, accept, onFile }: FileUploadProps) {
   const [preview, setPreview] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const inputId = useId()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -33,8 +34,9 @@ export function FileUpload({ label, accept, onFile }: FileUploadProps) {
 
   return (
     <div className="space-y-1">
-      <label className="block text-sm font-medium text-gray-700">{label}</label>
+      <label htmlFor={inputId} className="block text-sm font-medium text-gray-700">{label}</label>
       <input
+        id={inputId}
         ref={inputRef}
         type="file"
         accept={accept}
