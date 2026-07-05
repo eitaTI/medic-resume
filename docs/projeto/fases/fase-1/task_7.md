@@ -5,6 +5,7 @@
 Criar `lib/prisma.ts`:
 - Singleton do `PrismaClient` com adapter `PrismaBetterSqlite3`
 - Reutilizar em dev via `globalThis`
+- URL do banco via `DATABASE_URL` com fallback `file:./dev.db` (arquivo na raiz, não em `prisma/`)
 
 ## Commit
 

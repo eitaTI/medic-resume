@@ -5,13 +5,15 @@ import { Stepper } from '@/components/wizard/Stepper'
 import { StepClinica } from '@/components/wizard/StepClinica'
 import { StepMedicos } from '@/components/wizard/StepMedicos'
 import { Button } from '@/components/ui/Button'
+import type { DadosClinica } from '@/components/wizard/StepClinica'
+import type { Medico } from '@/components/wizard/StepMedicos'
 
 const LABELS = ['Clínica', 'Médicos', 'Exames', 'Dispositivos']
 
 export default function FormularioPage() {
   const [passoAtual, setPassoAtual] = useState(0)
-  const [dadosClinica, setDadosClinica] = useState({})
-  const [dadosMedicos, setDadosMedicos] = useState([{ nome: '', documento: '', email: '' }])
+  const [dadosClinica, setDadosClinica] = useState<DadosClinica>({})
+  const [dadosMedicos, setDadosMedicos] = useState<Medico[]>([{ nome: '', documento: '', email: '' }])
 
   const proximoPasso = () => {
     if (passoAtual < 3) setPassoAtual(passoAtual + 1)

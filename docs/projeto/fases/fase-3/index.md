@@ -6,7 +6,7 @@ Sistema de autenticação para o painel administrativo.
 
 | Componente | Status |
 |-----------|--------|
-| Better Auth configurado (`lib/auth.ts`) | ✅ Concluído |
+| Better Auth configurado (`lib/auth.ts` + rota API) | ✅ Concluído |
 | Server Action de login (`actions/login.ts`) | ❌ Pendente |
 | Tela de login (`app/login/page.tsx`) | ❌ Pendente |
 | Middleware de proteção (`middleware.ts`) | ❌ Pendente |
@@ -23,7 +23,7 @@ Sistema de autenticação para o painel administrativo.
 ## Fluxo
 
 ```
-/login → preenche email+senha → action login → Better Auth valida → cookie de sessão → redireciona /admin
+/login → preenche email+senha → action login → POST /api/auth/[...all] (Better Auth) → cookie → /admin
                                                                                               ↑
 Middleware: /admin sem cookie → redireciona /login  ──────────────────────────────────────────┘
 ```

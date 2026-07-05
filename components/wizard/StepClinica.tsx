@@ -3,9 +3,18 @@
 import { Input } from '@/components/ui/Input'
 import { FileUpload } from '@/components/ui/FileUpload'
 
+export interface DadosClinica {
+  nomeEmpresa?: string
+  nomeClinica?: string
+  nomeTitular?: string
+  emailTitular?: string
+  quantidadeMedicos?: number
+  logo?: File
+}
+
 interface StepClinicaProps {
-  dados: any
-  onChange: (dados: any) => void
+  dados: DadosClinica
+  onChange: (dados: DadosClinica) => void
 }
 
 export function StepClinica({ dados, onChange }: StepClinicaProps) {

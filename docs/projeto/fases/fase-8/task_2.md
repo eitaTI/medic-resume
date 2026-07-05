@@ -7,7 +7,7 @@ Criar `scripts/restore.sh`:
 - Se não informado, listar backups disponíveis e sair com uso
 - Restaurar banco: copiar `backups/db_TIMESTAMP.db` para `prisma/dev.db`
 - Restaurar uploads: extrair `backups/uploads_TIMESTAMP.tar.gz` para raiz
-- Mensagem final com instrução `npm run dev`
+- Mensagem final com instrução `pnpm dev`
 - Tornar executável: `chmod +x scripts/restore.sh`
 
 ## Commit

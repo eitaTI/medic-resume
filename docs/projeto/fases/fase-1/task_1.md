@@ -2,7 +2,7 @@
 
 ✅ **Concluído**
 
-- `npx create-next-app@latest medic-resume --ts --tailwind --app --src-dir=false`
+- `pnpm create next-app@latest medic-resume --ts --tailwind --app --src-dir=false`
 - Configurar `app/globals.css` com `@import "tailwindcss"` (Tailwind v4+ dispensa config)
 
 ## Commit

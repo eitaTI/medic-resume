@@ -3,9 +3,9 @@
 ✅ **Concluído**
 
 ```bash
-npm install @prisma/client better-auth bcryptjs ofetch zod
-npm install -D prisma @types/bcryptjs dotenv
-npm install better-sqlite3 @prisma/adapter-better-sqlite3
+pnpm add @prisma/client better-auth bcryptjs ofetch zod
+pnpm add -D prisma @types/bcryptjs dotenv
+pnpm add better-sqlite3 @prisma/adapter-better-sqlite3
 ```
 
 ## Commit

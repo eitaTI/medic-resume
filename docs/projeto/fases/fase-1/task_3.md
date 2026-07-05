@@ -2,7 +2,7 @@
 
 ✅ **Concluído**
 
-- `npx prisma init --datasource-provider sqlite`
+- `pnpm prisma init --datasource-provider sqlite`
 - Criar modelos: `Admin`, `Clinica`, `Medico`, `Exame`, `Dispositivo`, `AuditLog`
 - Configurar `prisma.config.ts` com seed path e datasource url
 

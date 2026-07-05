@@ -14,7 +14,7 @@ Adicionar modelo `AuditLog` no `prisma/schema.prisma`:
 
 Executar migração:
 ```
-npx prisma migrate dev --name add-audit-log
+pnpm prisma migrate dev --name add-audit-log
 ```
 
 ## Commit

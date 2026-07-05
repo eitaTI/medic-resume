@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import Image from 'next/image'
 
 interface FileUploadProps {
   label: string
@@ -41,7 +42,7 @@ export function FileUpload({ label, accept, onFile }: FileUploadProps) {
         className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
       />
       {preview && (
-        <img src={preview} alt="Preview" className="mt-2 max-h-32 rounded border" />
+        <Image src={preview} alt="Preview" width={0} height={0} className="mt-2 max-h-32 w-auto rounded border" sizes="100vw" unoptimized />
       )}
     </div>
   )

@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/Input'
 import { FileUpload } from '@/components/ui/FileUpload'
 import { Button } from '@/components/ui/Button'
 
-interface Medico {
+export interface Medico {
   nome: string
   documento: string
   email: string
