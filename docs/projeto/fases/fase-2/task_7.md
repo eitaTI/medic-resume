@@ -1,6 +1,6 @@
 # Task 7: Componente StepExames
 
-❌ **Pendente** — criar `components/wizard/StepExames.tsx`
+✅ **Concluído** — criar `components/wizard/StepExames.tsx`
 
 Criar `components/wizard/StepExames.tsx`:
 - Componente `'use client'` com props `cabecalho`, `rodape`, `exames` (array), `onChange`
