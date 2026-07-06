@@ -20,7 +20,7 @@ interface StepClinicaProps {
 export function StepClinica({ dados, onChange }: StepClinicaProps) {
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-bold">Dados da Clínica</h2>
+      <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Dados da Clínica</h2>
 
       <Input
         label="Nome da Empresa"

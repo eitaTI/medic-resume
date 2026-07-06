@@ -35,12 +35,12 @@ export function StepDispositivos({ dispositivos, onChange }: StepDispositivosPro
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-bold">Dispositivos</h2>
+      <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Dispositivos</h2>
 
       {dispositivos.map((dispositivo, index) => (
-        <div key={index} className="p-4 border rounded-lg space-y-3">
+        <div key={index} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3 bg-white dark:bg-gray-800">
           <div className="flex justify-between items-center">
-            <h3 className="font-medium">Dispositivo {index + 1}</h3>
+            <h3 className="font-medium text-gray-900 dark:text-gray-100">Dispositivo {index + 1}</h3>
             <Button
               variante="perigo"
               tamanho="pequeno"

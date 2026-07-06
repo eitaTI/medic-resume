@@ -37,12 +37,12 @@ export function StepMedicos({ medicos, onChange }: StepMedicosProps) {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-bold">Médicos</h2>
+      <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Médicos</h2>
 
       {medicos.map((medico, index) => (
-        <div key={index} className="p-4 border rounded-lg space-y-3">
+        <div key={index} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3 bg-white dark:bg-gray-800">
           <div className="flex justify-between items-center">
-            <h3 className="font-medium">Médico {index + 1}</h3>
+            <h3 className="font-medium text-gray-900 dark:text-gray-100">Médico {index + 1}</h3>
             <Button
               variante="perigo"
               tamanho="pequeno"

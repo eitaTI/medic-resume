@@ -34,14 +34,14 @@ export function FileUpload({ label, accept, onFile }: FileUploadProps) {
 
   return (
     <div className="space-y-1">
-      <label htmlFor={inputId} className="block text-sm font-medium text-gray-700">{label}</label>
+      <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 dark:text-gray-200">{label}</label>
       <input
         id={inputId}
         ref={inputRef}
         type="file"
         accept={accept}
         onChange={handleChange}
-        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+        className="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 dark:file:bg-blue-900 file:text-blue-700 dark:file:text-blue-200 hover:file:bg-blue-100 dark:hover:file:bg-blue-800"
       />
       {preview && (
         <div className="mt-2 max-h-32 relative">
