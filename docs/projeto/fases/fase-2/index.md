@@ -33,6 +33,6 @@ Wizard de 4 etapas para coleta de dados de clínicas.
 | 6 | `task_6.md` | Componente StepMedicos | ✅ Concluído |
 | 7 | `task_7.md` | Componente StepExames | ❌ Pendente |
 | 8 | `task_8.md` | Componente StepDispositivos | ❌ Pendente |
-| 9 | `task_9.md` | Esquemas de validação Zod | ❌ Pendente |
+| 9 | `task_9.md` | Esquemas de validação Zod | ✅ Concluído |
 | 10 | `task_10.md` | Server Action de submissão | ❌ Pendente |
 | 11 | `task_11.md` | Página principal do Wizard | ⚠️ Parcial |

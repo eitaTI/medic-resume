@@ -1,6 +1,6 @@
 # Task 9: Esquemas de validação Zod
 
-❌ **Pendente** — criar `lib/validacoes.ts`
+✅ **Concluído** — `lib/validacoes.ts` criado com schemas Zod
 
 Criar `lib/validacoes.ts`:
 - Schema `clinica`: `nomeEmpresa` (min 1), `nomeClinica` (min 1), `nomeTitular` (min 1), `emailTitular` (email), `quantidadeMedicos` (number min 1)

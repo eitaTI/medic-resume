@@ -2,19 +2,11 @@
 
 import { Input } from '@/components/ui/Input'
 import { FileUpload } from '@/components/ui/FileUpload'
-
-export interface DadosClinica {
-  nomeEmpresa?: string
-  nomeClinica?: string
-  nomeTitular?: string
-  emailTitular?: string
-  quantidadeMedicos?: number
-  logo?: File
-}
+import type { DadosClinica } from '@/lib/validacoes'
 
 interface StepClinicaProps {
-  dados: DadosClinica
-  onChange: (dados: DadosClinica) => void
+  dados: Partial<DadosClinica>
+  onChange: (dados: Partial<DadosClinica>) => void
 }
 
 export function StepClinica({ dados, onChange }: StepClinicaProps) {

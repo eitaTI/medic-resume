@@ -6,8 +6,7 @@ import { StepClinica } from '@/components/wizard/StepClinica'
 import { StepMedicos, criarMedicoVazio } from '@/components/wizard/StepMedicos'
 import { StepDispositivos } from '@/components/wizard/StepDispositivos'
 import { Button } from '@/components/ui/Button'
-import type { DadosClinica } from '@/components/wizard/StepClinica'
-import type { Medico } from '@/components/wizard/StepMedicos'
+import type { DadosClinica, Medico } from '@/lib/validacoes'
 
 const LABELS = ['Clínica', 'Médicos', 'Exames', 'Dispositivos']
 

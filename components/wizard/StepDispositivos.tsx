@@ -2,13 +2,7 @@
 
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
-
-interface Dispositivo {
-  tipo: string
-  marca: string
-  modelo: string
-  numeroSerie: string
-}
+import type { Dispositivo } from '@/lib/validacoes'
 
 interface StepDispositivosProps {
   dispositivos: Dispositivo[]

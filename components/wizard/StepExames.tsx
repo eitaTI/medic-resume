@@ -3,14 +3,7 @@
 import { Input } from '@/components/ui/Input'
 import { FileUpload } from '@/components/ui/FileUpload'
 import { Button } from '@/components/ui/Button'
-
-// Interface que representa um exame médico
-// nome: nome do exame (ex: "Hemograma", "Raio-X")
-// laudo: arquivo PDF do laudo (opcional)
-export interface Exame {
-  nome: string
-  laudo?: File
-}
+import type { Exame } from '@/lib/validacoes'
 
 // Contador para gerar IDs únicos para cada exame
 let exameIdCounter = 0

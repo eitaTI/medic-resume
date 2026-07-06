@@ -3,13 +3,7 @@
 import { Input } from '@/components/ui/Input'
 import { FileUpload } from '@/components/ui/FileUpload'
 import { Button } from '@/components/ui/Button'
-
-export interface Medico {
-  nome: string
-  documento: string
-  email: string
-  assinatura?: File
-}
+import type { Medico } from '@/lib/validacoes'
 
 interface StepMedicosProps {
   medicos: Medico[]
