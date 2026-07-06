@@ -1,6 +1,6 @@
 # Task 1: Dockerfile
 
-❌ **Pendente** — criar `Dockerfile`
+✅ **Concluído** — `Dockerfile` multi-stage criado
 
 Criar `Dockerfile` multi-stage:
 - **Stage builder**: imagem `node:18-alpine`, copiar `package.json` + `pnpm-lock.yaml`, `pnpm install --frozen-lockfile`, copiar código, `pnpm prisma generate`, `pnpm build`

@@ -6,7 +6,7 @@ Containerização e deploy em produção.
 
 | Componente | Status |
 |-----------|--------|
-| Dockerfile | ❌ Pendente |
+| Dockerfile | ✅ Concluído |
 | .dockerignore | ❌ Pendente |
 | docker-compose.yml completo | ❌ Pendente |
 | .env.production + build/deploy | ❌ Pendente |
@@ -16,7 +16,7 @@ Containerização e deploy em produção.
 
 | # | Arquivo | Descrição | Status |
 |---|---------|-----------|--------|
-| 1 | `task_1.md` | Dockerfile multi-stage | ❌ Pendente |
+| 1 | `task_1.md` | Dockerfile multi-stage | ✅ Concluído |
 | 2 | `task_2.md` | .dockerignore | ❌ Pendente |
 | 3 | `task_3.md` | docker-compose.yml completo | ❌ Pendente |
 | 4 | `task_4.md` | .env.production + build/deploy | ❌ Pendente |
