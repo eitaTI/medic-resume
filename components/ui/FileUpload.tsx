@@ -44,7 +44,16 @@ export function FileUpload({ label, accept, onFile }: FileUploadProps) {
         className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
       />
       {preview && (
-        <Image src={preview} alt="Preview" width={0} height={0} className="mt-2 max-h-32 w-auto rounded border" sizes="100vw" unoptimized />
+        <div className="mt-2 max-h-32 relative">
+          <Image
+            src={preview}
+            alt="Preview"
+            fill
+            className="rounded border object-contain"
+            sizes="100vw"
+            unoptimized
+          />
+        </div>
       )}
     </div>
   )
