@@ -6,16 +6,19 @@ export const clinicaSchema = z.object({
   nomeTitular: z.string().min(1, "Nome do titular é obrigatório"),
   emailTitular: z.string().email("Email inválido"),
   quantidadeMedicos: z.number().min(1, "Pelo menos 1 médico"),
+  logo: z.instanceof(File).optional(),
 })
 
 export const medicoSchema = z.object({
   nome: z.string().min(1, "Nome do médico é obrigatório"),
   documento: z.string().min(1, "Documento é obrigatório"),
   email: z.string().email("Email inválido"),
+  assinatura: z.instanceof(File).optional(),
 })
 
 export const exameSchema = z.object({
   nome: z.string().min(1, "Nome do exame é obrigatório"),
+  laudo: z.instanceof(File).optional(),
 })
 
 export const dispositivoSchema = z.object({

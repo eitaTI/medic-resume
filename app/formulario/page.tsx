@@ -12,7 +12,7 @@ const LABELS = ['Clínica', 'Médicos', 'Exames', 'Dispositivos']
 
 export default function FormularioPage() {
   const [passoAtual, setPassoAtual] = useState(0)
-  const [dadosClinica, setDadosClinica] = useState<DadosClinica>({})
+  const [dadosClinica, setDadosClinica] = useState<Partial<DadosClinica>>({})
   const [dadosMedicos, setDadosMedicos] = useState<Medico[]>([criarMedicoVazio()])
   const [dadosDispositivos, setDadosDispositivos] = useState([{ tipo: '', marca: '', modelo: '', numeroSerie: '' }])
 
