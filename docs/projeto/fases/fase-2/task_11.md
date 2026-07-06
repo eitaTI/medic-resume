@@ -1,6 +1,10 @@
 # Task 11: Página principal do Wizard
 
+<<<<<<< HEAD
 ⚠️ **Parcial** — `app/formulario/page.tsx` existe mas incompleto
+=======
+✅ **Concluído** — `app/formulario/page.tsx` 
+>>>>>>> e613d18c58f7394b800433c1e8b35ec38f09e968
 
 **Já implementado:**
 - Stepper com 4 labels
@@ -28,3 +32,12 @@ Substituir a navegação por submissão no último passo:
 ```
 feat(wizard): completar página principal com etapas 2-3 e submissão via useActionState
 ```
+
+### Realizado (ft. Bruno)
+
+- Etapa 2 (StepExames) funcional com states `cabecalhoLaudo`, `rodapeLaudo`, `dadosExames`
+- Etapa 3 (StepDispositivos) funcional com state `dadosDispositivos`
+- Botões "Anterior" e "Próximo" com navegação entre etapas
+- Último passo substitui "Próximo" por "Enviar Formulário"
+- Submissão via `useActionState` com `submeterFormulario`
+- Montagem programática de FormData a partir dos states
