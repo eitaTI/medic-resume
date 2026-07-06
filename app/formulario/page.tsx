@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Stepper } from '@/components/wizard/Stepper'
 import { StepClinica } from '@/components/wizard/StepClinica'
 import { StepMedicos, criarMedicoVazio } from '@/components/wizard/StepMedicos'
+import { StepDispositivos } from '@/components/wizard/StepDispositivos'
 import { Button } from '@/components/ui/Button'
 import type { DadosClinica } from '@/components/wizard/StepClinica'
 import type { Medico } from '@/components/wizard/StepMedicos'
@@ -14,6 +15,7 @@ export default function FormularioPage() {
   const [passoAtual, setPassoAtual] = useState(0)
   const [dadosClinica, setDadosClinica] = useState<DadosClinica>({})
   const [dadosMedicos, setDadosMedicos] = useState<Medico[]>([criarMedicoVazio()])
+  const [dadosDispositivos, setDadosDispositivos] = useState([{ tipo: '', marca: '', modelo: '', numeroSerie: '' }])
 
   const proximoPasso = () => {
     if (passoAtual < 3) setPassoAtual(passoAtual + 1)
@@ -30,34 +32,27 @@ export default function FormularioPage() {
       <Stepper passoAtual={passoAtual} totalPassos={4} labels={LABELS} />
 
       {passoAtual === 0 && (
-        <StepClinica
-          dados={dadosClinica}
-          onChange={setDadosClinica}
-        />
+        <StepClinica dados={dadosClinica} onChange={setDadosClinica} />
       )}
 
       {passoAtual === 1 && (
-        <StepMedicos
-          medicos={dadosMedicos}
-          onChange={setDadosMedicos}
-        />
+        <StepMedicos medicos={dadosMedicos} onChange={setDadosMedicos} />
       )}
 
-      {passoAtual >= 2 && (
+      {passoAtual === 2 && (
         <div className="p-8 text-center text-gray-400 border-2 border-dashed rounded-lg">
-          Etapa {passoAtual + 1} — em desenvolvimento
+          Etapa 3 — em desenvolvimento
         </div>
       )}
 
+      {passoAtual === 3 && (
+        <StepDispositivos dispositivos={dadosDispositivos} onChange={setDadosDispositivos} />
+      )}
+
       <div className="flex justify-between mt-8">
-        <Button
-          variante="secundario"
-          onClick={passoAnterior}
-          disabled={passoAtual === 0}
-        >
+        <Button variante="secundario" onClick={passoAnterior} disabled={passoAtual === 0}>
           Anterior
         </Button>
-
         <Button onClick={proximoPasso} disabled={passoAtual === 3}>
           Próximo
         </Button>
