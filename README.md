@@ -10,6 +10,7 @@ Sistema de coleta de dados de clínicas médicas com painel administrativo e int
 pnpm install
 cp .env.example .env
 pnpm prisma db seed        # admin@zscan.com / admin123
+npx prisma studio   #Para verificar os dados no banco Isso abre uma interface web no navegador onde você pode ver todas as tabelas e dados inseridos.
 pnpm dev
 ```
 
