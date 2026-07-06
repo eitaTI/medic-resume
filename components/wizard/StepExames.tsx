@@ -9,7 +9,7 @@ import type { Exame } from '@/lib/validacoes'
 let exameIdCounter = 0
 
 // Interface que representa um exame com ID para controle do React
-interface ExameComId extends Exame {
+export interface ExameComId extends Exame {
   id: string
 }
 
