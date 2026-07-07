@@ -1,6 +1,6 @@
 # Task 2: Server Action de Login
 
-❌ **Pendente** — criar `actions/login.ts`
+✅ **Concluído** — criar `actions/login.ts`
 
 Criar `actions/login.ts`:
 - `'use server'`
