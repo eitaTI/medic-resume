@@ -1,6 +1,6 @@
 # Task 4: Middleware de Proteção
 
-❌ **Pendente** — criar `middleware.ts` na raiz
+✅ **Concluído** — `middleware.ts` criado na raiz
 
 Criar `middleware.ts`:
 - Exportar `middleware` function que recebe `NextRequest`

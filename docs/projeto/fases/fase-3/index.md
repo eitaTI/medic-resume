@@ -9,7 +9,7 @@ Sistema de autenticação para o painel administrativo.
 | Better Auth configurado (`lib/auth.ts` + rota API) | ✅ Concluído |
 | Server Action de login (`actions/login.ts`) | ❌ Pendente |
 | Tela de login (`app/login/page.tsx`) | ❌ Pendente |
-| Middleware de proteção (`middleware.ts`) | ❌ Pendente |
+| Middleware de proteção (`middleware.ts`) | ✅ Concluído |
 
 ## Tasks (Commits)
 
@@ -18,7 +18,7 @@ Sistema de autenticação para o painel administrativo.
 | 1 | `task_1.md` | Configuração do Better Auth | ✅ Concluído |
 | 2 | `task_2.md` | Server Action de login | ❌ Pendente |
 | 3 | `task_3.md` | Tela de login | ❌ Pendente |
-| 4 | `task_4.md` | Middleware de proteção | ❌ Pendente |
+| 4 | `task_4.md` | Middleware de proteção | ✅ Concluído |
 
 ## Fluxo
 
