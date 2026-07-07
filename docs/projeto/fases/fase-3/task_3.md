@@ -1,6 +1,6 @@
 # Task 3: Tela de Login
 
-❌ **Pendente** — criar `app/login/page.tsx`
+✅ **Concluído** — criar `app/login/page.tsx`
 
 Criar `app/login/page.tsx`:
 - `'use client'` com `useActionState` vinculado à action `login`
