@@ -38,6 +38,18 @@ export default function FormularioPage() {
         bg-[url('/images/zscan-light-wallpaper.png')]
         dark:bg-[url('/images/zscan-dark-wallpaper.png')]"
     >
+      <a
+        href="/login"
+        className="fixed top-20 right-4 z-50 flex items-center gap-2 px-4 py-2 rounded-full
+          bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm
+          border border-gray-200 dark:border-gray-700
+          shadow-lg hover:shadow-xl
+          text-sm font-medium text-gray-700 dark:text-gray-300
+          hover:bg-gray-100 dark:hover:bg-gray-700
+          transition-all duration-200"
+      >
+        Admin
+      </a>
       <ThemeToggle />
 
       <div className="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
