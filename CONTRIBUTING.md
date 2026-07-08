@@ -1,203 +1,49 @@
-# Como Contribuir
+# Contribuindo
 
-Guia para o grupo de desenvolvimento contribuir no projeto medic-resume.
+Guia para contribuir com o projeto.
 
-## Fluxo de Trabalho
-
-### 1. Setup Inicial
+## Setup
 
 ```bash
-# Fork e clone o repositório
-git clone https://github.com/SEU-USER/medic-resume.git
-cd medic-resume
-
-# Instale dependências
-npm install
-
-# Configure o ambiente
+git clone <seu-fork> && cd medic-resume
+pnpm install
 cp .env.example .env
-
-# Rode migrações do banco
-npx prisma migrate dev
-
-# Crie o admin padrão
-npx prisma db seed
-
-# Rode o projeto
-npm run dev
+pnpm prisma migrate dev
+pnpm prisma db seed          # admin@zscan.com / admin123
+pnpm dev                     # http://localhost:3000
 ```
 
-**Nota sobre Prisma v7:** O projeto usa Prisma v7 com adapter para SQLite. O `lib/prisma.ts` já está configurado com o adapter `PrismaBetterSqlite3`.
+## Git
 
-### 2. Criando uma Branch
+Padrões detalhados em [`docs/dev/GIT.md`](docs/dev/GIT.md):
 
-Sempre crie uma branch para cada tarefa:
+- Branch: `tipo/tarefa-curta` — `feat/formulario-wizard`
+- Commit: `tipo(escopo): descrição` — `feat(auth): adiciona tela de login`
 
-```bash
-# Format: tipo/tarefa-curta
-git checkout -b feat/formulario-wizard
-git checkout -b fix/validacao-email
-git checkout -b docs/readme-update
-```
+## Workflow de Desenvolvimento
 
-**Tipos de branch:**
-- `feat/` — Nova funcionalidade
-- `fix/` — Correção de bug
-- `docs/` — Documentação
-- `refactor/` — Refatoração de código
-- `test/` — Testes
+Guia completo em [`docs/dev/DEV-WORKFLOW.md`](docs/dev/DEV-WORKFLOW.md):
 
-### 3. Desenvolvendo
+- Servidor com HMR, teste em tempo real, comandos Prisma
+- Rode `pnpm build && pnpm lint` antes de commitar
 
-- Siga o padrão de pastas do projeto
-- Use TypeScript para tipagem
-- Comente código complexo
-- Teste localmente antes de commitar
+## Padrões de Código
 
-### 4. Commit
+Consulte os guias em `docs/dev/`:
 
-Use commits claros e descritivos:
+| Guia | O que cobre |
+|------|-------------|
+| [`ARQUITETURA.md`](docs/dev/ARQUITETURA.md) | Estrutura de pastas, stack, data flow, decisões |
+| [`COMPONENTES.md`](docs/dev/COMPONENTES.md) | Server vs Client, props, composição |
+| [`SERVER-ACTIONS.md`](docs/dev/SERVER-ACTIONS.md) | Padrão, retorno, autenticação, auditoria |
+| [`CODIGO.md`](docs/dev/CODIGO.md) | Nomenclatura, tipagem, imports, validação |
+| [`BANCO-DE-DADOS.md`](docs/dev/BANCO-DE-DADOS.md) | Schema, queries, paginação, comandos |
+| [`ESTILIZACAO.md`](docs/dev/ESTILIZACAO.md) | Tailwind v4, paleta, responsividade |
 
-```bash
-# Formato: tipo(escopo): descrição
-git commit -m "feat(formulario): adiciona validação de email"
-git commit -m "fix(auth): corrige login com credenciais inválidas"
-git commit -m "docs: atualiza README com instruções de instalação"
-```
+## Checklist de PR
 
-**Tipos de commit:**
-- `feat` — Nova funcionalidade
-- `fix` — Correção de bug
-- `docs` — Documentação
-- `style` — Formatação (não afeta lógica)
-- `refactor` — Refatoração
-- `test` — Adição de testes
-- `chore` — Configurações, dependências
-
-### 5. Push e PR
-
-```bash
-# Push para sua branch
-git push origin feat/formulario-wizard
-
-# Crie um Pull Request no GitHub
-# Descreva o que foi feito e referencie issues (ex: "Closes #12")
-```
-
-## Regras Importantes
-
-### ✅ Faça
-
-- Uma branch por tarefa
-- Commits pequenos e frequentes
-- Teste antes de enviar
-- Documente mudanças complexas
-- Respeite a estrutura de pastas
-
-### ❌ Não Faça
-
-- Commite direto na `main`
-- Envie código que não compila
-- Ignore erros de TypeScript
-- Deixe código comentado desnecessariamente
-- Adicione dependências sem necessidade
-
-## Estrutura de Pastas
-
-```
-medic-resume/
-├── app/              # Rotas e páginas (Next.js App Router)
-├── components/       # Componentes React reutilizáveis
-├── actions/          # Server Actions (lógica do servidor)
-├── lib/              # Utilitários e configurações
-├── prisma/           # Schema do banco de dados
-├── data/uploads/     # Arquivos enviados (não committar!)
-├── docs/             # Documentação detalhada por fase
-└── public/           # Arquivos estáticos (imagens públicas)
-```
-
-**Arquivos importantes:**
-- `prisma.config.ts` — Configuração do Prisma v7
-- `lib/prisma.ts` — Singleton PrismaClient com adapter
-- `lib/auth.ts` — Configuração do Better Auth
-
-## Componentes UI
-
-Ao criar componentes, siga o padrão:
-
-```tsx
-// components/ui/Botao.tsx
-import { ButtonHTMLAttributes } from 'react'
-
-interface BotaoProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variante?: 'primario' | 'secundario' | 'perigo'
-  tamanho?: 'pequeno' | 'medio' | 'grande'
-}
-
-export function Botao({ 
-  variante = 'primario', 
-  tamanho = 'medio',
-  children,
-  ...props 
-}: BotaoProps) {
-  const estilos = {
-    primario: 'bg-blue-600 text-white hover:bg-blue-700',
-    secundario: 'bg-gray-200 text-gray-800 hover:bg-gray-300',
-    perigo: 'bg-red-600 text-white hover:bg-red-700'
-  }
-  
-  const tamanhos = {
-    pequeno: 'px-3 py-1 text-sm',
-    medio: 'px-4 py-2',
-    grande: 'px-6 py-3 text-lg'
-  }
-  
-  return (
-    <button 
-      className={`${estilos[variante]} ${tamanhos[tamanho]} rounded-lg font-medium transition-colors`}
-      {...props}
-    >
-      {children}
-    </button>
-  )
-}
-```
-
-## Server Actions
-
-Server Actions ficam em `actions/` e devem ser funções `"use server"`:
-
-```tsx
-// actions/exemplo.ts
-'use server'
-
-import { prisma } from '@/lib/prisma'
-import { z } from 'zod'
-
-const schemaExemplo = z.object({
-  nome: z.string().min(1, 'Nome é obrigatório'),
-  email: z.string().email('Email inválido')
-})
-
-export async function criarExemplo(formData: FormData) {
-  const dados = {
-    nome: formData.get('nome') as string,
-    email: formData.get('email') as string
-  }
-  
-  const validacao = schemaExemplo.safeParse(dados)
-  if (!validacao.success) {
-    return { erro: validacao.error.errors[0].message }
-  }
-  
-  const registro = await prisma.exemplo.create({
-    data: validacao.data
-  })
-  
-  return { sucesso: true, registro }
-}
-```
-
-## Dúvidas?
-
-Abra uma issue com a tag `pergunta` ou consulte o responsável pelo projeto.
+- [ ] Compila sem erros (`pnpm build`)
+- [ ] Lint passa (`pnpm lint`)
+- [ ] Server Actions em `actions/`, componentes na pasta correta
+- [ ] Documentação atualizada se necessário
+- [ ] PR com descrição clara do que foi feito
