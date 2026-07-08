@@ -17,11 +17,13 @@ model Admin {
 
 model Clinica {
   id                Int       @id @default(autoincrement())
-  nomeEmpresa       String
+  nomeEmpresa       String?
   nomeClinica       String
   nomeTitular       String
   emailTitular      String
-  quantidadeMedicos Int
+  celularTitular    String?
+  documentoTitular  String?
+  quantidadeMedicos Int @default(1)
   logoPath          String?
   cabecalhoLaudo    String?   @default("")
   rodapeLaudo       String?   @default("")
@@ -43,6 +45,7 @@ model Medico {
   nome           String
   documento      String
   email          String
+  tipo          String  @default("examinador")
   assinaturaPath String?
 }
 
