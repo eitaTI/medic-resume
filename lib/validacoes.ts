@@ -1,17 +1,18 @@
 import { z } from 'zod'
 
 export const schemaClinica = z.object({
-  nomeEmpresa: z.string().min(1, 'Nome da empresa é obrigatório'),
   nomeClinica: z.string().min(1, 'Nome da clínica é obrigatório'),
   nomeTitular: z.string().min(1, 'Nome do titular é obrigatório'),
   emailTitular: z.string().email('Email do titular inválido'),
-  quantidadeMedicos: z.number().min(1, 'Quantidade de médicos deve ser no mínimo 1'),
+  celularTitular: z.string().optional(),
+  documentoTitular: z.string().optional(),
 })
 
 export const schemaMedico = z.object({
-  nome: z.string().min(1, 'Nome do médico é obrigatório'),
-  documento: z.string().min(1, 'Documento do médico é obrigatório'),
-  email: z.string().email('Email do médico inválido'),
+  nome: z.string().min(1, 'Nome do usuário é obrigatório'),
+  documento: z.string().min(1, 'Documento do usuário é obrigatório'),
+  email: z.string().email('Email do usuário inválido'),
+  tipo: z.enum(['examinador', 'solicitante', 'recepcao']).optional(),
 })
 
 export const schemaExame = z.object({

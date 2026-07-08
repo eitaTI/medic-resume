@@ -42,11 +42,11 @@ async function salvarArquivo(file: File | null, subdir: string): Promise<string 
 export async function submeterFormulario(formData: FormData) {
   try {
     const dadosClinica = {
-      nomeEmpresa: formData.get('nomeEmpresa') as string,
       nomeClinica: formData.get('nomeClinica') as string,
       nomeTitular: formData.get('nomeTitular') as string,
       emailTitular: formData.get('emailTitular') as string,
-      quantidadeMedicos: Number(formData.get('quantidadeMedicos')),
+      celularTitular: (formData.get('celularTitular') as string) || undefined,
+      documentoTitular: (formData.get('documentoTitular') as string) || undefined,
     }
 
     const validacao = schemaClinica.safeParse(dadosClinica)
@@ -98,6 +98,7 @@ export async function submeterFormulario(formData: FormData) {
                 nome: m.nome as string,
                 documento: m.documento as string,
                 email: m.email as string,
+                tipo: (m.tipo as string) || 'examinador',
                 assinaturaPath,
               }
             })

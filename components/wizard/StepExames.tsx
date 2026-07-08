@@ -72,11 +72,11 @@ export function StepExames({ cabecalho, rodape, exames, onChange }: StepExamesPr
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-bold">Exames</h2>
+      <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Exames</h2>
 
       {/* Campo de cabeçalho do laudo */}
       <div className="space-y-1">
-        <label htmlFor="cabecalho-laudo" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="cabecalho-laudo" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
           Cabeçalho do Laudo
         </label>
         <textarea
@@ -84,14 +84,14 @@ export function StepExames({ cabecalho, rodape, exames, onChange }: StepExamesPr
           rows={3}
           value={cabecalho}
           onChange={(e) => atualizarCabecalho(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
-          placeholder="Ex: Laboratório de Análises Clínicas..."
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600"
+          placeholder="Ex: Clínica Médica de Gastro Zscan, Dr. João Silva - CRM 1234..."
         />
       </div>
 
       {/* Campo de rodapé do laudo */}
       <div className="space-y-1">
-        <label htmlFor="rodape-laudo" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="rodape-laudo" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
           Rodapé do Laudo
         </label>
         <textarea
@@ -99,20 +99,20 @@ export function StepExames({ cabecalho, rodape, exames, onChange }: StepExamesPr
           rows={3}
           value={rodape}
           onChange={(e) => atualizarRodape(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
-          placeholder="Ex: Resultados validados pelo Dr...."
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600"
+          placeholder="Ex: Endereço Rua X, nº 123 - Bairro, Cidade/UF - Contato: (62) 99999-8888"
         />
       </div>
 
       {/* Lista dinâmica de exames */}
       <div className="space-y-4">
-        <h3 className="font-medium text-gray-800">Lista de Exames</h3>
+        <h3 className="font-medium text-gray-800 dark:text-gray-200">Lista de Exames</h3>
 
         {exames.map((exame, index) => (
-          <div key={exame.id} className="p-4 border rounded-lg space-y-3 bg-gray-50">
+          <div key={exame.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3 bg-gray-50 dark:bg-gray-800/50">
             {/* Cabeçalho do card com número e botão remover */}
             <div className="flex justify-between items-center">
-              <h4 className="font-medium text-gray-700">Exame {index + 1}</h4>
+              <h4 className="font-medium text-gray-700 dark:text-gray-300">Exame {index + 1}</h4>
               <Button
                 variante="perigo"
                 tamanho="pequeno"
@@ -135,6 +135,7 @@ export function StepExames({ cabecalho, rodape, exames, onChange }: StepExamesPr
             <FileUpload
               label="PDF do Laudo"
               accept=".pdf"
+              acceptHint="Apenas arquivos PDF"
               onFile={(file) => atualizarExame(index, { laudo: file })}
             />
           </div>

@@ -10,11 +10,13 @@ CREATE TABLE "Admin" (
 -- CreateTable
 CREATE TABLE "Clinica" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "nomeEmpresa" TEXT NOT NULL,
+    "nomeEmpresa" TEXT,
     "nomeClinica" TEXT NOT NULL,
     "nomeTitular" TEXT NOT NULL,
     "emailTitular" TEXT NOT NULL,
-    "quantidadeMedicos" INTEGER NOT NULL,
+    "celularTitular" TEXT,
+    "documentoTitular" TEXT,
+    "quantidadeMedicos" INTEGER NOT NULL DEFAULT 1,
     "logoPath" TEXT,
     "cabecalhoLaudo" TEXT DEFAULT '',
     "rodapeLaudo" TEXT DEFAULT '',
@@ -32,6 +34,7 @@ CREATE TABLE "Medico" (
     "nome" TEXT NOT NULL,
     "documento" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "tipo" TEXT NOT NULL DEFAULT 'examinador',
     "assinaturaPath" TEXT,
     CONSTRAINT "Medico_clinicaId_fkey" FOREIGN KEY ("clinicaId") REFERENCES "Clinica" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
