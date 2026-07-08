@@ -10,7 +10,6 @@ Containerização e deploy em produção.
 | .dockerignore | ❌ Pendente |
 | docker-compose.yml completo | ❌ Pendente |
 | .env.production + build/deploy | ❌ Pendente |
-| Cloudflare Tunnel | ❌ Pendente |
 
 ## Tasks (Commits)
 
@@ -20,4 +19,3 @@ Containerização e deploy em produção.
 | 2 | `task_2.md` | .dockerignore | ❌ Pendente |
 | 3 | `task_3.md` | docker-compose.yml completo | ❌ Pendente |
 | 4 | `task_4.md` | .env.production + build/deploy | ❌ Pendente |
-| 5 | `task_5.md` | Cloudflare Tunnel | ❌ Pendente |

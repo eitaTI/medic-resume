@@ -129,4 +129,3 @@ Fase 1 (Setup) — base do projeto
 | .dockerignore | ❌ |
 | docker-compose.yml completo | ❌ |
 | .env.production + build/deploy | ❌ |
-| Cloudflare Tunnel | ❌ |

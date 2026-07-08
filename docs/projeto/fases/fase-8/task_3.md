@@ -1,10 +1,43 @@
-# Task 3: Docker Compose com Backup
+# Task 3: Serviço de Backup no Docker Compose
 
-❌ **Pendente** — atualizar `docker-compose.yml`
+❌ **Pendente** — adicionar serviço de backup ao `docker-compose.yml`
 
-Adicionar ao `docker-compose.yml`:
-- Serviço `app`: build, porta 3000, volumes para `data/uploads` e `prisma/dev.db`, variáveis de ambiente, `restart: unless-stopped`
-- Serviço `backup`: imagem `alpine:latest`, volumes para app e backups, instalar bash+sqlite, cron diário às 02:00 executando `scripts/backup.sh`, `restart: unless-stopped`
+Complementar o `docker-compose.yml` criado na **Fase 9** com o serviço de backup:
+
+```yaml
+services:
+  app:
+    # ... definido na Fase 9 ...
+
+  backup:
+    image: alpine:latest
+    volumes:
+      - sqlite-data:/data/db:ro
+      - uploads:/data/uploads:ro
+      - ./backups:/backups
+      - ./scripts:/scripts:ro
+    entrypoint: |
+      sh -c "
+        apk add --no-cache sqlite bash &&
+        echo '0 2 * * * cd /scripts && bash backup.sh' | crontab - &&
+        crond -f -l 2
+      "
+    restart: unless-stopped
+    depends_on:
+      - app
+```
+
+**Volumes adicionais no `docker-compose.yml`:** (já estão em `volumes:`)
+```yaml
+volumes:
+  uploads:
+  sqlite-data:
+```
+
+**Criar diretório local:**
+```bash
+mkdir -p backups
+```
 
 ## Commit
 
