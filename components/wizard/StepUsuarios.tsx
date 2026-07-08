@@ -1,6 +1,7 @@
 'use client'
 
 import { Input } from '@/components/ui/Input'
+import { Select } from '@/components/ui/Select'
 import { FileUpload } from '@/components/ui/FileUpload'
 import { Button } from '@/components/ui/Button'
 
@@ -85,19 +86,13 @@ export function StepUsuarios({ usuarios, onChange }: StepUsuariosProps) {
                   </p>
                 </div>
               ) : (
-                <div className="space-y-1">
-                  <label htmlFor={`tipo-${index}`} className="block text-sm font-medium text-gray-700 dark:text-gray-200">Tipo</label>
-                  <select
-                    id={`tipo-${index}`}
-                    value={usuario.tipo}
-                    onChange={(e) => atualizarUsuario(index, { tipo: e.target.value as Usuario['tipo'] })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                  >
-                    {TIPOS_USUARIO.map((t) => (
-                      <option key={t.value} value={t.value}>{t.label}</option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  label="Tipo"
+                  id={`tipo-${index}`}
+                  value={usuario.tipo}
+                  opcoes={TIPOS_USUARIO}
+                  onChange={(e) => atualizarUsuario(index, { tipo: e.target.value as Usuario['tipo'] })}
+                />
               )}
 
               <Input
