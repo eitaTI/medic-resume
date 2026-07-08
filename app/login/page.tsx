@@ -1,26 +1,46 @@
 'use client'
 
-import { useActionState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { login } from '@/actions/login'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 
 export default function LoginPage() {
   const router = useRouter()
+  const [erro, setErro] = useState<string | null>(null)
+  const [isPending, setIsPending] = useState(false)
 
-  const loginAction = async (_prevState: unknown, formData: FormData) => {
-    return login(formData)
-  }
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setErro(null)
+    setIsPending(true)
 
-  const [state, formAction, isPending] = useActionState(loginAction, null)
+    const formData = new FormData(e.currentTarget)
+    const email = formData.get('email') as string
+    const senha = formData.get('senha') as string
 
-  useEffect(() => {
-    if (state?.sucesso) {
+    try {
+      const res = await fetch('/api/auth/sign-in/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: senha }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setErro(data.message || 'Credenciais inválidas')
+        return
+      }
+
       router.push('/admin')
+    } catch {
+      setErro('Erro ao conectar com o servidor')
+    } finally {
+      setIsPending(false)
     }
-  }, [state, router])
+  }
 
   return (
     <div
@@ -34,13 +54,13 @@ export default function LoginPage() {
         <div className="w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-8 shadow-lg">
           <h1 className="mb-6 text-center text-2xl font-bold text-gray-900 dark:text-gray-100">Login Admin</h1>
 
-          {state?.erro && (
+          {erro && (
             <div className="mb-4 rounded-lg bg-red-50 dark:bg-red-900/50 p-4 text-sm text-red-600 dark:text-red-400">
-              {state.erro}
+              {erro}
             </div>
           )}
 
-          <form action={formAction} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               label="E-mail"
               type="email"

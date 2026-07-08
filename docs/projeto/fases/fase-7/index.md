@@ -10,7 +10,7 @@ Registro de todas as ações administrativas.
 | Helper `lib/audit.ts` | ❌ Pendente |
 | Action `actions/auditoria.ts` | ❌ Pendente |
 | AuditLogCard | ❌ Pendente |
-| Página `/admin/auditoria` | ❌ Pendente |
+| Página `/admin/auditoria` | ⚠️ Placeholder criado (Fase 4) |
 | Integrar nas Server Actions | ❌ Pendente |
 | Registrar login na auditoria | ❌ Pendente |
 

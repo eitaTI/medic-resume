@@ -1,26 +1,71 @@
-'use client'
+import Link from 'next/link'
+import { listarSubmissoes } from '@/actions/submissoes'
+import { SubmissaoCard } from '@/components/admin/SubmissaoCard'
 
-import { ThemeToggle } from '@/components/ui/ThemeToggle'
+interface Props {
+  searchParams: Promise<{ status?: string }>
+}
 
-export default function AdminPage() {
+const filtros = [
+  { label: 'Todas', valor: undefined },
+  { label: 'Pendente', valor: 'PENDENTE' },
+  { label: 'Aprovada', valor: 'APROVADA' },
+  { label: 'Rejeitada', valor: 'REJEITADA' },
+]
+
+export default async function AdminPage({ searchParams }: Props) {
+  const { status } = await searchParams
+  const resultado = await listarSubmissoes({ status })
+
+  if ('erro' in resultado) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-red-600 dark:text-red-400">{resultado.erro}</p>
+      </div>
+    )
+  }
+
+  const submissoes = resultado
+
   return (
-    <div
-      className="min-h-screen bg-cover bg-center bg-fixed transition-colors duration-300
-        bg-[url('/images/zscan-light-wallpaper.png')]
-        dark:bg-[url('/images/zscan-dark-wallpaper.png')]"
-    >
-      <ThemeToggle />
+    <div>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
+        Submissões
+      </h1>
 
-      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 sm:p-8">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            Painel Administrativo
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">
-            Bem-vindo ao painel de administração.
+      <div className="flex flex-wrap gap-2 mb-6">
+        {filtros.map((f) => {
+          const ativo = f.valor === undefined ? !status : status === f.valor
+          const href = f.valor ? `?status=${f.valor}` : '/admin'
+          return (
+            <Link
+              key={f.label}
+              href={href}
+              className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+                ativo
+                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
+                  : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+              }`}
+            >
+              {f.label}
+            </Link>
+          )
+        })}
+      </div>
+
+      {submissoes.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-gray-500 dark:text-gray-400">
+            Nenhuma submissão encontrada
           </p>
         </div>
-      </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {submissoes.map((submissao) => (
+            <SubmissaoCard key={submissao.id} submissao={submissao as never} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
