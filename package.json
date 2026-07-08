@@ -13,6 +13,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.4.0",
     "@prisma/adapter-better-sqlite3": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "bcryptjs": "^3.0.3",
@@ -22,6 +23,7 @@
     "ofetch": "^1.5.1",
     "react": "^19",
     "react-dom": "^19",
+    "react-hook-form": "^7.81.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

@@ -2,32 +2,43 @@
 
 import Image from 'next/image'
 import { useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Stepper } from '@/components/wizard/Stepper'
 import { StepClinica } from '@/components/wizard/StepClinica'
-import { StepUsuarios, criarUsuarioVazio } from '@/components/wizard/StepUsuarios'
-import { StepExames, criarExameVazio } from '@/components/wizard/StepExames'
+import { StepUsuarios } from '@/components/wizard/StepUsuarios'
+import { StepExames } from '@/components/wizard/StepExames'
 import { StepEquipamentos } from '@/components/wizard/StepEquipamentos'
 import { Button } from '@/components/ui/Button'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { submeterFormulario } from '@/actions/submeter-formulario'
-import type { DadosClinica } from '@/components/wizard/StepClinica'
-import type { Usuario } from '@/components/wizard/StepUsuarios'
+import { schemaFormulario } from '@/lib/validacoes'
+import type { FormularioValues } from '@/lib/validacoes'
 const LABELS = ['Clínica', 'Usuários', 'Exames', 'Equipamentos']
+
+const defaultValues: FormularioValues = {
+  nomeClinica: '',
+  nomeTitular: '',
+  emailTitular: '',
+  celularTitular: '',
+  documentoTitular: '',
+  cabecalhoLaudo: '',
+  rodapeLaudo: '',
+  usuarios: [{ nome: '', documento: '', email: '', tipo: 'examinador', temAssinatura: false }],
+  exames: [{ nome: '' }],
+  equipamentos: [{ tipo: '', marca: '', modelo: '', numeroSerie: '' }],
+}
 
 export default function FormularioPage() {
   const [passoAtual, setPassoAtual] = useState(0)
-  const [dadosClinica, setDadosClinica] = useState<DadosClinica>({
-    nomeClinica: '', nomeTitular: '', emailTitular: '', celularTitular: '', documentoTitular: ''
-  })
-  const [dadosUsuarios, setDadosUsuarios] = useState<Usuario[]>([criarUsuarioVazio('examinador')])
-  const [dadosExames, setDadosExames] = useState({
-    cabecalho: '',
-    rodape: '',
-    exames: [criarExameVazio()]
-  })
-  const [dadosEquipamentos, setDadosEquipamentos] = useState([{ tipo: '', marca: '', modelo: '', numeroSerie: '' }])
-  const [submetendo, setSubmetendo] = useState(false)
   const [resultado, setResultado] = useState<{ sucesso?: boolean; erro?: string } | null>(null)
+
+  const formMethods = useForm<FormularioValues>({
+    resolver: zodResolver(schemaFormulario),
+    defaultValues,
+  })
+
+  const { handleSubmit, getValues, reset, watch } = formMethods
 
   const proximoPasso = () => {
     if (passoAtual < 3) setPassoAtual(passoAtual + 1)
@@ -37,34 +48,41 @@ export default function FormularioPage() {
     if (passoAtual > 0) setPassoAtual(passoAtual - 1)
   }
 
-  async function handleSubmit() {
-    setSubmetendo(true)
+  async function onSubmit() {
     setResultado(null)
+    const dados = getValues()
 
     const fd = new FormData()
-    fd.append('nomeClinica', dadosClinica.nomeClinica || '')
-    fd.append('nomeTitular', dadosClinica.nomeTitular || '')
-    fd.append('emailTitular', dadosClinica.emailTitular || '')
-    fd.append('celularTitular', dadosClinica.celularTitular || '')
-    fd.append('documentoTitular', dadosClinica.documentoTitular || '')
-    fd.append('cabecalhoLaudo', dadosExames.cabecalho)
-    fd.append('rodapeLaudo', dadosExames.rodape)
-    if (dadosClinica.logo) fd.append('logo', dadosClinica.logo)
+    fd.append('nomeClinica', dados.nomeClinica || '')
+    fd.append('nomeTitular', dados.nomeTitular || '')
+    fd.append('emailTitular', dados.emailTitular || '')
+    fd.append('celularTitular', dados.celularTitular || '')
+    fd.append('documentoTitular', dados.documentoTitular || '')
+    fd.append('cabecalhoLaudo', dados.cabecalhoLaudo || '')
+    fd.append('rodapeLaudo', dados.rodapeLaudo || '')
 
-    dadosUsuarios.forEach((usuario, i) => {
+    const logoField = watch('logo')
+    if (logoField instanceof File) fd.append('logo', logoField)
+
+    const raw = getValues() as Record<string, unknown>
+    const usuariosArr = raw.usuarios as (Record<string, unknown> & { nome: string; documento: string; email: string; tipo?: string })[]
+    usuariosArr.forEach((usuario, i) => {
       fd.append(`medicos[${i}].nome`, usuario.nome)
       fd.append(`medicos[${i}].documento`, usuario.documento)
       fd.append(`medicos[${i}].email`, usuario.email)
-      fd.append(`medicos[${i}].tipo`, usuario.tipo)
-      if (usuario.assinatura) fd.append(`medicos[${i}].assinatura`, usuario.assinatura)
+      fd.append(`medicos[${i}].tipo`, usuario.tipo || 'examinador')
+      const ass = usuario.assinatura
+      if (ass instanceof File) fd.append(`medicos[${i}].assinatura`, ass)
     })
 
-    dadosExames.exames.forEach((exame, i) => {
+    const examesArr = raw.exames as (Record<string, unknown> & { nome: string })[]
+    examesArr.forEach((exame, i) => {
       fd.append(`exames[${i}].nome`, exame.nome)
-      if (exame.laudo) fd.append(`exames[${i}].laudo`, exame.laudo)
+      const laudoFile = exame.laudo
+      if (laudoFile instanceof File) fd.append(`exames[${i}].laudo`, laudoFile)
     })
 
-    dadosEquipamentos.forEach((equipamento, i) => {
+    dados.equipamentos.forEach((equipamento, i) => {
       fd.append(`dispositivos[${i}].tipo`, equipamento.tipo)
       fd.append(`dispositivos[${i}].marca`, equipamento.marca)
       fd.append(`dispositivos[${i}].modelo`, equipamento.modelo)
@@ -73,10 +91,11 @@ export default function FormularioPage() {
 
     const res = await submeterFormulario(fd)
     setResultado(res)
-    setSubmetendo(false)
   }
 
-  if (resultado && 'sucesso' in resultado) {
+  const sucesso = resultado && 'sucesso' in resultado
+
+  if (sucesso) {
     return (
       <div
         className="min-h-screen bg-cover bg-center bg-fixed transition-colors duration-300
@@ -171,51 +190,37 @@ export default function FormularioPage() {
             </div>
           </div>
 
-          <Stepper passoAtual={passoAtual} totalPassos={4} labels={LABELS} />
+          <FormProvider {...formMethods}>
+            <Stepper passoAtual={passoAtual} totalPassos={4} labels={LABELS} />
 
-          <div className="mt-8">
-            {passoAtual === 0 && (
-              <StepClinica dados={dadosClinica} onChange={setDadosClinica} />
-            )}
-
-            {passoAtual === 1 && (
-              <StepUsuarios usuarios={dadosUsuarios} onChange={setDadosUsuarios} />
-            )}
-
-            {passoAtual === 2 && (
-              <StepExames
-                cabecalho={dadosExames.cabecalho}
-                rodape={dadosExames.rodape}
-                exames={dadosExames.exames}
-                onChange={setDadosExames}
-              />
-            )}
-
-            {passoAtual === 3 && (
-              <StepEquipamentos equipamentos={dadosEquipamentos} onChange={setDadosEquipamentos} />
-            )}
-          </div>
-
-          {resultado && 'erro' in resultado && (
-            <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm">
-              {resultado.erro}
+            <div className="mt-8">
+              {passoAtual === 0 && <StepClinica />}
+              {passoAtual === 1 && <StepUsuarios />}
+              {passoAtual === 2 && <StepExames />}
+              {passoAtual === 3 && <StepEquipamentos />}
             </div>
-          )}
 
-          <div className="flex justify-between mt-8 pt-6 border-t border-gray-200 dark:border-gray-800">
-            <Button variante="secundario" onClick={passoAnterior} disabled={passoAtual === 0}>
-              ← Anterior
-            </Button>
-            {passoAtual === 3 ? (
-              <Button onClick={handleSubmit} disabled={submetendo}>
-                {submetendo ? 'Enviando...' : 'Enviar Cadastro'}
-              </Button>
-            ) : (
-              <Button onClick={proximoPasso}>
-                Próximo →
-              </Button>
+            {resultado && 'erro' in resultado && (
+              <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm">
+                {resultado.erro}
+              </div>
             )}
-          </div>
+
+            <div className="flex justify-between mt-8 pt-6 border-t border-gray-200 dark:border-gray-800">
+              <Button variante="secundario" onClick={passoAnterior} disabled={passoAtual === 0}>
+                ← Anterior
+              </Button>
+              {passoAtual === 3 ? (
+                <Button onClick={handleSubmit(onSubmit)}>
+                  Enviar Cadastro
+                </Button>
+              ) : (
+                <Button onClick={proximoPasso}>
+                  Próximo →
+                </Button>
+              )}
+            </div>
+          </FormProvider>
         </div>
 
         <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-6">
@@ -224,8 +229,10 @@ export default function FormularioPage() {
       </div>
     </div>
   )
-}
 
-function resetarFormulario() {
-  window.location.reload()
+  function resetarFormulario() {
+    reset(defaultValues)
+    setResultado(null)
+    setPassoAtual(0)
+  }
 }

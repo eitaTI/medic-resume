@@ -1,9 +1,11 @@
 'use client'
 
+import { useFieldArray, useFormContext } from 'react-hook-form'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { FileUpload } from '@/components/ui/FileUpload'
 import { Button } from '@/components/ui/Button'
+import type { FormularioValues } from '@/lib/validacoes'
 
 const TIPOS_USUARIO = [
   { value: 'examinador', label: 'Médico Examinador' },
@@ -11,38 +13,9 @@ const TIPOS_USUARIO = [
   { value: 'recepcao', label: 'Recepção' },
 ] as const
 
-export interface Usuario {
-  nome: string
-  documento: string
-  email: string
-  tipo: 'examinador' | 'solicitante' | 'recepcao'
-  temAssinatura: boolean
-  assinatura?: File
-}
-
-interface StepUsuariosProps {
-  usuarios: Usuario[]
-  onChange: (usuarios: Usuario[]) => void
-}
-
-export function criarUsuarioVazio(tipo?: Usuario['tipo']): Usuario {
-  return { nome: '', documento: '', email: '', tipo: tipo || 'examinador', temAssinatura: false }
-}
-
-export function StepUsuarios({ usuarios, onChange }: StepUsuariosProps) {
-  const adicionarUsuario = () => {
-    onChange([...usuarios, criarUsuarioVazio()])
-  }
-
-  const removerUsuario = (index: number) => {
-    onChange(usuarios.filter((_, i) => i !== index))
-  }
-
-  const atualizarUsuario = (index: number, dados: Partial<Usuario>) => {
-    const novos = [...usuarios]
-    novos[index] = { ...novos[index], ...dados }
-    onChange(novos)
-  }
+export function StepUsuarios() {
+  const { control, register, setValue, watch, formState: { errors } } = useFormContext<FormularioValues>()
+  const { fields, append, remove } = useFieldArray({ control, name: 'usuarios' })
 
   return (
     <div className="space-y-4">
@@ -52,18 +25,18 @@ export function StepUsuarios({ usuarios, onChange }: StepUsuariosProps) {
         Tipos disponíveis: <strong>Médico Examinador</strong>, <strong>Médico Solicitante</strong> e <strong>Recepção</strong>.
       </p>
 
-      {usuarios.map((usuario, index) => {
+      {fields.map((field, index) => {
         const isPrimeiro = index === 0
 
         return (
-          <div key={index} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3 bg-gray-50 dark:bg-gray-800/50">
+          <div key={field.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3 bg-gray-50 dark:bg-gray-800/50">
             <div className="flex justify-between items-center">
               <h3 className="font-medium text-gray-900 dark:text-gray-100">Usuário {index + 1}</h3>
               {!isPrimeiro && (
                 <Button
                   variante="perigo"
                   tamanho="pequeno"
-                  onClick={() => removerUsuario(index)}
+                  onClick={() => remove(index)}
                 >
                   Remover
                 </Button>
@@ -72,8 +45,8 @@ export function StepUsuarios({ usuarios, onChange }: StepUsuariosProps) {
 
             <Input
               label="Nome completo"
-              value={usuario.nome}
-              onChange={(e) => atualizarUsuario(index, { nome: e.target.value })}
+              {...register(`usuarios.${index}.nome`)}
+              erro={errors.usuarios?.[index]?.nome?.message}
               required
             />
 
@@ -88,17 +61,15 @@ export function StepUsuarios({ usuarios, onChange }: StepUsuariosProps) {
               ) : (
                 <Select
                   label="Tipo"
-                  id={`tipo-${index}`}
-                  value={usuario.tipo}
                   opcoes={TIPOS_USUARIO}
-                  onChange={(e) => atualizarUsuario(index, { tipo: e.target.value as Usuario['tipo'] })}
+                  {...register(`usuarios.${index}.tipo`)}
                 />
               )}
 
               <Input
                 label="Documento (CRM/CPF)"
-                value={usuario.documento}
-                onChange={(e) => atualizarUsuario(index, { documento: e.target.value })}
+                {...register(`usuarios.${index}.documento`)}
+                erro={errors.usuarios?.[index]?.documento?.message}
                 required
               />
             </div>
@@ -106,37 +77,36 @@ export function StepUsuarios({ usuarios, onChange }: StepUsuariosProps) {
             <Input
               label="Email"
               type="email"
-              value={usuario.email}
-              onChange={(e) => atualizarUsuario(index, { email: e.target.value })}
+              {...register(`usuarios.${index}.email`)}
+              erro={errors.usuarios?.[index]?.email?.message}
               required
             />
 
             <label className="flex items-center gap-2 cursor-pointer select-none">
               <input
                 type="checkbox"
-                checked={usuario.temAssinatura}
-                onChange={(e) => {
-                  const checked = e.target.checked
-                  atualizarUsuario(index, { temAssinatura: checked, ...(checked ? {} : { assinatura: undefined }) })
-                }}
+                {...register(`usuarios.${index}.temAssinatura`)}
                 className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
               <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Possui assinatura digitalizada</span>
             </label>
 
-            {usuario.temAssinatura && (
+            {watch(`usuarios.${index}.temAssinatura`) && (
               <FileUpload
                 label="Assinatura (imagem)"
                 accept="image/*"
                 acceptHint="PNG, JPG ou JPEG"
-                onFile={(file) => atualizarUsuario(index, { assinatura: file })}
+                onFile={(file) => setValue(`usuarios.${index}.assinatura`, file)}
               />
             )}
           </div>
         )
       })}
 
-      <Button variante="secundario" onClick={adicionarUsuario}>
+      <Button
+        variante="secundario"
+        onClick={() => append({ nome: '', documento: '', email: '', tipo: 'examinador', temAssinatura: false })}
+      >
         + Adicionar Usuário
       </Button>
     </div>
