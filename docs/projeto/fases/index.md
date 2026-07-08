@@ -31,13 +31,13 @@ Fase 1 (Setup) — base do projeto
 | 1 | Setup do Projeto | 9/9 | ✅ Concluído |
 | 2 | Formulário Público | 9/11 | ✅ Concluído |
 | 3 | Autenticação e Login | 4/4 | ✅ Concluído |
-| 4 | Painel Admin | 0/7 | ❌ Pendente |
+| 4 | Painel Admin | 7/7 | ✅ Concluído |
 | 5 | Integração Jira | 0/4 | ❌ Pendente |
 | 6 | Gerenciar Admins | 0/3 | ❌ Pendente |
 | 7 | Sistema de Auditoria | 1/7 | ⚠️ Parcial |
 | 8 | Sistema de Backup | 0/4 | ❌ Pendente |
 | 9 | Deploy com Docker | 0/5 | ❌ Pendente |
-| | **Total** | **24/54** | **~44%** |
+| | **Total** | **31/54** | **~57%** |
 
 ## Detalhamento
 
@@ -77,16 +77,16 @@ Fase 1 (Setup) — base do projeto
 | Tela de login | ✅ |
 | Middleware de proteção | ✅ |
 
-### ❌ Fase 4 — Painel Admin
+### ✅ Fase 4 — Painel Admin
 | Task | Status |
 |------|--------|
-| Server Actions submissões | ❌ |
-| StatusBadge | ❌ |
-| SubmissaoCard | ❌ |
-| AprovarRejeitarButtons | ❌ |
-| Layout protegido `/admin` | ❌ |
-| Dashboard `/admin` | ❌ |
-| Detalhe `/admin/submissao/[id]` | ❌ |
+| Server Actions submissões | ✅ |
+| StatusBadge | ✅ |
+| SubmissaoCard | ✅ |
+| AprovarRejeitarButtons | ✅ |
+| Layout protegido `/admin` | ✅ |
+| Dashboard `/admin` | ✅ |
+| Detalhe `/admin/submissao/[id]` | ✅ |
 
 ### ❌ Fase 5 — Integração Jira
 | Task | Status |

@@ -20,13 +20,13 @@ Após as fases 2 e 3, o projeto tem as seguintes características que impactam e
 
 | Componente | Status |
 |-----------|--------|
-| Server Actions de submissões | ❌ Pendente |
-| StatusBadge UI | ❌ Pendente |
-| SubmissaoCard | ❌ Pendente |
-| AprovarRejeitarButtons | ❌ Pendente |
-| Layout protegido `/admin` | ❌ Pendente |
-| Dashboard `/admin` | ⚠️ Placeholder existente (precisa ser refeito como Server Component) |
-| Detalhe `/admin/submissao/[id]` | ❌ Pendente |
+| Server Actions de submissões | ✅ Concluído |
+| StatusBadge UI | ✅ Concluído |
+| SubmissaoCard | ✅ Concluído |
+| AprovarRejeitarButtons | ✅ Concluído |
+| Layout protegido `/admin` | ✅ Concluído |
+| Dashboard `/admin` | ✅ Concluído (substituído placeholder) |
+| Detalhe `/admin/submissao/[id]` | ✅ Concluído |
 
 ## Estrutura
 
@@ -39,10 +39,10 @@ Após as fases 2 e 3, o projeto tem as seguintes características que impactam e
 
 | # | Arquivo | Descrição | Status |
 |---|---------|-----------|--------|
-| 1 | `task_1.md` | Server Actions de submissões | ❌ Pendente |
-| 2 | `task_2.md` | Componente StatusBadge | ❌ Pendente |
-| 3 | `task_3.md` | Componente SubmissaoCard | ❌ Pendente |
-| 4 | `task_4.md` | Componente AprovarRejeitarButtons | ❌ Pendente |
-| 5 | `task_5.md` | Layout protegido `/admin` | ❌ Pendente |
-| 6 | `task_6.md` | Dashboard `/admin` | ❌ Pendente |
-| 7 | `task_7.md` | Detalhe `/admin/submissao/[id]` | ❌ Pendente |
+| 1 | `task_1.md` | Server Actions de submissões | ✅ Concluído |
+| 2 | `task_2.md` | Componente StatusBadge | ✅ Concluído |
+| 3 | `task_3.md` | Componente SubmissaoCard | ✅ Concluído |
+| 4 | `task_4.md` | Componente AprovarRejeitarButtons | ✅ Concluído |
+| 5 | `task_5.md` | Layout protegido `/admin` | ✅ Concluído |
+| 6 | `task_6.md` | Dashboard `/admin` | ✅ Concluído |
+| 7 | `task_7.md` | Detalhe `/admin/submissao/[id]` | ✅ Concluído |
