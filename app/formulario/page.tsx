@@ -15,6 +15,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { submeterFormulario } from '@/actions/submeter-formulario'
 import { schemaFormulario } from '@/lib/validacoes'
 import type { FormularioValues } from '@/lib/validacoes'
+import { useDraftPersistence } from '@/hooks/useDraftPersistence'
 const LABELS = ['Clínica', 'Usuários', 'Exames', 'Equipamentos']
 
 const defaultValues: FormularioValues = {
@@ -38,7 +39,7 @@ export default function FormularioPage() {
     defaultValues,
   })
 
-  const { handleSubmit, getValues, reset, setFocus } = formMethods
+  const { handleSubmit, getValues, reset, setFocus, watch } = formMethods
 
   useEffect(() => {
     const campos = {
@@ -50,6 +51,8 @@ export default function FormularioPage() {
     const campo = campos[passoAtual as keyof typeof campos]
     setTimeout(() => setFocus(campo), 100)
   }, [passoAtual, setFocus])
+
+  const { limparRascunho } = useDraftPersistence(watch, reset)
 
   const montarFormData = (): FormData => {
     const dados = getValues()
@@ -95,7 +98,9 @@ export default function FormularioPage() {
 
   const [resultado, formAction, isPending] = useActionState(
     async () => {
-      return await submeterFormulario(montarFormData())
+      const res = await submeterFormulario(montarFormData())
+      if (res && 'sucesso' in res) limparRascunho()
+      return res
     },
     null,
   )
@@ -253,6 +258,7 @@ export default function FormularioPage() {
 
   function resetarFormulario() {
     reset(defaultValues)
+    limparRascunho()
     setPassoAtual(0)
   }
 }
