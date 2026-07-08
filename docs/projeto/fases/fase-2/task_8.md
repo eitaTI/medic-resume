@@ -1,6 +1,6 @@
 # Task 8: Componente StepDispositivos
 
-❌ **Pendente** — criar `components/wizard/StepDispositivos.tsx`
+✅ **Concluído** — `components/wizard/StepDispositivos.tsx`
 
 Criar `components/wizard/StepDispositivos.tsx`:
 - Componente `'use client'` com props `dispositivos` (array) e `onChange`

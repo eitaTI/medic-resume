@@ -8,8 +8,8 @@ Wizard de 4 etapas para coleta de dados de clínicas.
 |-------|--------|
 | 1 - Clínica | ✅ Completo |
 | 2 - Médicos | ✅ Completo |
-| 3 - Exames | ❌ Pendente |
-| 4 - Dispositivos | ❌ Pendente |
+| 3 - Exames | ✅ Completo |
+| 4 - Dispositivos | ✅ Completo |
 | Submissão | ❌ Pendente |
 
 ## Estrutura do Wizard
@@ -31,8 +31,8 @@ Wizard de 4 etapas para coleta de dados de clínicas.
 | 4 | `task_4.md` | Componente Stepper | ✅ Concluído |
 | 5 | `task_5.md` | Componente StepClinica | ✅ Concluído |
 | 6 | `task_6.md` | Componente StepMedicos | ✅ Concluído |
-| 7 | `task_7.md` | Componente StepExames | ❌ Pendente |
-| 8 | `task_8.md` | Componente StepDispositivos | ❌ Pendente |
+| 7 | `task_7.md` | Componente StepExames | ✅ Concluído |
+| 8 | `task_8.md` | Componente StepDispositivos | ✅ Concluído |
 | 9 | `task_9.md` | Esquemas de validação Zod | ❌ Pendente |
 | 10 | `task_10.md` | Server Action de submissão | ❌ Pendente |
-| 11 | `task_11.md` | Página principal do Wizard | ⚠️ Parcial |
+| 11 | `task_11.md` | Página principal do Wizard | ✅ Concluído |

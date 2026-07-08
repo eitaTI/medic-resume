@@ -1,6 +1,6 @@
 # Task 1: Schema AuditLog + Migração
 
-❌ **Pendente** — adicionar ao schema Prisma
+✅ **Concluído** — modelo `AuditLog` adicionado ao schema Prisma
 
 Adicionar modelo `AuditLog` no `prisma/schema.prisma`:
 - `id` (Int, autoincrement)

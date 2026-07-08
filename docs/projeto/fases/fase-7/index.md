@@ -6,7 +6,7 @@ Registro de todas as ações administrativas.
 
 | Componente | Status |
 |-----------|--------|
-| Schema AuditLog + Migração | ❌ Pendente |
+| Schema AuditLog + Migração | ✅ Concluído |
 | Helper `lib/audit.ts` | ❌ Pendente |
 | Action `actions/auditoria.ts` | ❌ Pendente |
 | AuditLogCard | ❌ Pendente |
@@ -18,7 +18,7 @@ Registro de todas as ações administrativas.
 
 | # | Arquivo | Descrição | Status |
 |---|---------|-----------|--------|
-| 1 | `task_1.md` | Schema AuditLog + migração | ❌ Pendente |
+| 1 | `task_1.md` | Schema AuditLog + migração | ✅ Concluído |
 | 2 | `task_2.md` | Helper de auditoria | ❌ Pendente |
 | 3 | `task_3.md` | Action de auditoria | ❌ Pendente |
 | 4 | `task_4.md` | Componente AuditLogCard | ❌ Pendente |
