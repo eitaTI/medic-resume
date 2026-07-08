@@ -23,4 +23,4 @@ pnpm dev
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Setup, contribuição, git, workflow |
 | [`docs/dev/`](docs/dev/) | Padrões de código, componentes, server actions, banco, estilos, git |
 | [`docs/dev/DEV-WORKFLOW.md`](docs/dev/DEV-WORKFLOW.md) | HMR, teste em tempo real, comandos do dia a dia |
-| [`docs/projeto/fases/`](docs/projeto/fases/) | Status do projeto (~44%) por fase |
+| [`docs/projeto/fases/`](docs/projeto/fases/) | Status do projeto (~46%) por fase |

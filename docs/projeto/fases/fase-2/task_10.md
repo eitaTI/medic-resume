@@ -1,6 +1,6 @@
 # Task 10: Server Action de submissão
 
-❌ **Pendente** — criar `actions/submeter-formulario.ts`
+✅ **Concluído** — `actions/submeter-formulario.ts` criado
 
 Criar `actions/submeter-formulario.ts`:
 - `'use server'`

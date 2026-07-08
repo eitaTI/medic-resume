@@ -9,6 +9,7 @@ import { StepExames, criarExameVazio } from '@/components/wizard/StepExames'
 import { StepDispositivos } from '@/components/wizard/StepDispositivos'
 import { Button } from '@/components/ui/Button'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { submeterFormulario } from '@/actions/submeter-formulario'
 import type { DadosClinica } from '@/components/wizard/StepClinica'
 import type { Medico } from '@/components/wizard/StepMedicos'
 const LABELS = ['Clínica', 'Médicos', 'Exames', 'Dispositivos']
@@ -23,6 +24,8 @@ export default function FormularioPage() {
     exames: [criarExameVazio()]
   })
   const [dadosDispositivos, setDadosDispositivos] = useState([{ tipo: '', marca: '', modelo: '', numeroSerie: '' }])
+  const [submetendo, setSubmetendo] = useState(false)
+  const [resultado, setResultado] = useState<{ sucesso?: boolean; erro?: string } | null>(null)
 
   const proximoPasso = () => {
     if (passoAtual < 3) setPassoAtual(passoAtual + 1)
@@ -30,6 +33,88 @@ export default function FormularioPage() {
 
   const passoAnterior = () => {
     if (passoAtual > 0) setPassoAtual(passoAtual - 1)
+  }
+
+  async function handleSubmit() {
+    setSubmetendo(true)
+    setResultado(null)
+
+    const fd = new FormData()
+    fd.append('nomeEmpresa', dadosClinica.nomeEmpresa || '')
+    fd.append('nomeClinica', dadosClinica.nomeClinica || '')
+    fd.append('nomeTitular', dadosClinica.nomeTitular || '')
+    fd.append('emailTitular', dadosClinica.emailTitular || '')
+    fd.append('quantidadeMedicos', String(dadosClinica.quantidadeMedicos || 0))
+    fd.append('cabecalhoLaudo', dadosExames.cabecalho)
+    fd.append('rodapeLaudo', dadosExames.rodape)
+    if (dadosClinica.logo) fd.append('logo', dadosClinica.logo)
+
+    dadosMedicos.forEach((medico, i) => {
+      fd.append(`medicos[${i}].nome`, medico.nome)
+      fd.append(`medicos[${i}].documento`, medico.documento)
+      fd.append(`medicos[${i}].email`, medico.email)
+      if (medico.assinatura) fd.append(`medicos[${i}].assinatura`, medico.assinatura)
+    })
+
+    dadosExames.exames.forEach((exame, i) => {
+      fd.append(`exames[${i}].nome`, exame.nome)
+      if (exame.laudo) fd.append(`exames[${i}].laudo`, exame.laudo)
+    })
+
+    dadosDispositivos.forEach((dispositivo, i) => {
+      fd.append(`dispositivos[${i}].tipo`, dispositivo.tipo)
+      fd.append(`dispositivos[${i}].marca`, dispositivo.marca)
+      fd.append(`dispositivos[${i}].modelo`, dispositivo.modelo)
+      fd.append(`dispositivos[${i}].numeroSerie`, dispositivo.numeroSerie)
+    })
+
+    const res = await submeterFormulario(fd)
+    setResultado(res)
+    setSubmetendo(false)
+  }
+
+  if (resultado && 'sucesso' in resultado) {
+    return (
+      <div
+        className="min-h-screen bg-cover bg-center bg-fixed transition-colors duration-300
+          bg-[url('/images/zscan-light-wallpaper.png')]
+          dark:bg-[url('/images/zscan-dark-wallpaper.png')]"
+      >
+        <ThemeToggle />
+        <div className="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 sm:p-8 text-center">
+            <Image
+              src="/images/zscan-logo-light.png"
+              alt="ZScan"
+              width={93}
+              height={40}
+              className="block dark:hidden mx-auto mb-6"
+              priority
+            />
+            <Image
+              src="/images/zscan-logo-dark.png"
+              alt="ZScan"
+              width={93}
+              height={40}
+              className="hidden dark:block mx-auto mb-6"
+              priority
+            />
+            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl text-green-600 dark:text-green-400">✓</span>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+              Cadastro enviado com sucesso!
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400 mb-8">
+              Agradecemos pelo cadastro. Sua clínica será revisada em breve.
+            </p>
+            <Button onClick={resetarFormulario}>
+              Novo Cadastro
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -108,16 +193,32 @@ export default function FormularioPage() {
             )}
           </div>
 
+          {resultado && 'erro' in resultado && (
+            <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm">
+              {resultado.erro}
+            </div>
+          )}
+
           <div className="flex justify-between mt-8 pt-6 border-t border-gray-200 dark:border-gray-800">
             <Button variante="secundario" onClick={passoAnterior} disabled={passoAtual === 0}>
               ← Anterior
             </Button>
-            <Button onClick={proximoPasso} disabled={passoAtual === 3}>
-              Próximo →
-            </Button>
+            {passoAtual === 3 ? (
+              <Button onClick={handleSubmit} disabled={submetendo}>
+                {submetendo ? 'Enviando...' : 'Enviar Cadastro'}
+              </Button>
+            ) : (
+              <Button onClick={proximoPasso}>
+                Próximo →
+              </Button>
+            )}
           </div>
         </div>
       </div>
     </div>
   )
+}
+
+function resetarFormulario() {
+  window.location.reload()
 }
