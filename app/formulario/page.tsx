@@ -40,8 +40,16 @@ export default function FormularioPage() {
 
   const { handleSubmit, getValues, reset, watch } = formMethods
 
-  const proximoPasso = () => {
-    if (passoAtual < 3) setPassoAtual(passoAtual + 1)
+  const proximoPasso = async () => {
+    const camposPorPasso: Record<number, (keyof FormularioValues)[]> = {
+      0: ['nomeClinica', 'nomeTitular', 'emailTitular'],
+      1: ['usuarios'],
+      2: ['exames'],
+      3: ['equipamentos'],
+    }
+    const campos = camposPorPasso[passoAtual]
+    const valido = await formMethods.trigger(campos)
+    if (valido && passoAtual < 3) setPassoAtual(passoAtual + 1)
   }
 
   const passoAnterior = () => {
