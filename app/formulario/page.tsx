@@ -1,7 +1,8 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useActionState } from 'react'
+import { useFormStatus } from 'react-dom'
 import { FormProvider, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Stepper } from '@/components/wizard/Stepper'
@@ -31,35 +32,16 @@ const defaultValues: FormularioValues = {
 
 export default function FormularioPage() {
   const [passoAtual, setPassoAtual] = useState(0)
-  const [resultado, setResultado] = useState<{ sucesso?: boolean; erro?: string } | null>(null)
 
   const formMethods = useForm<FormularioValues>({
     resolver: zodResolver(schemaFormulario),
     defaultValues,
   })
 
-  const { handleSubmit, getValues, reset, watch } = formMethods
+  const { handleSubmit, getValues, reset } = formMethods
 
-  const proximoPasso = async () => {
-    const camposPorPasso: Record<number, (keyof FormularioValues)[]> = {
-      0: ['nomeClinica', 'nomeTitular', 'emailTitular'],
-      1: ['usuarios'],
-      2: ['exames'],
-      3: ['equipamentos'],
-    }
-    const campos = camposPorPasso[passoAtual]
-    const valido = await formMethods.trigger(campos)
-    if (valido && passoAtual < 3) setPassoAtual(passoAtual + 1)
-  }
-
-  const passoAnterior = () => {
-    if (passoAtual > 0) setPassoAtual(passoAtual - 1)
-  }
-
-  async function onSubmit() {
-    setResultado(null)
+  const montarFormData = (): FormData => {
     const dados = getValues()
-
     const fd = new FormData()
     fd.append('nomeClinica', dados.nomeClinica || '')
     fd.append('nomeTitular', dados.nomeTitular || '')
@@ -69,10 +51,10 @@ export default function FormularioPage() {
     fd.append('cabecalhoLaudo', dados.cabecalhoLaudo || '')
     fd.append('rodapeLaudo', dados.rodapeLaudo || '')
 
-    const logoField = watch('logo')
+    const raw = dados as Record<string, unknown>
+    const logoField = raw.logo
     if (logoField instanceof File) fd.append('logo', logoField)
 
-    const raw = getValues() as Record<string, unknown>
     const usuariosArr = raw.usuarios as (Record<string, unknown> & { nome: string; documento: string; email: string; tipo?: string })[]
     usuariosArr.forEach((usuario, i) => {
       fd.append(`medicos[${i}].nome`, usuario.nome)
@@ -97,8 +79,30 @@ export default function FormularioPage() {
       fd.append(`dispositivos[${i}].numeroSerie`, equipamento.numeroSerie)
     })
 
-    const res = await submeterFormulario(fd)
-    setResultado(res)
+    return fd
+  }
+
+  const [resultado, formAction, isPending] = useActionState(
+    async () => {
+      return await submeterFormulario(montarFormData())
+    },
+    null,
+  )
+
+  const proximoPasso = async () => {
+    const camposPorPasso: Record<number, (keyof FormularioValues)[]> = {
+      0: ['nomeClinica', 'nomeTitular', 'emailTitular'],
+      1: ['usuarios'],
+      2: ['exames'],
+      3: ['equipamentos'],
+    }
+    const campos = camposPorPasso[passoAtual]
+    const valido = await formMethods.trigger(campos)
+    if (valido && passoAtual < 3) setPassoAtual(passoAtual + 1)
+  }
+
+  const passoAnterior = () => {
+    if (passoAtual > 0) setPassoAtual(passoAtual - 1)
   }
 
   const sucesso = resultado && 'sucesso' in resultado
@@ -219,9 +223,7 @@ export default function FormularioPage() {
                 ← Anterior
               </Button>
               {passoAtual === 3 ? (
-                <Button onClick={handleSubmit(onSubmit)}>
-                  Enviar Cadastro
-                </Button>
+                <SubmitButton onClick={handleSubmit(() => formAction())} isPending={isPending} />
               ) : (
                 <Button onClick={proximoPasso}>
                   Próximo →
@@ -240,7 +242,16 @@ export default function FormularioPage() {
 
   function resetarFormulario() {
     reset(defaultValues)
-    setResultado(null)
     setPassoAtual(0)
   }
+}
+
+function SubmitButton({ onClick, isPending }: { onClick: () => void; isPending: boolean }) {
+  const { pending } = useFormStatus()
+
+  return (
+    <Button onClick={onClick} disabled={isPending || pending}>
+      {isPending || pending ? 'Enviando...' : 'Enviar Cadastro'}
+    </Button>
+  )
 }
