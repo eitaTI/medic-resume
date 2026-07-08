@@ -135,7 +135,7 @@ Client Component → Server Action → Prisma → SQLite
 
 ## Segurança
 
-- Senhas hasheadas com bcryptjs
+- Senhas hasheadas com scrypt via `@better-auth/utils/password`
 - Sessões gerenciadas por Better Auth
 - Rotas /admin protegidas por middleware + layout server-side
 - Uploads fora de `public/` (LGPD)

@@ -14,7 +14,7 @@ Fase 1 (Setup) — base do projeto
     │                    │         │
     │                    │         ├──→ Fase 5 (Integração Jira)
     │                    │         │
-    │                    │         └──→ Fase 6 (Gerenciar Admins)
+    │                    │         └──→ Fase 6 (Gerenciar Usuários)
     │                    │
     │                    └──→ Fase 7 (Auditoria) — logs em todas as actions
     │
@@ -33,7 +33,7 @@ Fase 1 (Setup) — base do projeto
 | 3 | Autenticação e Login | 4/4 | ✅ Concluído |
 | 4 | Painel Admin | 7/7 | ✅ Concluído |
 | 5 | Integração Jira | 0/4 | ❌ Pendente |
-| 6 | Gerenciar Admins | 0/3 | ❌ Pendente |
+| 6 | Gerenciar Usuários | 0/3 | ⚠️ Placeholder |
 | 7 | Sistema de Auditoria | 1/7 | ⚠️ Parcial |
 | 8 | Sistema de Backup | 0/4 | ❌ Pendente |
 | 9 | Deploy com Docker | 0/5 | ❌ Pendente |
@@ -96,12 +96,12 @@ Fase 1 (Setup) — base do projeto
 | Botões com feedback Jira | ❌ |
 | Variáveis de ambiente | ❌ |
 
-### ❌ Fase 6 — Gerenciar Admins
+### ❌ Fase 6 — Gerenciar Usuários
 | Task | Status |
 |------|--------|
 | Server Actions admins | ❌ |
 | AdminForm | ❌ |
-| Página `/admin/admins` | ❌ |
+| Página `/admin/usuarios` | ⚠️ Placeholder |
 
 ### ⚠️ Fase 7 — Sistema de Auditoria
 | Task | Status |
@@ -110,7 +110,7 @@ Fase 1 (Setup) — base do projeto
 | Helper `lib/audit.ts` | ❌ |
 | Action `actions/auditoria.ts` | ❌ |
 | AuditLogCard | ❌ |
-| Página `/admin/auditoria` | ❌ |
+| Página `/admin/auditoria` | ⚠️ Placeholder |
 | Integrar nas Server Actions | ❌ |
 | Registrar login na auditoria | ❌ |
 

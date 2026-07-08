@@ -144,3 +144,4 @@ vite.config.ts.timestamp-*
 
 /app/generated/prisma
 dev.db
+.playwright-mcp/

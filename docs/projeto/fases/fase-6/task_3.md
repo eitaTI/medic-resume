@@ -1,16 +1,18 @@
-# Task 3: Página de Admins
+# Task 3: Página de Usuários
 
-❌ **Pendente** — criar `app/admin/admins/page.tsx`
+⚠️ **Placeholder criado** — `app/admin/usuarios/page.tsx`
 
-Criar `app/admin/admins/page.tsx` (Server Component):
+Placeholder criado na Fase 4 para evitar 404 nas rotas do navbar. Implementação completa pendente. Rota renomeada de `/admin/admins` para `/admin/usuarios`.
+
+Criar `app/admin/usuarios/page.tsx` (Server Component):
 - Buscar todos os admins do Prisma ordenados por `createdAt desc`
-- Título "Gerenciar Admins"
+- Título "Gerenciar Usuários"
 - Renderizar `AdminForm` no topo
-- Seção "Admins Cadastrados": lista com nome (bold), email, data de criação formatada (pt-BR)
-- Mensagem "Nenhum admin cadastrado" se lista vazia
+- Seção "Usuários Cadastrados": lista com nome (bold), email, data de criação formatada (pt-BR)
+- Mensagem "Nenhum usuário cadastrado" se lista vazia
 
 ## Commit
 
 ```
-feat(admin): criar página de gerenciamento de admins
+feat(admin): criar página de gerenciamento de usuários
 ```

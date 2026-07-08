@@ -1,6 +1,8 @@
 # Task 5: Página de Auditoria
 
-❌ **Pendente** — criar `app/admin/auditoria/page.tsx`
+⚠️ **Placeholder criado** — `app/admin/auditoria/page.tsx`
+
+Placeholder criado na Fase 4 para evitar 404 nas rotas do navbar. Implementação completa pendente.
 
 Criar `app/admin/auditoria/page.tsx` (Server Component):
 - Ler `searchParams`: `acao`, `dataInicio`, `dataFim`

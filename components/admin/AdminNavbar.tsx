@@ -6,7 +6,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle'
 
 const links = [
   { href: '/admin', label: 'Dashboard' },
-  { href: '/admin/admins', label: 'Admins' },
+  { href: '/admin/usuarios', label: 'Usuários' },
   { href: '/admin/auditoria', label: 'Auditoria' },
 ]
 

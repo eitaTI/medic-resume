@@ -27,6 +27,8 @@ Após as fases 2 e 3, o projeto tem as seguintes características que impactam e
 | Layout protegido `/admin` | ✅ Concluído |
 | Dashboard `/admin` | ✅ Concluído (substituído placeholder) |
 | Detalhe `/admin/submissao/[id]` | ✅ Concluído |
+| Login via fetch client-side | ✅ Concluído (corrigido nesta sessão) |
+| Middleware cookie name | ✅ Concluído (corrigido nesta sessão) |
 
 ## Estrutura
 
