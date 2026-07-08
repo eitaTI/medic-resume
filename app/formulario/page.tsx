@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useState, useActionState } from 'react'
+import { useState, useActionState, useEffect } from 'react'
 import { useFormStatus } from 'react-dom'
 import { FormProvider, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -38,7 +38,18 @@ export default function FormularioPage() {
     defaultValues,
   })
 
-  const { handleSubmit, getValues, reset } = formMethods
+  const { handleSubmit, getValues, reset, setFocus } = formMethods
+
+  useEffect(() => {
+    const campos = {
+      0: 'nomeClinica' as const,
+      1: 'usuarios.0.nome' as const,
+      2: 'cabecalhoLaudo' as const,
+      3: 'equipamentos.0.tipo' as const,
+    }
+    const campo = campos[passoAtual as keyof typeof campos]
+    setTimeout(() => setFocus(campo), 100)
+  }, [passoAtual, setFocus])
 
   const montarFormData = (): FormData => {
     const dados = getValues()
