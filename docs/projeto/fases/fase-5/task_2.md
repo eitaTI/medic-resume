@@ -7,7 +7,7 @@ Alterar `actions/submissoes.ts`:
 - Retornar `{ sucesso: true, jiraIssueKey }`
 - **`rejeitarSubmissao(id, motivo)`**: manter implementação existente (status `'REJEITADA'`, `motivoRejeicao`, `reviewedAt`)
 - Adicionar `// TODO: Registrar auditoria` em ambas
-- Garantir verificação de sessão (`auth()`) em ambas
+- Garantir verificação de sessão (`auth.api.getSession({ headers: await headers() })`) em ambas
 
 ## Commit
 

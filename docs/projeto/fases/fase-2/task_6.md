@@ -1,22 +1,26 @@
-# Task 6: Componente StepMedicos
+# Task 6: Componente StepUsuarios
 
-✅ **Concluído** — `components/wizard/StepMedicos.tsx`
+✅ **Concluído** — `components/wizard/StepUsuarios.tsx`
 
-Criar `components/wizard/StepMedicos.tsx`:
-- Componente `'use client'` com props `medicos` (array) e `onChange`
-- Interface `Medico`: `{ nome, documento, email, assinatura?: File }`
-- Lista dinâmica: adicionar médico, remover médico, atualizar campos
-- Cada médico: Nome, Documento (CRM/CPF), Email, Assinatura (FileUpload, accept image/*)
-- Botão "+ Adicionar Médico"
+Criar `components/wizard/StepUsuarios.tsx`:
+- Componente `'use client'` com React Hook Form (`useFieldArray`)
+- Interface `Usuario`: `{ nome, documento, email, tipo, temAssinatura, assinatura?: File }`
+- Lista dinâmica: adicionar usuário, remover usuário, atualizar campos
+- Cada usuário:
+  - Nome, Documento (CRM/CPF), Email
+  - `tipo`: select com opções `examinador` / `solicitante` / `recepcao` (padrão: `examinador`)
+  - `temAssinatura`: checkbox que revela FileUpload para imagem de assinatura
+- Primeiro usuário fixo como "Médico Examinador" (tipo não editável)
+- Botão "+ Adicionar Usuário" (variante secundario)
 
 ## Correção aplicada
 
-**`key={index}` → `key={medico.id}`** — usar o índice do array como key em listas dinâmicas (com adição/remoção) causa bugs de reconciliação no React. Exemplo: com 3 médicos cadastrados, remover o primeiro faz com que as keys `0,1,2` sejam reatribuídas aos médicos restantes, misturando valores dos campos de formulário entre os cards. A solução foi adicionar um campo `id` único estável (gerado por contador incremental) no lugar do índice.
+**`key={index}` → `key={usuario.id}`** — usar o índice do array como key em listas dinâmicas (com adição/remoção) causa bugs de reconciliação no React. Foi adicionado um campo `id` único estável (gerado por `crypto.randomUUID()`) no lugar do índice.
 
-**Interface `Medico` atualizada:** agora inclui o campo `id: string` obrigatório. O helper `criarMedicoVazio()` centraliza a criação de médicos com ID único.
+**Interface `Usuario` atualizada:** agora inclui os campos `id: string`, `tipo: 'examinador' | 'solicitante' | 'recepcao'`, `temAssinatura: boolean`.
 
 ## Commit
 
 ```
-feat(wizard): criar StepMedicos com lista dinâmica de médicos
+feat(wizard): criar StepUsuarios com lista dinâmica, tipo e assinatura
 ```

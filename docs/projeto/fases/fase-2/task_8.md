@@ -1,17 +1,19 @@
-# Task 8: Componente StepDispositivos
+# Task 8: Componente StepEquipamentos
 
-✅ **Concluído** — `components/wizard/StepDispositivos.tsx`
+✅ **Concluído** — `components/wizard/StepEquipamentos.tsx`
 
-Criar `components/wizard/StepDispositivos.tsx`:
-- Componente `'use client'` com props `dispositivos` (array) e `onChange`
-- Interface `Dispositivo`: `{ tipo, marca, modelo, numeroSerie }`
-- Lista dinâmica: adicionar dispositivo, remover, atualizar
-- Cada dispositivo: Tipo (placeholder "Ex: Raio-X, Ultrassom, etc."), Marca, Modelo, Número de Série
-- Botão "+ Adicionar Dispositivo" (variante secundario)
-- Botão "Remover" em cada dispositivo (variante perigo, tamanho pequeno)
+Criar `components/wizard/StepEquipamentos.tsx`:
+- Componente `'use client'` com React Hook Form (`useFieldArray`)
+- Interface `Equipamento`: `{ tipo, marca, modelo, numeroSerie }`
+- Lista dinâmica: adicionar equipamento, remover, atualizar
+- Cada equipamento: Tipo (placeholder "Ex: Raio-X, Ultrassom, etc."), Marca, Modelo, Número de Série
+- Botão "+ Adicionar Equipamento" (variante secundario)
+- Botão "Remover" em cada equipamento (variante perigo, tamanho pequeno)
+
+> **Nota:** O modelo Prisma ainda se chama `Dispositivo` — a UI usa "Equipamentos" como label.
 
 ## Commit
 
 ```
-feat(wizard): criar StepDispositivos com lista dinâmica de dispositivos
+feat(wizard): criar StepEquipamentos com lista dinâmica de equipamentos
 ```

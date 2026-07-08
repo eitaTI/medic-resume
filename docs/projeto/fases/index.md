@@ -62,9 +62,9 @@ Fase 1 (Setup) — base do projeto
 | FileUpload UI | ✅ |
 | Stepper | ✅ |
 | StepClinica | ✅ |
-| StepMedicos | ✅ |
+| StepUsuarios | ✅ |
 | StepExames | ✅ |
-| StepDispositivos | ✅ |
+| StepEquipamentos | ✅ |
 | Validação Zod | ✅ |
 | Server Action submissão | ✅ |
 | Página principal do Wizard | ✅ |
