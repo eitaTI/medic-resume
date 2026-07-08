@@ -12,9 +12,6 @@ export interface Exame {
   laudo?: File
 }
 
-// Contador para gerar IDs únicos para cada exame
-let exameIdCounter = 0
-
 // Interface que representa um exame com ID para controle do React
 interface ExameComId extends Exame {
   id: string
@@ -22,7 +19,7 @@ interface ExameComId extends Exame {
 
 // Factory function para criar um exame vazio com ID único
 export function criarExameVazio(): ExameComId {
-  return { id: `exame_${++exameIdCounter}`, nome: '' }
+  return { id: crypto.randomUUID(), nome: '' }
 }
 
 // Props do componente StepExames
