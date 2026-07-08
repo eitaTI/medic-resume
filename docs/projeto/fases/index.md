@@ -29,14 +29,14 @@ Fase 1 (Setup) — base do projeto
 | Fase | Descrição | Tasks | Status |
 |------|-----------|-------|--------|
 | 1 | Setup do Projeto | 9/9 | ✅ Concluído |
-| 2 | Formulário Público | 9/11 | ⚠️ Parcial |
+| 2 | Formulário Público | 9/11 | ✅ Concluído |
 | 3 | Autenticação e Login | 4/4 | ✅ Concluído |
 | 4 | Painel Admin | 0/7 | ❌ Pendente |
 | 5 | Integração Jira | 0/4 | ❌ Pendente |
 | 6 | Gerenciar Admins | 0/3 | ❌ Pendente |
 | 7 | Sistema de Auditoria | 1/7 | ⚠️ Parcial |
 | 8 | Sistema de Backup | 0/4 | ❌ Pendente |
-| 9 | Deploy com Docker | 1/5 | ⚠️ Parcial |
+| 9 | Deploy com Docker | 0/5 | ❌ Pendente |
 | | **Total** | **24/54** | **~44%** |
 
 ## Detalhamento
@@ -54,7 +54,7 @@ Fase 1 (Setup) — base do projeto
 | Better Auth configurado | ✅ |
 | Scripts package.json | ✅ |
 
-### ⚠️ Fase 2 — Formulário Público
+### ✅ Fase 2 — Formulário Público
 | Task | Status |
 |------|--------|
 | Button UI | ✅ |
@@ -65,8 +65,8 @@ Fase 1 (Setup) — base do projeto
 | StepMedicos | ✅ |
 | StepExames | ✅ |
 | StepDispositivos | ✅ |
-| Validação Zod | ❌ |
-| Server Action submissão | ❌ |
+| Validação Zod | ✅ |
+| Server Action submissão | ✅ |
 | Página principal do Wizard | ✅ |
 
 ### ✅ Fase 3 — Autenticação e Login
@@ -122,10 +122,10 @@ Fase 1 (Setup) — base do projeto
 | Docker Compose com backup | ❌ |
 | Testar backup/restore | ❌ |
 
-### ⚠️ Fase 9 — Deploy com Docker
+### ❌ Fase 9 — Deploy com Docker
 | Task | Status |
 |------|--------|
-| Dockerfile | ✅ |
+| Dockerfile | ❌ |
 | .dockerignore | ❌ |
 | docker-compose.yml completo | ❌ |
 | .env.production + build/deploy | ❌ |
