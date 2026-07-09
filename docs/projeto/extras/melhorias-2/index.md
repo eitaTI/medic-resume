@@ -20,9 +20,9 @@ Atualmente os arquivos são salvos em pastas planas (`data/uploads/logos/`, `dat
 
 | # | Arquivo | Descrição | Prioridade | Status |
 |---|---------|-----------|------------|--------|
-| 1 | `task_1.md` | Adicionar `slugify` e refatorar `salvarArquivo` para estrutura hierárquica | Alta | ❌ Pendente |
-| 2 | `task_2.md` | Reestruturar `submeterFormulario`: Clinica no banco antes dos arquivos | Alta | ❌ Pendente |
-| 3 | `task_3.md` | try/catch com limpeza de arquivos órfãos no disco | Alta | ❌ Pendente |
+| 1 | `task_1.md` | Adicionar `slugify` e refatorar `salvarArquivo` para estrutura hierárquica | Alta | ✅ Concluído |
+| 2 | `task_2.md` | Reestruturar `submeterFormulario`: Clinica no banco antes dos arquivos | Alta | ✅ Concluído |
+| 3 | `task_3.md` | try/catch com limpeza de arquivos órfãos no disco | Alta | ✅ Concluído |
 | 4 | `task_4.md` | Criar rota API `GET /api/uploads/[...path]` com autenticação | Média | ❌ Pendente |
 | 5 | `task_5.md` | Atualizar `middleware.ts` para proteger `/api/uploads/` | Média | ❌ Pendente |
 

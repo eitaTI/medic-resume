@@ -1,9 +1,10 @@
 'use server'
 
-import { writeFile, mkdir } from 'fs/promises'
+import { writeFile, mkdir, rm } from 'fs/promises'
 import path from 'path'
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
+import type { Clinica } from '@prisma/client'
 import { schemaClinica, schemaMedico, schemaExame, schemaDispositivo } from '@/lib/validacoes'
 
 function extrairArray(formData: FormData, prefix: string): Record<number, Record<string, FormDataEntryValue>> {
@@ -23,10 +24,26 @@ function extrairArray(formData: FormData, prefix: string): Record<number, Record
   return resultado
 }
 
-async function salvarArquivo(file: File | null, subdir: string): Promise<string | null> {
+function slugify(text: string): string {
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\w\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .toLowerCase()
+    .slice(0, 60)
+}
+
+async function salvarArquivo(
+  file: File | null,
+  submissionFolder: string,
+  tipo: string,
+): Promise<string | null> {
   if (!file || file.size === 0) return null
 
-  const dir = path.join(process.cwd(), 'data', 'uploads', subdir)
+  const dir = path.join(process.cwd(), 'data', 'uploads', submissionFolder, tipo)
   await mkdir(dir, { recursive: true })
 
   const ext = path.extname(file.name)
@@ -36,7 +53,7 @@ async function salvarArquivo(file: File | null, subdir: string): Promise<string 
   const bytes = await file.arrayBuffer()
   await writeFile(caminho, Buffer.from(bytes))
 
-  return `data/uploads/${subdir}/${nomeUnico}`
+  return `data/uploads/${submissionFolder}/${tipo}/${nomeUnico}`
 }
 
 export async function submeterFormulario(formData: FormData) {
@@ -79,57 +96,83 @@ export async function submeterFormulario(formData: FormData) {
       if (!v.success) return { erro: v.error.issues[0].message }
     }
 
-    const logoFile = formData.get('logo') as File | null
-    const logoPath = await salvarArquivo(logoFile, 'logos')
+    let clinica: Clinica
+    let submissionFolder = ''
 
-    const clinica = await prisma.clinica.create({
-      data: {
-        ...validacao.data,
-        logoPath,
-        cabecalhoLaudo,
-        rodapeLaudo,
-        medicos: {
-          create: await Promise.all(
-            medicoIndices.map(async (i) => {
-              const m = medicosRaw[i]
-              const assinatura = formData.get(`medicos[${i}].assinatura`) as File | null
-              const assinaturaPath = await salvarArquivo(assinatura, 'assinaturas')
+    try {
+      clinica = await prisma.clinica.create({
+        data: {
+          ...validacao.data,
+          cabecalhoLaudo,
+          rodapeLaudo,
+          dispositivos: {
+            create: dispositivoIndices.map((i) => {
+              const d = dispositivosRaw[i]
               return {
-                nome: m.nome as string,
-                documento: m.documento as string,
-                email: m.email as string,
-                tipo: (m.tipo as string) || 'examinador',
-                assinaturaPath,
+                tipo: d.tipo as string,
+                marca: d.marca as string,
+                modelo: d.modelo as string,
+                numeroSerie: d.numeroSerie as string,
               }
-            })
-          ),
+            }),
+          },
         },
-        exames: {
-          create: await Promise.all(
-            exameIndices.map(async (i) => {
-              const e = examesRaw[i]
-              const laudo = formData.get(`exames[${i}].laudo`) as File | null
-              const laudoPath = await salvarArquivo(laudo, 'laudos')
-              return {
-                nome: e.nome as string,
-                laudoPath,
-              }
-            })
-          ),
-        },
-        dispositivos: {
-          create: dispositivoIndices.map((i) => {
-            const d = dispositivosRaw[i]
-            return {
-              tipo: d.tipo as string,
-              marca: d.marca as string,
-              modelo: d.modelo as string,
-              numeroSerie: d.numeroSerie as string,
-            }
-          }),
-        },
-      },
-    })
+      })
+
+      submissionFolder = `${clinica.id}-${slugify(clinica.nomeClinica)}`
+
+      const logoFile = formData.get('logo') as File | null
+      const logoPath = await salvarArquivo(logoFile, submissionFolder, 'logo')
+      if (logoPath) {
+        await prisma.clinica.update({
+          where: { id: clinica.id },
+          data: { logoPath },
+        })
+      }
+
+      const medicosData = await Promise.all(
+        medicoIndices.map(async (i) => {
+          const m = medicosRaw[i]
+          const assinatura = formData.get(`medicos[${i}].assinatura`) as File | null
+          const assinaturaPath = await salvarArquivo(assinatura, submissionFolder, 'assinaturas')
+          return {
+            clinicaId: clinica.id,
+            nome: m.nome as string,
+            documento: m.documento as string,
+            email: m.email as string,
+            tipo: (m.tipo as string) || 'examinador',
+            assinaturaPath,
+          }
+        }),
+      )
+
+      if (medicosData.length > 0) {
+        await prisma.medico.createMany({ data: medicosData })
+      }
+
+      const examesData = await Promise.all(
+        exameIndices.map(async (i) => {
+          const e = examesRaw[i]
+          const laudo = formData.get(`exames[${i}].laudo`) as File | null
+          const laudoPath = await salvarArquivo(laudo, submissionFolder, 'laudos')
+          return {
+            clinicaId: clinica.id,
+            nome: e.nome as string,
+            laudoPath,
+          }
+        }),
+      )
+
+      if (examesData.length > 0) {
+        await prisma.exame.createMany({ data: examesData })
+      }
+    } catch (innerErro) {
+      if (submissionFolder) {
+        const uploadDir = path.join(process.cwd(), 'data', 'uploads', submissionFolder)
+        await rm(uploadDir, { recursive: true, force: true }).catch(() => {})
+      }
+      throw innerErro
+    }
 
     console.log(`Submissão criada: Clinica #${clinica.id}`)
     revalidatePath('/admin')
