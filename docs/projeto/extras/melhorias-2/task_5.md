@@ -1,6 +1,6 @@
 # Task 5: Atualizar `middleware.ts` para proteger `/api/uploads/`
 
-❌ **Pendente**
+✅ **Concluído**
 
 Adicionar `/api/uploads/:path*` ao `matcher` do middleware existente para redirecionar usuários não autenticados antes mesmo de chegarem à rota de arquivos.
 
