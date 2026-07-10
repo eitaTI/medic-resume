@@ -1,0 +1,30 @@
+services:
+  app:
+    # Placeholder para a aplicação definida na Fase 9
+    image: node:20-alpine
+    restart: always
+    volumes:
+      - .:/app
+      - sqlite-data:/app/prisma
+      - uploads:/app/data/uploads
+
+  backup:
+    image: alpine:latest
+    volumes:
+      - sqlite-data:/data/db:ro
+      - uploads:/data/uploads:ro
+      - ./backups:/backups
+      - ./scripts:/scripts:ro
+    entrypoint: |
+      sh -c "
+        apk add --no-cache sqlite bash &&
+        echo '0 2 * * * cd /scripts && bash backup.sh' | crontab - &&
+        crond -f -l 2
+      "
+    restart: unless-stopped
+    depends_on:
+      - app
+
+volumes:
+  uploads:
+  sqlite-data:
