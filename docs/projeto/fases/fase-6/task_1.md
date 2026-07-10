@@ -1,6 +1,6 @@
 # Task 1: Server Actions de Admins
 
-❌ **Pendente** — criar `actions/admins.ts`
+✅ **Concluído** — criar `actions/admins.ts`
 
 Criar `actions/admins.ts` (`'use server'`):
 

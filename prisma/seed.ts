@@ -1,6 +1,5 @@
 import { prisma } from '../lib/prisma';
 import { randomUUID } from 'node:crypto';
-// @ts-expect-error - módulo existe em runtime (exportado via package.json exports)
 import { hashPassword } from '@better-auth/utils/password';
 
 async function main() {

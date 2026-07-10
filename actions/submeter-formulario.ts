@@ -41,19 +41,19 @@ async function salvarArquivo(file: File | null, subdir: string): Promise<string 
 
 export async function submeterFormulario(formData: FormData) {
   try {
+    const cabecalhoLaudo = (formData.get('cabecalhoLaudo') as string) || ''
+    const rodapeLaudo = (formData.get('rodapeLaudo') as string) || ''
+
     const dadosClinica = {
-      nomeClinica: formData.get('nomeClinica') as string,
-      nomeTitular: formData.get('nomeTitular') as string,
-      emailTitular: formData.get('emailTitular') as string,
+      nomeClinica: (formData.get('nomeClinica') as string) || '',
+      nomeTitular: (formData.get('nomeTitular') as string) || '',
+      emailTitular: (formData.get('emailTitular') as string) || '',
       celularTitular: (formData.get('celularTitular') as string) || undefined,
       documentoTitular: (formData.get('documentoTitular') as string) || undefined,
     }
 
     const validacao = schemaClinica.safeParse(dadosClinica)
     if (!validacao.success) return { erro: validacao.error.issues[0].message }
-
-    const cabecalhoLaudo = (formData.get('cabecalhoLaudo') as string) || ''
-    const rodapeLaudo = (formData.get('rodapeLaudo') as string) || ''
 
     const medicosRaw = extrairArray(formData, 'medicos')
     const medicoIndices = Object.keys(medicosRaw).map(Number).sort()
@@ -84,7 +84,13 @@ export async function submeterFormulario(formData: FormData) {
 
     const clinica = await prisma.clinica.create({
       data: {
-        ...validacao.data,
+        nomeEmpresa: (formData.get('nomeEmpresa') as string) || null,
+        nomeClinica: validacao.data.nomeClinica,
+        nomeTitular: validacao.data.nomeTitular,
+        emailTitular: validacao.data.emailTitular,
+        quantidadeMedicos: parseInt(formData.get('quantidadeMedicos') as string) || 1,
+        celularTitular: validacao.data.celularTitular || null,
+        documentoTitular: validacao.data.documentoTitular || null,
         logoPath,
         cabecalhoLaudo,
         rodapeLaudo,
