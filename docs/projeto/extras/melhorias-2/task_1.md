@@ -1,6 +1,6 @@
 # Task 1: Adicionar `slugify` e Refatorar `salvarArquivo` para Estrutura Hierárquica
 
-❌ **Pendente**
+✅ **Concluído**
 
 Criar função `slugify` para normalizar o nome da clínica e refatorar `salvarArquivo` para salvar arquivos em `data/uploads/{submissionFolder}/{tipo}/...`.
 

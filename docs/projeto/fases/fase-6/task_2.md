@@ -1,6 +1,6 @@
 # Task 2: Componente AdminForm
 
-❌ **Pendente** — criar `components/admin/AdminForm.tsx`
+✅ **Concluído** — criar `components/admin/AdminForm.tsx`
 
 Criar `components/admin/AdminForm.tsx` (`'use client'`):
 - `useActionState` com wrapper inline que chama `criarAdmin()` e dá `router.refresh()` em caso de sucesso
