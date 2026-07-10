@@ -7,13 +7,13 @@ import { headers } from 'next/headers'
 /**
  * Filtros opcionais para busca de logs de auditoria.
  *
- * - adminId: filtra por ID do administrador que realizou a ação
+ * - userId: filtra por ID do usuário que realizou a ação (Better Auth User.id)
  * - acao: filtra por tipo de ação (CRIAR, APROVAR, REJEITAR, EXCLUIR, LOGIN)
  * - dataInicio: data inicial do período (formato ISO: YYYY-MM-DD)
  * - dataFim: data final do período (formato ISO: YYYY-MM-DD)
  */
 interface FiltrosAuditoria {
-  adminId?: number
+  userId?: string
   acao?: string
   dataInicio?: string
   dataFim?: string
@@ -57,8 +57,8 @@ export async function listarAuditoria(filtros?: FiltrosAuditoria) {
     // Monta o objeto 'where' dinamicamente
     // Só inclui os filtros que foram informados pelo usuário
     const where = {
-      // Filtro por administrador específico
-      ...(filtros?.adminId && { adminId: filtros.adminId }),
+      // Filtro por usuário específico (Better Auth User.id)
+      ...(filtros?.userId && { userId: filtros.userId }),
       // Filtro por tipo de ação (ex: apenas "APROVAR")
       ...(filtros?.acao && { acao: filtros.acao }),
       // Filtro por período (se informado)
@@ -68,12 +68,12 @@ export async function listarAuditoria(filtros?: FiltrosAuditoria) {
     // Busca os logs no banco de dados
     const logs = await prisma.auditLog.findMany({
       where,
-      // Inclui dados do admin (nome e email) para exibição na tela
+      // Inclui dados do usuário (Better Auth) para exibição na tela
       include: {
-        admin: {
+        user: {
           select: {
             id: true,
-            nome: true,
+            name: true,
             email: true
           }
         }

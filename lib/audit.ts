@@ -5,15 +5,15 @@ import { prisma } from './prisma'
 /**
  * Parâmetros aceitos pela função registrarAcao.
  *
- * - adminId: ID do administrador que realizou a ação (opcional para ações anônimas)
+ * - userId: ID do usuário que realizou a ação (Better Auth User.id, String UUID)
  * - acao: tipo da ação realizada (CRIAR, APROVAR, REJEITAR, EXCLUIR, LOGIN)
- * - entidade: nome da entidade afetada (Clinica, Medico, Admin, etc.)
+ * - entidade: nome da entidade afetada (Clinica, Medico, User, etc.)
  * - entidadeId: ID da entidade afetada (opcional)
  * - detalhes: objeto com informações extras sobre a ação (opcional)
  * - ipAddress: endereço IP de onde a ação foi realizada (opcional)
  */
 interface RegistrarAcaoParams {
-  adminId?: number
+  userId?: string
   acao: string
   entidade: string
   entidadeId?: number
@@ -31,7 +31,7 @@ interface RegistrarAcaoParams {
  * Exemplo de uso:
  * ```ts
  * await registrarAcao({
- *   adminId: 1,
+ *   userId: 'abc123-uuid-from-better-auth',
  *   acao: 'CRIAR',
  *   entidade: 'Clinica',
  *   entidadeId: 15,
@@ -53,7 +53,7 @@ export async function registrarAcao(params: RegistrarAcaoParams) {
   // Insere o registro de auditoria no banco de dados
   return prisma.auditLog.create({
     data: {
-      adminId: params.adminId,
+      userId: params.userId,
       acao: params.acao,
       entidade: params.entidade,
       entidadeId: params.entidadeId,

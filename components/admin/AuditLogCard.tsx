@@ -15,7 +15,7 @@ interface AuditLog {
   entidade: string
   entidadeId?: number | null
   detalhes?: string | null
-  admin?: { nome: string; email: string } | null
+  user?: { name: string; email: string } | null
 }
 
 /**
@@ -111,7 +111,7 @@ export function AuditLogCard({ log }: AuditLogCardProps) {
 
           {/* Nome do admin e data/hora */}
           <div className="mt-1 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-            <span>{log.admin?.nome || 'Sistema'}</span>
+            <span>{log.user?.name || 'Sistema'}</span>
             <span>·</span>
             <span>{dataFormatada}</span>
           </div>
