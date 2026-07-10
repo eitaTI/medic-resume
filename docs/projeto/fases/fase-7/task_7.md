@@ -1,6 +1,6 @@
 # Task 7: Registrar Login na Auditoria
 
-❌ **Pendente** — atualizar `actions/login.ts`
+✅ **Concluído** — atualizar `actions/login.ts`
 
 Em `actions/login.ts`:
 - Importar `registrarAcao` e `prisma`
