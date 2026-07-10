@@ -1,6 +1,6 @@
 # Task 3: Página de Usuários
 
-⚠️ **Placeholder criado** — `app/admin/usuarios/page.tsx`
+✅ **Concluído** — `app/admin/usuarios/page.tsx`
 
 Placeholder criado na Fase 4 para evitar 404 nas rotas do navbar. Implementação completa pendente. Rota renomeada de `/admin/admins` para `/admin/usuarios`.
 
