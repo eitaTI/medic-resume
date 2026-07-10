@@ -33,8 +33,8 @@ Fase 1 (Setup) — base do projeto
 | 3 | Autenticação e Login | 4/4 | ✅ Concluído |
 | 4 | Painel Admin | 7/7 | ✅ Concluído |
 | 5 | Integração Jira | 0/4 | ❌ Pendente |
-| 6 | Gerenciar Usuários | 0/3 | ⚠️ Placeholder |
-| 7 | Sistema de Auditoria | 1/7 | ⚠️ Parcial |
+| 6 | Gerenciar Usuários | 3/3 | ✅ |
+| 7 | Sistema de Auditoria | 7/7 | ✅ |
 | 8 | Sistema de Backup | 0/4 | ❌ Pendente |
 | 9 | Deploy com Docker | 0/5 | ❌ Pendente |
 | | **Total** | **31/54** | **~57%** |
@@ -99,9 +99,9 @@ Fase 1 (Setup) — base do projeto
 ### ❌ Fase 6 — Gerenciar Usuários
 | Task | Status |
 |------|--------|
-| Server Actions admins | ❌ |
-| AdminForm | ❌ |
-| Página `/admin/usuarios` | ⚠️ Placeholder |
+| Server Actions admins | ✅ |
+| AdminForm | ✅ |
+| Página `/admin/usuarios` | ✅  |
 
 ### ⚠️ Fase 7 — Sistema de Auditoria
 | Task | Status |
