@@ -1,9 +1,10 @@
 'use server'
 
-import { writeFile, mkdir } from 'fs/promises'
+import { writeFile, mkdir, rm } from 'fs/promises'
 import path from 'path'
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
+import type { Clinica } from '@prisma/client'
 import { schemaClinica, schemaMedico, schemaExame, schemaDispositivo } from '@/lib/validacoes'
 
 function extrairArray(formData: FormData, prefix: string): Record<number, Record<string, FormDataEntryValue>> {
@@ -23,10 +24,26 @@ function extrairArray(formData: FormData, prefix: string): Record<number, Record
   return resultado
 }
 
-async function salvarArquivo(file: File | null, subdir: string): Promise<string | null> {
+function slugify(text: string): string {
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\w\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .toLowerCase()
+    .slice(0, 60)
+}
+
+async function salvarArquivo(
+  file: File | null,
+  submissionFolder: string,
+  tipo: string,
+): Promise<string | null> {
   if (!file || file.size === 0) return null
 
-  const dir = path.join(process.cwd(), 'data', 'uploads', subdir)
+  const dir = path.join(process.cwd(), 'data', 'uploads', submissionFolder, tipo)
   await mkdir(dir, { recursive: true })
 
   const ext = path.extname(file.name)
@@ -36,7 +53,7 @@ async function salvarArquivo(file: File | null, subdir: string): Promise<string 
   const bytes = await file.arrayBuffer()
   await writeFile(caminho, Buffer.from(bytes))
 
-  return `data/uploads/${subdir}/${nomeUnico}`
+  return `data/uploads/${submissionFolder}/${tipo}/${nomeUnico}`
 }
 
 export async function submeterFormulario(formData: FormData) {
@@ -79,18 +96,12 @@ export async function submeterFormulario(formData: FormData) {
       if (!v.success) return { erro: v.error.issues[0].message }
     }
 
-    const logoFile = formData.get('logo') as File | null
-    const logoPath = await salvarArquivo(logoFile, 'logos')
+    let clinica: Clinica
+    let submissionFolder = ''
 
     const clinica = await prisma.clinica.create({
       data: {
-        nomeEmpresa: (formData.get('nomeEmpresa') as string) || null,
-        nomeClinica: validacao.data.nomeClinica,
-        nomeTitular: validacao.data.nomeTitular,
-        emailTitular: validacao.data.emailTitular,
-        quantidadeMedicos: parseInt(formData.get('quantidadeMedicos') as string) || 1,
-        celularTitular: validacao.data.celularTitular || null,
-        documentoTitular: validacao.data.documentoTitular || null,
+        ...validacao.data,
         logoPath,
         cabecalhoLaudo,
         rodapeLaudo,

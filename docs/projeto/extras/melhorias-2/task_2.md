@@ -1,6 +1,6 @@
 # Task 2: Reestruturar `submeterFormulario` — Clinica no Banco Antes dos Arquivos
 
-❌ **Pendente**
+✅ **Concluído**
 
 Reordenar o fluxo de `submeterFormulario` para criar o registro `Clinica` no banco de dados (passo b) **antes** de salvar os arquivos (passos d–f), permitindo usar `clinica.id` como parte do caminho das pastas.
 

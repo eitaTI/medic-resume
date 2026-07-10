@@ -1,6 +1,6 @@
 # Task 3: try/catch com Limpeza de Arquivos Órfãos
 
-❌ **Pendente**
+✅ **Concluído**
 
 Adicionar tratamento de erro robusto no `submeterFormulario` para garantir que, se algo falhar durante o salvamento de arquivos ou criação de registros, os arquivos já escritos no disco sejam limpos.
 

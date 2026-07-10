@@ -11,6 +11,7 @@ Sistema de coleta de dados de clínicas médicas com wizard público de 4 etapas
 | Onde | Conteúdo |
 |------|----------|
 | [`docs/dev/`](docs/dev/) | Padrões de código, componentes, server actions, banco, estilos, git |
+| [`docs/dev/WINDOWS-SETUP.md`](docs/dev/WINDOWS-SETUP.md) | Configuração do ambiente Windows (Modo Desenvolvedor, troubleshooting) |
 | [`docs/dev/DEV-WORKFLOW.md`](docs/dev/DEV-WORKFLOW.md) | HMR, teste em tempo real, comandos do dia a dia |
 | [`docs/projeto/fases/index.md`](docs/projeto/fases/index.md) | Status do projeto (~46%) por fase |
 | [`docs/projeto/extras/`](docs/projeto/extras/) | Oportunidades de melhorias encontradas  |

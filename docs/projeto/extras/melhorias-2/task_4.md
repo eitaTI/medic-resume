@@ -1,6 +1,6 @@
 # Task 4: Criar Rota API `GET /api/uploads/[...path]` com Autenticação
 
-❌ **Pendente**
+✅ **Concluído**
 
 Criar uma rota de API do Next.js que permita ao admin visualizar e baixar os arquivos enviados (logos, assinaturas, laudos) que estão armazenados em `data/uploads/`. A rota deve verificar autenticação e prevenir path traversal.
 
