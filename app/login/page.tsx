@@ -1,45 +1,44 @@
 'use client'
 
-import { useState } from 'react'
+import { useActionState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { login } from '@/actions/login'
 
+/**
+ * Página de Login do Admin.
+ *
+ * Utiliza Server Action do Next.js para autenticar o usuário.
+ * O login é processado server-side via Better Auth e registrado
+ * no log de auditoria automaticamente.
+ *
+ * Funcionalidades:
+ * - Formulário de email/senha
+ * - Tratamento de erros (credenciais inválidas)
+ * - Redirecionamento para /admin após sucesso
+ * - Indicador de carregamento durante submissão
+ */
 export default function LoginPage() {
   const router = useRouter()
-  const [erro, setErro] = useState<string | null>(null)
-  const [isPending, setIsPending] = useState(false)
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setErro(null)
-    setIsPending(true)
+  // useActionState gerencia o estado da server action
+  // - state: resultado da última execução (null no início)
+  // - formAction: função para submeter o formulário
+  // - isPending: true enquanto a action está executando
+  const [state, formAction, isPending] = useActionState(
+    async (_prev: { erro?: string } | null, formData: FormData) => {
+      const resultado = await login(formData)
+      return resultado
+    },
+    null
+  )
 
-    const formData = new FormData(e.currentTarget)
-    const email = formData.get('email') as string
-    const senha = formData.get('senha') as string
-
-    try {
-      const res = await fetch('/api/auth/sign-in/email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password: senha }),
-      })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        setErro(data.message || 'Credenciais inválidas')
-        return
-      }
-
-      router.push('/admin')
-    } catch {
-      setErro('Erro ao conectar com o servidor')
-    } finally {
-      setIsPending(false)
-    }
+  // Se o login foi bem-sucedido, redireciona para o admin
+  if (state && 'sucesso' in state && state.sucesso) {
+    router.push('/admin')
+    return null
   }
 
   return (
@@ -54,13 +53,15 @@ export default function LoginPage() {
         <div className="w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-8 shadow-lg">
           <h1 className="mb-6 text-center text-2xl font-bold text-gray-900 dark:text-gray-100">Login Admin</h1>
 
-          {erro && (
+          {/* Exibe mensagem de erro se houver */}
+          {state && 'erro' in state && state.erro && (
             <div className="mb-4 rounded-lg bg-red-50 dark:bg-red-900/50 p-4 text-sm text-red-600 dark:text-red-400">
-              {erro}
+              {state.erro}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Formulário de login usando Server Action */}
+          <form action={formAction} className="space-y-4">
             <Input
               label="E-mail"
               type="email"
