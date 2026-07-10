@@ -96,9 +96,9 @@ export async function submeterFormulario(formData: FormData) {
       if (!v.success) return { erro: v.error.issues[0].message }
     }
 
-    let clinica: Clinica
-    let submissionFolder = ''
-
+    const logoFile = formData.get('logo') as File | null
+    const logoPath = await salvarArquivo(logoFile, 'logos', '')
+    
     const clinica = await prisma.clinica.create({
       data: {
         ...validacao.data,
@@ -109,31 +109,31 @@ export async function submeterFormulario(formData: FormData) {
           create: await Promise.all(
             medicoIndices.map(async (i) => {
               const m = medicosRaw[i]
-              const assinatura = formData.get(`medicos[${i}].assinatura`) as File | null
-              const assinaturaPath = await salvarArquivo(assinatura, 'assinaturas')
-              return {
-                nome: m.nome as string,
-                documento: m.documento as string,
-                email: m.email as string,
-                tipo: (m.tipo as string) || 'examinador',
-                assinaturaPath,
-              }
-            })
-          ),
-        },
-        exames: {
-          create: await Promise.all(
-            exameIndices.map(async (i) => {
-              const e = examesRaw[i]
-              const laudo = formData.get(`exames[${i}].laudo`) as File | null
-              const laudoPath = await salvarArquivo(laudo, 'laudos')
-              return {
-                nome: e.nome as string,
-                laudoPath,
-              }
-            })
-          ),
-        },
+               const assinatura = formData.get(`medicos[${i}].assinatura`) as File | null
+               const assinaturaPath = await salvarArquivo(assinatura, 'assinaturas', 'assinaturas')
+               return {
+                 nome: m.nome as string,
+                 documento: m.documento as string,
+                 email: m.email as string,
+                 tipo: (m.tipo as string) || 'examinador',
+                 assinaturaPath,
+               }
+             })
+           ),
+         },
+         exames: {
+           create: await Promise.all(
+             exameIndices.map(async (i) => {
+               const e = examesRaw[i]
+               const laudo = formData.get(`exames[${i}].laudo`) as File | null
+               const laudoPath = await salvarArquivo(laudo, 'laudos', 'laudos')
+               return {
+                 nome: e.nome as string,
+                 laudoPath,
+               }
+             })
+           ),
+         },
         dispositivos: {
           create: dispositivoIndices.map((i) => {
             const d = dispositivosRaw[i]
