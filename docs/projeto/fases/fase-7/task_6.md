@@ -1,6 +1,6 @@
 # Task 6: Integrar Auditoria nas Server Actions
 
-❌ **Pendente** — atualizar `actions/submissoes.ts` e `actions/admins.ts`
+✅ **Concluído**  — atualizar `actions/submissoes.ts` e `actions/admins.ts`
 
 **Em `actions/submissoes.ts`:**
 - Importar `registrarAcao` de `@/lib/audit`
