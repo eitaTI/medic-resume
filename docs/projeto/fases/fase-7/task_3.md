@@ -1,6 +1,6 @@
 # Task 3: Action de Auditoria
 
-❌ **Pendente** — criar `actions/auditoria.ts`
+✅ **Concluído** — criar `actions/auditoria.ts`
 
 Criar `actions/auditoria.ts` (`'use server'`):
 - Função `listarAuditoria(filtros?)` com filtros opcionais: `adminId`, `acao`, `dataInicio`, `dataFim`
