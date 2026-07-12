@@ -73,6 +73,7 @@ model Clinica {
   status            String    @default("PENDENTE")
   motivoRejeicao    String?
   jiraIssueKey      String?
+  jiraSyncStatus    String?
   createdAt         DateTime  @default(now())
   reviewedAt        DateTime?
 

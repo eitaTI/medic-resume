@@ -1,17 +1,18 @@
 import { prisma } from '@/lib/prisma'
-import { AdminForm } from '@/components/admin/AdminForm'
 
 /**
- * Página de Gerenciamento de Usuários (Administradores).
- * 
- * Server Component:
- * - Busca a lista completa de administradores ordenados pela data de criação.
- * - Exibe formulário de criação (AdminForm) para novos administradores.
- * - Lista usuários existentes com nome, email e data de cadastro.
+ * Página de Gerenciamento de Usuários.
+ *
+ * Após a migração para o Better Auth, os usuários do sistema passam a ser
+ * registros do modelo `User` (Better Auth), e não mais do modelo `Admin`
+ * (removido). Esta página lista os usuários existentes em ordem de criação.
+ *
+ * Server Component (leitura apenas):
+ * - Busca a lista completa de usuários ordenados pela data de criação.
+ * - Exibe nome, e-mail e data de cadastro de cada usuário.
  */
 export default async function UsuariosPage() {
-  // Busca todos os administradores ordenados do mais recente para o mais antigo.
-  const admins = await prisma.admin.findMany({
+  const usuarios = await prisma.user.findMany({
     orderBy: { createdAt: 'desc' },
   })
 
@@ -21,42 +22,32 @@ export default async function UsuariosPage() {
         Gerenciar Usuários
       </h1>
 
-      {/* Formulário de Criação no Topo */}
-      <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-6 shadow-lg mb-8">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-          Novo Usuário
-        </h2>
-        <AdminForm />
-      </div>
-
-      {/* Seção de Listagem */}
       <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-6 shadow-lg">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
           Usuários Cadastrados
         </h2>
 
-        {admins.length === 0 ? (
+        {usuarios.length === 0 ? (
           <p className="text-gray-500 dark:text-gray-400">
             Nenhum usuário cadastrado.
           </p>
         ) : (
           <div className="divide-y divide-gray-200 dark:divide-gray-700">
-            {admins.map((admin) => (
+            {usuarios.map((usuario) => (
               <div
-                key={admin.id}
+                key={usuario.id}
                 className="flex items-center justify-between py-3"
               >
                 <div>
                   <p className="font-medium text-gray-900 dark:text-gray-100">
-                    {admin.nome}
+                    {usuario.name}
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {admin.email}
+                    {usuario.email}
                   </p>
                 </div>
                 <p className="text-sm text-gray-400 dark:text-gray-500">
-                  {/* Data formatada em PT-BR */}
-                  {admin.createdAt.toLocaleDateString('pt-BR', {
+                  {usuario.createdAt.toLocaleDateString('pt-BR', {
                     day: '2-digit',
                     month: 'long',
                     year: 'numeric',

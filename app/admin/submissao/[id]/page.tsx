@@ -40,7 +40,12 @@ export default async function DetalheSubmissaoPage({ params }: Props) {
           </h1>
           <StatusBadge status={clinica.status as 'PENDENTE' | 'APROVADA' | 'REJEITADA'} />
         </div>
-        <AprovarRejeitarButtons clinicaId={clinica.id} status={clinica.status} />
+        <AprovarRejeitarButtons
+          clinicaId={clinica.id}
+          status={clinica.status}
+          jiraSyncStatus={clinica.jiraSyncStatus}
+          jiraIssueKey={clinica.jiraIssueKey}
+        />
       </div>
 
       <div className={cardClass}>

@@ -13,12 +13,14 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@better-auth/utils": "^0.4.2",
     "@hookform/resolvers": "^5.4.0",
     "@prisma/adapter-better-sqlite3": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "bcryptjs": "^3.0.3",
     "better-auth": "^1.6.23",
     "better-sqlite3": "^12.11.1",
+    "jira.js": "^5.4.0",
     "next": "^15",
     "ofetch": "^1.5.1",
     "react": "^19",
