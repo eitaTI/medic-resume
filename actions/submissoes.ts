@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { criarCardJira } from '@/lib/jira'
+import { registrarAcao } from '@/lib/audit'
 
 export async function listarSubmissoes(filtro?: { status?: string }) {
   try {
@@ -54,6 +55,7 @@ export async function detalharSubmissao(id: number) {
 
 export async function aprovarSubmissao(id: number) {
   try {
+    // Verifica se o usuário está autenticado
     const session = await auth.api.getSession({ headers: await headers() })
     if (!session) return { erro: 'Não autenticado' }
 
@@ -102,6 +104,17 @@ export async function aprovarSubmissao(id: number) {
         data: { jiraSyncStatus: 'ERRO' },
       })
     }
+
+    await registrarAcao({
+      userId: session.user.id,
+      acao: 'APROVAR',
+      entidade: 'Clinica',
+      entidadeId: id,
+      detalhes: {
+        jiraIssueKey,
+        nomeClinica: clinica.nomeClinica,
+      }
+    })
 
     revalidatePath('/admin')
     return { sucesso: true, jiraIssueKey, jiraErro }
@@ -160,9 +173,17 @@ export async function sincronizarJira(id: number) {
 
 export async function rejeitarSubmissao(id: number, motivo: string) {
   try {
+    // Verifica se o usuário está autenticado
     const session = await auth.api.getSession({ headers: await headers() })
     if (!session) return { erro: 'Não autenticado' }
 
+    // Busca dados da clínica antes de atualizar (para o log de auditoria)
+    const clinica = await prisma.clinica.findUnique({
+      where: { id },
+      select: { nomeClinica: true }
+    })
+
+    // Atualiza o status da clínica para REJEITADA
     await prisma.clinica.update({
       where: { id },
       data: {
@@ -172,6 +193,19 @@ export async function rejeitarSubmissao(id: number, motivo: string) {
       },
     })
 
+    // Registra ação de auditoria: rejeição da clínica
+    await registrarAcao({
+      userId: session.user.id,
+      acao: 'REJEITAR',
+      entidade: 'Clinica',
+      entidadeId: id,
+      detalhes: {
+        motivo,
+        nomeClinica: clinica?.nomeClinica
+      }
+    })
+
+    // Atualiza a página para refletir as mudanças
     revalidatePath('/admin')
     return { sucesso: true }
   } catch {

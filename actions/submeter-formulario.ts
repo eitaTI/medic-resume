@@ -98,7 +98,6 @@ export async function submeterFormulario(formData: FormData) {
     const submissionFolder = `${slugify(validacao.data.nomeClinica)}-${Date.now()}`
     const logo = formData.get('logo') as File | null
     const logoPath = await salvarArquivo(logo, submissionFolder, 'logo')
-
     const clinica = await prisma.clinica.create({
       data: {
         ...validacao.data,

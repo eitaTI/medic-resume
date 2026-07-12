@@ -1,6 +1,6 @@
 # Task 2: Helper de Auditoria
 
-❌ **Pendente** — criar `lib/audit.ts`
+✅ **Concluído** — criar `lib/audit.ts`
 
 Criar `lib/audit.ts`:
 - Função `registrarAcao(params)` com: `adminId?`, `acao`, `entidade`, `entidadeId?`, `detalhes?` (Record), `ipAddress?`

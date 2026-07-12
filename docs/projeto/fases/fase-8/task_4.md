@@ -1,6 +1,6 @@
 # Task 4: Testar Backup/Restore
 
-❌ **Pendente** — validação manual do fluxo
+✅ **Concluído** — validação manual do fluxo
 
 **Scripts locais (desenvolvimento):**
 - Executar `wsl bash scripts/backup.sh` e verificar arquivos criados em `backups/`

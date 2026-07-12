@@ -1,6 +1,6 @@
 # Task 3: Serviço de Backup no Docker Compose
 
-❌ **Pendente** — adicionar serviço de backup ao `docker-compose.yml`
+✅ **Concluído**  — adicionar serviço de backup ao `docker-compose.yml`
 
 Complementar o `docker-compose.yml` criado na **Fase 9** com o serviço de backup:
 
