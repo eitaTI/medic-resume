@@ -36,8 +36,8 @@ Fase 1 (Setup) — base do projeto
 | 6 | Gerenciar Usuários | 3/3 | ✅ |
 | 7 | Sistema de Auditoria | 7/7 | ✅ Concluído |
 | 8 | Sistema de Backup | 6/6 | ✅ Concluído |
-| 9 | Deploy com Docker | 0/5 | ❌ Pendente |
-| | **Total** | **49/56** | **~88%** |
+| 9 | Deploy com Docker | 4/4 | ✅ Concluído |
+| | **Total** | **53/55** | **~96%** |
 
 ## Detalhamento
 
@@ -124,10 +124,10 @@ Fase 1 (Setup) — base do projeto
 | Compatibilidade Docker dos scripts | ✅ |
 | `.gitignore` (backups/uploads) | ✅ |
 
-### ❌ Fase 9 — Deploy com Docker
+### ✅ Fase 9 — Deploy com Docker
 | Task | Status |
 |------|--------|
-| Dockerfile | ❌ |
-| .dockerignore | ❌ |
-| docker-compose.yml completo | ❌ |
-| .env.production + build/deploy | ❌ |
+| Dockerfile | ✅ |
+| .dockerignore | ✅ |
+| docker-compose.yml completo | ✅ |
+| .env.production + build/deploy | ✅ |
