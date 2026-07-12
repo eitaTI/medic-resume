@@ -1,6 +1,6 @@
 # Task 2: Script de Restauração
 
-❌ **Pendente** — criar `scripts/restore.sh`
+✅ **Concluído** — criar `scripts/restore.sh`
 
 Criar `scripts/restore.sh`:
 - Receber `TIMESTAMP` como argumento

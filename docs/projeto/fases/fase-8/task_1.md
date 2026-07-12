@@ -1,6 +1,6 @@
 # Task 1: Script de Backup
 
-❌ **Pendente** — criar `scripts/backup.sh`
+✅ **Concluído** — criar `scripts/backup.sh`
 
 Criar `scripts/backup.sh`:
 - Config: `BACKUP_DIR=./backups`, `DB_PATH=./prisma/dev.db`, `UPLOADS_DIR=./data/uploads`, `RETENCAO_DIAS=30`
