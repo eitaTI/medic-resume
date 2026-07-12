@@ -1,10 +1,9 @@
 'use server'
 
-import { writeFile, mkdir, rm } from 'fs/promises'
+import { writeFile, mkdir } from 'fs/promises'
 import path from 'path'
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
-import type { Clinica } from '@prisma/client'
 import { schemaClinica, schemaMedico, schemaExame, schemaDispositivo } from '@/lib/validacoes'
 
 function extrairArray(formData: FormData, prefix: string): Record<number, Record<string, FormDataEntryValue>> {
@@ -96,8 +95,9 @@ export async function submeterFormulario(formData: FormData) {
       if (!v.success) return { erro: v.error.issues[0].message }
     }
 
-    let clinica: Clinica
-    let submissionFolder = ''
+    const submissionFolder = `${slugify(validacao.data.nomeClinica)}-${Date.now()}`
+    const logo = formData.get('logo') as File | null
+    const logoPath = await salvarArquivo(logo, submissionFolder, 'logo')
 
     const clinica = await prisma.clinica.create({
       data: {
@@ -110,7 +110,7 @@ export async function submeterFormulario(formData: FormData) {
             medicoIndices.map(async (i) => {
               const m = medicosRaw[i]
               const assinatura = formData.get(`medicos[${i}].assinatura`) as File | null
-              const assinaturaPath = await salvarArquivo(assinatura, 'assinaturas')
+              const assinaturaPath = await salvarArquivo(assinatura, submissionFolder, 'assinaturas')
               return {
                 nome: m.nome as string,
                 documento: m.documento as string,
@@ -126,7 +126,7 @@ export async function submeterFormulario(formData: FormData) {
             exameIndices.map(async (i) => {
               const e = examesRaw[i]
               const laudo = formData.get(`exames[${i}].laudo`) as File | null
-              const laudoPath = await salvarArquivo(laudo, 'laudos')
+              const laudoPath = await salvarArquivo(laudo, submissionFolder, 'laudos')
               return {
                 nome: e.nome as string,
                 laudoPath,
