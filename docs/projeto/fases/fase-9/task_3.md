@@ -1,6 +1,6 @@
 # Task 3: docker-compose.yml Completo
 
-❌ **Pendente** — criar `docker-compose.yml`
+✅ **Concluído** — criar `docker-compose.yml`
 
 Criar `docker-compose.yml` (sem `version`, Compose v2):
 
@@ -48,3 +48,14 @@ npx prisma db seed || true
 ```
 feat(docker): criar docker-compose.yml com app, healthcheck e volumes persistidos
 ```
+
+## Ajustes aplicados vs. spec original
+- `DATABASE_URL=file:/data/db/dev.db` (absoluto) e volume `sqlite-data:/data/db`, alinhados
+  ao serviço `backup` da Fase 8 (que lê `DB_PATH=/data/db/dev.db`). O banco fica em `./dev.db`
+  relativo ao cwd, que no container é `/app` → `/app/dev.db`; usar caminho absoluto evita
+  ambiguidade e mantém backup/restauração consistentes.
+- Adicionado `HOSTNAME=0.0.0.0` no `app` — o `server.js` standalone binda em `localhost` por
+  padrão, o que bloqueia o acesso externo via port mapping.
+- `healthcheck` aponta para `/api/health` (rota criada em `app/api/health/route.ts`).
+- Serviço `backup` (Fase 8) mantido e integrado, com os mesmos volumes `sqlite-data`/`uploads`.
+- Entrypoint de migrate/seed vive em `scripts/start.sh` (referenciado pelo `CMD` do Dockerfile).
