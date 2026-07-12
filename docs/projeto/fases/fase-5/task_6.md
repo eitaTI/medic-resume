@@ -1,6 +1,6 @@
 # Task 6: Anexar imagens e PDFs reais ao card Jira
 
-❌ **Pendente** — anexar arquivos de `data/uploads/` à issue via `jira.js`
+✅ **Pronto** — anexar arquivos de `data/uploads/` à issue via `jira.js`
 
 ## Objetivo
 

@@ -1,3 +1,6 @@
+import { existsSync } from 'node:fs'
+import { readFile } from 'node:fs/promises'
+import path from 'node:path'
 import { Version3Client } from 'jira.js'
 
 export interface ClinicaParaJira {
@@ -63,6 +66,17 @@ function montarDescricao(clinica: ClinicaParaJira): ADFParagraph[] {
   return bloco
 }
 
+async function anexarArquivo(client: Version3Client, issueKey: string, caminhoRelativo: string | null | undefined) {
+  if (!caminhoRelativo) return
+  const abs = path.join(process.cwd(), caminhoRelativo)
+  if (!existsSync(abs)) return
+  const buffer = await readFile(abs)
+  await client.issueAttachments.addAttachment({
+    issueIdOrKey: issueKey,
+    attachment: { file: buffer, filename: path.basename(abs) },
+  })
+}
+
 export async function criarCardJira(clinica: ClinicaParaJira): Promise<string> {
   const client = new Version3Client({
     host: process.env.JIRA_BASE_URL || '',
@@ -92,6 +106,19 @@ export async function criarCardJira(clinica: ClinicaParaJira): Promise<string> {
       },
     },
   })
+
+  try {
+    await anexarArquivo(client, issue.key, clinica.logoPath)
+    for (const m of clinica.medicos) {
+      await anexarArquivo(client, issue.key, m.assinaturaPath)
+    }
+    for (const e of clinica.exames) {
+      await anexarArquivo(client, issue.key, e.laudoPath)
+    }
+  } catch (err) {
+    console.error('Falha ao anexar arquivos ao card Jira:', err instanceof Error ? err.message : err)
+    if (err instanceof Error) console.error(err.stack)
+  }
 
   return issue.key
 }
