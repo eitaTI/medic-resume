@@ -1,35 +1,125 @@
 'use client'
 
 import { useState, useActionState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { StatusBadge } from '@/components/ui/StatusBadge'
-import { aprovarSubmissao, rejeitarSubmissao } from '@/actions/submissoes'
+import { aprovarSubmissao, rejeitarSubmissao, sincronizarJira } from '@/actions/submissoes'
 
 interface AprovarRejeitarButtonsProps {
   clinicaId: number
   status: string
+  jiraSyncStatus?: string | null
+  jiraIssueKey?: string | null
 }
 
-export function AprovarRejeitarButtons({ clinicaId, status }: AprovarRejeitarButtonsProps) {
+type AprovarResult = { sucesso: boolean; jiraIssueKey?: string | null; jiraErro?: string | null } | { erro: string } | null
+type SincronizarResult = { sucesso: boolean; jiraIssueKey: string } | { erro: string } | null
+
+function FeedbackJira({
+  clinicaId,
+  jiraSyncStatus,
+  jiraIssueKey,
+  sincResult,
+  sincState,
+  sincando,
+}: {
+  clinicaId: number
+  jiraSyncStatus?: string | null
+  jiraIssueKey?: string | null
+  sincResult: SincronizarResult
+  sincState: (formData: FormData) => void
+  sincando: boolean
+}) {
+  if (jiraSyncStatus === 'SINCRONIZADO') {
+    return (
+      <p className="text-sm text-green-600 dark:text-green-400">
+        Card criado: {jiraIssueKey}
+      </p>
+    )
+  }
+
+  if (jiraSyncStatus === 'ERRO') {
+    return (
+      <div className="flex flex-col gap-2">
+        <p className="text-sm text-amber-600 dark:text-amber-400">
+          Card Jira pendente — tente novamente
+        </p>
+        <form action={sincState} className="flex gap-2 items-center">
+          <input type="hidden" name="clinicaId" value={clinicaId} />
+          <Button type="submit" variante="secundario" tamanho="pequeno" disabled={sincando}>
+            {sincando ? 'Sincronizando...' : 'Tentar novamente Jira'}
+          </Button>
+        </form>
+        {sincResult && 'erro' in sincResult && (
+          <p className="text-sm text-red-600 dark:text-red-400">{sincResult.erro}</p>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <p className="text-sm text-gray-500 dark:text-gray-400">Sincronizando com o Jira...</p>
+  )
+}
+
+export function AprovarRejeitarButtons({
+  clinicaId,
+  status,
+  jiraSyncStatus,
+  jiraIssueKey,
+}: AprovarRejeitarButtonsProps) {
+  const router = useRouter()
   const [mostrarMotivo, setMostrarMotivo] = useState(false)
   const [motivo, setMotivo] = useState('')
 
-  const aprovarAction = async (_prev: unknown, formData: FormData) => {
+  const aprovarAction = async (_prev: AprovarResult, formData: FormData): Promise<AprovarResult> => {
     const id = parseInt(formData.get('clinicaId') as string)
-    return aprovarSubmissao(id)
+    const res = await aprovarSubmissao(id)
+    if (res && 'sucesso' in res) router.refresh()
+    return res
   }
 
   const rejeitarAction = async (_prev: unknown, formData: FormData) => {
     const id = parseInt(formData.get('clinicaId') as string)
     const motivoTexto = formData.get('motivo') as string
-    return rejeitarSubmissao(id, motivoTexto)
+    const res = await rejeitarSubmissao(id, motivoTexto)
+    if (res && 'sucesso' in res) router.refresh()
+    return res
   }
 
-  const [, aprovarFormAction, aprovando] = useActionState(aprovarAction, null)
+  const sincronizarAction = async (_prev: SincronizarResult, formData: FormData): Promise<SincronizarResult> => {
+    const id = parseInt(formData.get('clinicaId') as string)
+    const res = await sincronizarJira(id)
+    if (res && 'sucesso' in res) router.refresh()
+    return res
+  }
+
+  const [aprovarResult, aprovarFormAction, aprovando] = useActionState<AprovarResult, FormData>(aprovarAction, null)
   const [, rejeitarFormAction, rejeitando] = useActionState(rejeitarAction, null)
+  const [sincResult, sincFormAction, sincando] = useActionState<SincronizarResult, FormData>(sincronizarAction, null)
 
   if (status !== 'PENDENTE') {
-    return <StatusBadge status={status as 'PENDENTE' | 'APROVADA' | 'REJEITADA'} />
+    return (
+      <div className="flex flex-col gap-2 items-end">
+        <StatusBadge status={status as 'PENDENTE' | 'APROVADA' | 'REJEITADA'} />
+        <FeedbackJira
+          clinicaId={clinicaId}
+          jiraSyncStatus={jiraSyncStatus}
+          jiraIssueKey={jiraIssueKey}
+          sincResult={sincResult}
+          sincState={sincFormAction}
+          sincando={sincando}
+        />
+        {aprovarResult && 'sucesso' in aprovarResult && (
+          <p className="text-sm text-green-600 dark:text-green-400">
+            {aprovarResult.jiraIssueKey
+              ? `Card criado: ${aprovarResult.jiraIssueKey}`
+              : 'Aprovação concluída — card Jira pendente'}
+          </p>
+        )}
+      </div>
+    )
   }
 
   return (
