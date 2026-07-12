@@ -1,6 +1,6 @@
 # Task 5: Página de Auditoria
 
-⚠️ **Placeholder criado** — `app/admin/auditoria/page.tsx`
+✅ **Concluído** — `app/admin/auditoria/page.tsx`
 
 Placeholder criado na Fase 4 para evitar 404 nas rotas do navbar. Implementação completa pendente.
 

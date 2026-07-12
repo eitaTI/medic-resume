@@ -1,6 +1,6 @@
 # Task 4: Componente AuditLogCard
 
-❌ **Pendente** — criar `components/admin/AuditLogCard.tsx`
+✅ **Concluído** — criar `components/admin/AuditLogCard.tsx`
 
 Criar `components/admin/AuditLogCard.tsx` (`'use client'`):
 - Props: `log` com `id`, `createdAt`, `acao`, `entidade`, `entidadeId?`, `detalhes?`, `admin?`
