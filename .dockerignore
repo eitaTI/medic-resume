@@ -1,0 +1,10 @@
+node_modules
+.next
+.git
+.env
+.env.*
+backups/
+data/uploads/
+*.db
+*.db-journal
+prisma/dev.db

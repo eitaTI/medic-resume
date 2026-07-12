@@ -1,6 +1,10 @@
 # Task 2: .dockerignore
 
-❌ **Pendente** — criar `.dockerignore`
+✅ **Concluído** — criar `.dockerignore`
+
+## Ajustes aplicados
+- `pnpm-lock.yaml` **não** é excluído (o Stage 1 usa `pnpm install --frozen-lockfile`, que
+  exige o lockfile presente no contexto de build).
 
 Criar `.dockerignore`:
 
