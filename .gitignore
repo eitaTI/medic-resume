@@ -146,3 +146,9 @@ vite.config.ts.timestamp-*
 *dev.db
 .playwright-mcp/
 *jira-ts/
+
+# Backups gerados pelos scripts de backup
+backups/
+
+# Uploads de clínicas (LGPD — fora do versionamento)
+data/uploads/
