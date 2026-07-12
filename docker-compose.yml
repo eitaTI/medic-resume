@@ -10,6 +10,10 @@ services:
 
   backup:
     image: alpine:latest
+    environment:
+      DB_PATH: /data/db/dev.db
+      UPLOADS_DIR: /data/uploads
+      BACKUP_DIR: /backups
     volumes:
       - sqlite-data:/data/db:ro
       - uploads:/data/uploads:ro
@@ -18,7 +22,7 @@ services:
     entrypoint: |
       sh -c "
         apk add --no-cache sqlite bash &&
-        echo '0 2 * * * cd /scripts && bash backup.sh' | crontab - &&
+        echo '0 2 * * * cd /scripts && DB_PATH=/data/db/dev.db UPLOADS_DIR=/data/uploads BACKUP_DIR=/backups bash backup.sh' | crontab - &&
         crond -f -l 2
       "
     restart: unless-stopped

@@ -3,9 +3,11 @@
 # Script de Restauração de Backup
 # Uso: ./scripts/restore.sh <TIMESTAMP>
 
-BACKUP_DIR="./backups"
-DB_PATH="./prisma/dev.db"
-UPLOADS_DIR="./data/uploads"
+# Caminhos parametrizáveis (defaults para desenvolvimento local; em Docker,
+# o docker-compose injeta DB_PATH/UPLOADS_DIR/BACKUP_DIR apontando para os volumes)
+DB_PATH="${DB_PATH:-./dev.db}"
+UPLOADS_DIR="${UPLOADS_DIR:-./data/uploads}"
+BACKUP_DIR="${BACKUP_DIR:-./backups}"
 
 # Verifica se o timestamp foi informado
 if [ -z "$1" ]; then
