@@ -1,6 +1,6 @@
 # Task 1: Dockerfile
 
-❌ **Pendente** — criar `Dockerfile`
+✅ **Concluído** — criar `Dockerfile` multi-stage
 
 Criar `Dockerfile` multi-stage usando `output: 'standalone'` do Next.js:
 
@@ -54,3 +54,12 @@ CMD ["node", "server.js"]
 ```
 feat(docker): criar Dockerfile multi-stage com standalone output
 ```
+
+## Ajustes aplicados vs. spec original
+- Builder adiciona `python3 make g++` (`apk`) para compilar `better-sqlite3` no musl (Alpine).
+- Runner copia o `node_modules` completo do builder (e não só `node_modules/.prisma`),
+  garantindo o CLI do Prisma (migrate), o `tsx` (seed) e o binário nativo do `better-sqlite3`
+  em runtime.
+- `CMD` executa `scripts/start.sh` (migrate + seed + `node server.js`) em vez de `node server.js`
+  direto, para aplicar migrações no volume na subida do container.
+- Mantido `output: 'standalone'` (já configurado em `next.config.ts`).
