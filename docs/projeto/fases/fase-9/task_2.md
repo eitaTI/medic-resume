@@ -1,6 +1,10 @@
 # Task 2: .dockerignore
 
-❌ **Pendente** — criar `.dockerignore`
+✅ **Concluído** — criar `.dockerignore`
+
+## Ajustes aplicados
+- `pnpm-lock.yaml` **não** é excluído (o Stage 1 usa `pnpm install --frozen-lockfile`, que
+  exige o lockfile presente no contexto de build).
 
 Criar `.dockerignore`:
 
@@ -9,16 +13,14 @@ node_modules
 .next
 .git
 .env
-.env.local
-.env.production
+.env.*
 backups/
 data/uploads/
 *.db
 *.db-journal
 prisma/dev.db
-pnpm-lock.yaml
 ```
-> **Importante:** `pnpm-lock.yaml` é excluído porque no Stage 1 usamos `--frozen-lockfile`. Se for fazer rebuild local, pode remover essa linha.
+> **Importante:** `pnpm-lock.yaml` **não** é excluído — o Stage 1 usa `pnpm install --frozen-lockfile`, que exige o lockfile presente no contexto de build. Por isso ele não aparece na lista acima.
 
 ## Commit
 
