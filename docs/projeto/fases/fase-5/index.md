@@ -31,7 +31,7 @@ Criação automática de cards no Jira após aprovação de submissões, **integ
 | Migração Prisma (`jiraSyncStatus`) | ✅ Pronto |
 | Atualizar Server Action (`actions/submissoes.ts`) | ✅ Pronto |
 | Action `sincronizarJira(id)` (retry) | ✅ Pronto |
-| Botões com feedback Jira (`AprovarRejeitarButtons.tsx`) | ❌ Pendente |
+| Botões com feedback Jira (`AprovarRejeitarButtons.tsx`) | ✅ Pronto |
 | Variáveis de ambiente (`.env.example`) | ✅ Pronto (já existe) |
 
 ## Fluxo
@@ -82,7 +82,7 @@ Colunas já existentes / a adicionar no model `Clinica`:
 |---|---------|-----------|--------|
 | 1 | `lib/jira.ts` + `package.json` | Cliente Jira com `jira.js` e `criarCardJira` | ✅ Pronto |
 | 2 | `prisma/schema.prisma` + migration, `actions/submissoes.ts` | `jiraSyncStatus` + `aprovarSubmissao` (fail-open) + `sincronizarJira` | ✅ Pronto |
-| 3 | `components/admin/AprovarRejeitarButtons.tsx` | Feedback inline + retry do card Jira | ❌ Pendente |
+| 3 | `components/admin/AprovarRejeitarButtons.tsx` | Feedback inline + retry do card Jira | ✅ Pronto |
 | 4 | `.env.example` | Variáveis de ambiente (já presentes) | ✅ Pronto |
 
 ## Convenções do projeto (aplicar em todo código)

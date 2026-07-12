@@ -32,12 +32,12 @@ Fase 1 (Setup) — base do projeto
 | 2 | Formulário Público | 9/11 | ✅ Concluído |
 | 3 | Autenticação e Login | 4/4 | ✅ Concluído |
 | 4 | Painel Admin | 7/7 | ✅ Concluído |
-| 5 | Integração Jira | 2/4 | ⏳ Em andamento |
+| 5 | Integração Jira | 4/4 | ✅ Concluído |
 | 6 | Gerenciar Usuários | 3/3 | ✅ |
 | 7 | Sistema de Auditoria | 7/7 | ✅ |
 | 8 | Sistema de Backup | 0/4 | ❌ Pendente |
 | 9 | Deploy com Docker | 0/5 | ❌ Pendente |
-| | **Total** | **31/54** | **~57%** |
+| | **Total** | **35/54** | **~65%** |
 
 ## Detalhamento
 
@@ -88,13 +88,13 @@ Fase 1 (Setup) — base do projeto
 | Dashboard `/admin` | ✅ |
 | Detalhe `/admin/submissao/[id]` | ✅ |
 
-### ⏳ Fase 5 — Integração Jira
+### ✅ Fase 5 — Integração Jira
 | Task | Status |
 |------|--------|
 | Cliente Jira (`lib/jira.ts`) | ✅ |
 | Atualizar Server Action | ✅ |
-| Botões com feedback Jira | ❌ |
-| Variáveis de ambiente | ❌ |
+| Botões com feedback Jira | ✅ |
+| Variáveis de ambiente | ✅ |
 
 ### ❌ Fase 6 — Gerenciar Usuários
 | Task | Status |
