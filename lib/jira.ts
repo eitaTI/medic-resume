@@ -6,8 +6,14 @@ export interface ClinicaParaJira {
   nomeClinica: string
   nomeTitular: string
   emailTitular: string
+  celularTitular: string | null
+  documentoTitular: string | null
   quantidadeMedicos: number
-  exames: { nome: string }[]
+  logoPath?: string | null
+  cabecalhoLaudo?: string | null
+  rodapeLaudo?: string | null
+  medicos: { nome: string; documento: string; email: string; tipo: string; assinaturaPath?: string | null }[]
+  exames: { nome: string; laudoPath?: string | null }[]
   dispositivos: { tipo: string; marca: string; modelo: string; numeroSerie: string }[]
 }
 
@@ -26,12 +32,24 @@ function montarDescricao(clinica: ClinicaParaJira): ADFParagraph[] {
   if (clinica.nomeEmpresa) bloco.push(paragrafo(`Empresa: ${clinica.nomeEmpresa}`))
   bloco.push(paragrafo(`Titular: ${clinica.nomeTitular}`))
   bloco.push(paragrafo(`E-mail do titular: ${clinica.emailTitular}`))
+  bloco.push(paragrafo(`Celular do titular: ${clinica.celularTitular ?? '—'}`))
+  bloco.push(paragrafo(`Documento do titular: ${clinica.documentoTitular ?? '—'}`))
   bloco.push(paragrafo(`Quantidade de médicos: ${clinica.quantidadeMedicos}`))
+  if (clinica.logoPath) bloco.push(paragrafo(`Logo: ${clinica.logoPath} (anexo)`))
+  if (clinica.cabecalhoLaudo) bloco.push(paragrafo(`Cabeçalho do laudo: ${clinica.cabecalhoLaudo}`))
+  if (clinica.rodapeLaudo) bloco.push(paragrafo(`Rodapé do laudo: ${clinica.rodapeLaudo}`))
+
+  if (clinica.medicos.length > 0) {
+    bloco.push(paragrafo('Médicos:', true))
+    for (const m of clinica.medicos) {
+      bloco.push(paragrafo(`- ${m.nome} | ${m.tipo} | ${m.documento} | ${m.email}${m.assinaturaPath ? ' (assinatura anexa)' : ''}`))
+    }
+  }
 
   if (clinica.exames.length > 0) {
     bloco.push(paragrafo('Exames:', true))
     for (const exame of clinica.exames) {
-      bloco.push(paragrafo(`- ${exame.nome}`))
+      bloco.push(paragrafo(`- ${exame.nome}${exame.laudoPath ? ' (laudo anexo)' : ''}`))
     }
   }
 
@@ -56,11 +74,17 @@ export async function criarCardJira(clinica: ClinicaParaJira): Promise<string> {
     },
   })
 
+  const labels = (process.env.JIRA_LABELS || 'medic-resume')
+    .split(',')
+    .map((l) => l.trim())
+    .filter(Boolean)
+
   const issue = await client.issues.createIssue({
     fields: {
       summary: `Clínica aprovada: ${clinica.nomeClinica}`,
       project: { key: process.env.JIRA_PROJECT_KEY || 'ZSCAN' },
-      issuetype: { name: 'Task' },
+      issuetype: { name: process.env.JIRA_ISSUE_TYPE || 'Task' },
+      labels,
       description: {
         type: 'doc',
         version: 1,

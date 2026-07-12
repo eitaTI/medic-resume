@@ -65,7 +65,8 @@ export async function aprovarSubmissao(id: number) {
         jiraSyncStatus: 'PENDENTE',
       },
       include: {
-        exames: { select: { nome: true } },
+        medicos: { select: { nome: true, documento: true, email: true, tipo: true, assinaturaPath: true } },
+        exames: { select: { nome: true, laudoPath: true } },
         dispositivos: { select: { tipo: true, marca: true, modelo: true, numeroSerie: true } },
       },
     })
@@ -74,7 +75,22 @@ export async function aprovarSubmissao(id: number) {
     let jiraErro: string | null = null
 
     try {
-      jiraIssueKey = await criarCardJira(clinica)
+      jiraIssueKey = await criarCardJira({
+        id: clinica.id,
+        nomeEmpresa: clinica.nomeEmpresa,
+        nomeClinica: clinica.nomeClinica,
+        nomeTitular: clinica.nomeTitular,
+        emailTitular: clinica.emailTitular,
+        celularTitular: clinica.celularTitular,
+        documentoTitular: clinica.documentoTitular,
+        quantidadeMedicos: clinica.quantidadeMedicos,
+        logoPath: clinica.logoPath,
+        cabecalhoLaudo: clinica.cabecalhoLaudo,
+        rodapeLaudo: clinica.rodapeLaudo,
+        medicos: clinica.medicos,
+        exames: clinica.exames,
+        dispositivos: clinica.dispositivos,
+      })
       await prisma.clinica.update({
         where: { id },
         data: { jiraIssueKey, jiraSyncStatus: 'SINCRONIZADO' },
@@ -102,7 +118,8 @@ export async function sincronizarJira(id: number) {
     const clinica = await prisma.clinica.findUnique({
       where: { id },
       include: {
-        exames: { select: { nome: true } },
+        medicos: { select: { nome: true, documento: true, email: true, tipo: true, assinaturaPath: true } },
+        exames: { select: { nome: true, laudoPath: true } },
         dispositivos: { select: { tipo: true, marca: true, modelo: true, numeroSerie: true } },
       },
     })
@@ -111,7 +128,22 @@ export async function sincronizarJira(id: number) {
     if (clinica.status !== 'APROVADA') return { erro: 'A clínica não está aprovada' }
     if (clinica.jiraSyncStatus === 'SINCRONIZADO') return { erro: 'Jira já sincronizado' }
 
-    const jiraIssueKey = await criarCardJira(clinica)
+    const jiraIssueKey = await criarCardJira({
+      id: clinica.id,
+      nomeEmpresa: clinica.nomeEmpresa,
+      nomeClinica: clinica.nomeClinica,
+      nomeTitular: clinica.nomeTitular,
+      emailTitular: clinica.emailTitular,
+      celularTitular: clinica.celularTitular,
+      documentoTitular: clinica.documentoTitular,
+      quantidadeMedicos: clinica.quantidadeMedicos,
+      logoPath: clinica.logoPath,
+      cabecalhoLaudo: clinica.cabecalhoLaudo,
+      rodapeLaudo: clinica.rodapeLaudo,
+      medicos: clinica.medicos,
+      exames: clinica.exames,
+      dispositivos: clinica.dispositivos,
+    })
     await prisma.clinica.update({
       where: { id },
       data: { jiraIssueKey, jiraSyncStatus: 'SINCRONIZADO' },
