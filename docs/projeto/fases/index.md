@@ -34,10 +34,10 @@ Fase 1 (Setup) — base do projeto
 | 4 | Painel Admin | 7/7 | ✅ Concluído |
 | 5 | Integração Jira | 4/4 | ✅ Concluído |
 | 6 | Gerenciar Usuários | 3/3 | ✅ |
-| 7 | Sistema de Auditoria | 7/7 | ✅ |
-| 8 | Sistema de Backup | 0/4 | ❌ Pendente |
+| 7 | Sistema de Auditoria | 7/7 | ✅ Concluído |
+| 8 | Sistema de Backup | 6/6 | ✅ Concluído |
 | 9 | Deploy com Docker | 0/5 | ❌ Pendente |
-| | **Total** | **35/54** | **~65%** |
+| | **Total** | **49/56** | **~88%** |
 
 ## Detalhamento
 
@@ -96,31 +96,33 @@ Fase 1 (Setup) — base do projeto
 | Botões com feedback Jira | ✅ |
 | Variáveis de ambiente | ✅ |
 
-### ❌ Fase 6 — Gerenciar Usuários
+### ✅ Fase 6 — Gerenciar Usuários
 | Task | Status |
 |------|--------|
 | Server Actions admins | ✅ |
 | AdminForm | ✅ |
 | Página `/admin/usuarios` | ✅  |
 
-### ⚠️ Fase 7 — Sistema de Auditoria
+### ✅ Fase 7 — Sistema de Auditoria
 | Task | Status |
 |------|--------|
 | Schema AuditLog + migração | ✅ |
-| Helper `lib/audit.ts` | ❌ |
-| Action `actions/auditoria.ts` | ❌ |
-| AuditLogCard | ❌ |
-| Página `/admin/auditoria` | ⚠️ Placeholder |
-| Integrar nas Server Actions | ❌ |
-| Registrar login na auditoria | ❌ |
+| Helper `lib/audit.ts` | ✅ |
+| Action `actions/auditoria.ts` | ✅ |
+| AuditLogCard | ✅ |
+| Página `/admin/auditoria` | ✅ |
+| Integrar nas Server Actions | ✅ |
+| Registrar login na auditoria | ✅ |
 
-### ❌ Fase 8 — Sistema de Backup
+### ✅ Fase 8 — Sistema de Backup
 | Task | Status |
 |------|--------|
-| Script de backup | ❌ |
-| Script de restauração | ❌ |
-| Docker Compose com backup | ❌ |
-| Testar backup/restore | ❌ |
+| Script de backup | ✅ |
+| Script de restauração | ✅ |
+| Docker Compose com backup | ✅ |
+| Testar backup/restore | ✅ |
+| Compatibilidade Docker dos scripts | ✅ |
+| `.gitignore` (backups/uploads) | ✅ |
 
 ### ❌ Fase 9 — Deploy com Docker
 | Task | Status |
