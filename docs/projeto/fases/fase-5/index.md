@@ -26,8 +26,8 @@ Criação automática de cards no Jira após aprovação de submissões, **integ
 
 | Componente | Status |
 |-----------|--------|
-| Dependência `jira.js` no projeto | ❌ Pendente |
-| Cliente Jira (`lib/jira.ts`) | ❌ Pendente |
+| Dependência `jira.js` no projeto | ✅ Pronto |
+| Cliente Jira (`lib/jira.ts`) | ✅ Pronto |
 | Migração Prisma (`jiraSyncStatus`) | ❌ Pendente |
 | Atualizar Server Action (`actions/submissoes.ts`) | ❌ Pendente |
 | Action `sincronizarJira(id)` (retry) | ❌ Pendente |
@@ -80,7 +80,7 @@ Colunas já existentes / a adicionar no model `Clinica`:
 
 | # | Arquivo | Descrição | Status |
 |---|---------|-----------|--------|
-| 1 | `lib/jira.ts` + `package.json` | Cliente Jira com `jira.js` e `criarCardJira` | ❌ Pendente |
+| 1 | `lib/jira.ts` + `package.json` | Cliente Jira com `jira.js` e `criarCardJira` | ✅ Pronto |
 | 2 | `prisma/schema.prisma` + migration, `actions/submissoes.ts` | `jiraSyncStatus` + `aprovarSubmissao` (fail-open) + `sincronizarJira` | ❌ Pendente |
 | 3 | `components/admin/AprovarRejeitarButtons.tsx` | Feedback inline + retry do card Jira | ❌ Pendente |
 | 4 | `.env.example` | Variáveis de ambiente (já presentes) | ✅ Pronto |
