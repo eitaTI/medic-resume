@@ -41,6 +41,12 @@ export function StepClinica() {
         required
       />
 
+      <Input
+        label="Nome da Empresa"
+        {...register('nomeEmpresa')}
+        erro={errors.nomeEmpresa?.message}
+      />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input
           label="Nome do Titular"
@@ -75,6 +81,14 @@ export function StepClinica() {
           }}
         />
       </div>
+
+      <Input
+        label="Quantidade de Médicos"
+        type="number"
+        min={1}
+        {...register('quantidadeMedicos', { valueAsNumber: true })}
+        erro={errors.quantidadeMedicos?.message}
+      />
 
       <FileUpload
         label="Logo da Clínica"

@@ -62,10 +62,12 @@ export async function submeterFormulario(formData: FormData) {
 
     const dadosClinica = {
       nomeClinica: (formData.get('nomeClinica') as string) || '',
+      nomeEmpresa: (formData.get('nomeEmpresa') as string) || undefined,
       nomeTitular: (formData.get('nomeTitular') as string) || '',
       emailTitular: (formData.get('emailTitular') as string) || '',
       celularTitular: (formData.get('celularTitular') as string) || undefined,
       documentoTitular: (formData.get('documentoTitular') as string) || undefined,
+      quantidadeMedicos: Number(formData.get('quantidadeMedicos')) || 1,
     }
 
     const validacao = schemaClinica.safeParse(dadosClinica)

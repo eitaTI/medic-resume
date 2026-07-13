@@ -1,6 +1,6 @@
 # Task 6: Dashboard Admin
 
-❌ **Pendente** — refazer `app/admin/page.tsx` como Server Component
+✅ **Concluído** — refazer `app/admin/page.tsx` como Server Component
 
 O arquivo atual é um placeholder `'use client'` simples. Deve ser substituído por um Server Component completo.
 

@@ -1,6 +1,6 @@
 # Task 2: Substituir useState por useActionState + useFormStatus
 
-❌ **Pendente**
+✅ **Concluído**
 
 Migrar o estado de submissão (`submetendo`, `resultado`) para usar `useActionState` (React 19) e `useFormStatus` do React DOM.
 

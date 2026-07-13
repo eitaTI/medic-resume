@@ -15,7 +15,7 @@ O arquivo `.env.example` (raiz do projeto) **já contém** as variáveis necess�
 JIRA_BASE_URL=https://sua-empresa.atlassian.net
 JIRA_EMAIL=seu-email@empresa.com
 JIRA_API_TOKEN=seu_token_aqui
-JIRA_PROJECT_KEY=ZSCAN
+JIRA_PROJECT_KEY=EITATI
 ```
 
 ## Ações

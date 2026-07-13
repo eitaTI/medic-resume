@@ -1,6 +1,6 @@
 # Task 4: Componente AprovarRejeitarButtons
 
-❌ **Pendente** — criar `components/admin/AprovarRejeitarButtons.tsx`
+✅ **Concluído** — criar `components/admin/AprovarRejeitarButtons.tsx`
 
 Criar `components/admin/AprovarRejeitarButtons.tsx`:
 

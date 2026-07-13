@@ -1,10 +1,11 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { useBranding } from '@/components/providers/BrandingProvider'
 import { login } from '@/actions/login'
 
 /**
@@ -22,6 +23,7 @@ import { login } from '@/actions/login'
  */
 export default function LoginPage() {
   const router = useRouter()
+  const branding = useBranding()
 
   // useActionState gerencia o estado da server action
   // - state: resultado da última execução (null no início)
@@ -44,8 +46,8 @@ export default function LoginPage() {
   return (
     <div
       className="min-h-screen bg-cover bg-center bg-fixed transition-colors duration-300
-        bg-[url('/images/zscan-light-wallpaper.png')]
-        dark:bg-[url('/images/zscan-dark-wallpaper.png')]"
+        [background-image:var(--wp-light)] dark:[background-image:var(--wp-dark)]"
+      style={{ '--wp-light': branding.wallpaperLight, '--wp-dark': branding.wallpaperDark } as CSSProperties}
     >
       <ThemeToggle />
 
@@ -67,7 +69,7 @@ export default function LoginPage() {
               type="email"
               name="email"
               required
-              placeholder="admin@zscan.com"
+              placeholder="admin@eitati.com"
               disabled={isPending}
             />
 

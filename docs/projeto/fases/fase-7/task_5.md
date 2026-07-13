@@ -2,8 +2,6 @@
 
 ✅ **Concluído** — `app/admin/auditoria/page.tsx`
 
-Placeholder criado na Fase 4 para evitar 404 nas rotas do navbar. Implementação completa pendente.
-
 Criar `app/admin/auditoria/page.tsx` (Server Component):
 - Ler `searchParams`: `acao`, `dataInicio`, `dataFim`
 - Chamar `listarAuditoria` com filtros

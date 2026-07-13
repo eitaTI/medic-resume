@@ -1,6 +1,6 @@
 # Task 1: Migrar para React Hook Form + @hookform/resolvers
 
-❌ **Pendente**
+✅ **Concluído**
 
 Substituir os 5 `useState` do formulário por um único `useForm` do React Hook Form com resolução Zod.
 

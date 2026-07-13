@@ -1,6 +1,6 @@
 # Task 7: Substituir window.location.reload() por Reset Controlado
 
-❌ **Pendente**
+✅ **Concluído**
 
 A função `resetarFormulario()` atualmente recarrega a página inteira com `window.location.reload()`. Substituir por um reset controlado do estado do React Hook Form.
 

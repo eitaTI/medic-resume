@@ -26,7 +26,7 @@ pnpm exec prisma generate
 
 ## Seed
 Seed runs through `pnpm prisma db seed` (wired in `prisma.config.ts` + `package.json`, not
-the schema datasource). Admin seed: `admin@zscan.com` / `admin123`.
+the schema datasource). Admin seed: `admin@eitati.com` / `admin123`.
 
 ## First-run setup
 ```bash

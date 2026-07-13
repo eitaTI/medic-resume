@@ -42,13 +42,13 @@ Admin clica "Aprovar" → aprovarSubmissao(id) [server action]
   → buscar clínica + exames + dispositivos (prisma)
   → prisma.clinica.update: status='APROVADA', reviewedAt, jiraSyncStatus='PENDENTE'
   → tentar criarCardJira(clinica)  [lib/jira.ts → jira.js → Jira REST] (try/catch interno)
-       → sucesso: Jira retorna issue.key (ex: ZSCAN-42)
+       → sucesso: Jira retorna issue.key (ex: EITATI-42)
             → update: jiraIssueKey=key, jiraSyncStatus='SINCRONIZADO'
             → retorna { sucesso: true, jiraIssueKey }
        → falha: captura e.message
             → update: jiraSyncStatus='ERRO'  (aprovação NÃO é desfeita)
             → retorna { sucesso: true, jiraIssueKey: null, jiraErro: '<msg>' }
-  → UI: "Card criado: ZSCAN-42" (sucesso) OU "Card Jira pendente — tente novamente" (aviso)
+  → UI: "Card criado: EITATI-42" (sucesso) OU "Card Jira pendente — tente novamente" (aviso)
 
 Admin clica "Tentar novamente Jira" → sincronizarJira(id)
   → valida status==='APROVADA' e jiraSyncStatus!='SINCRONIZADO'
@@ -72,7 +72,7 @@ A função `criarCardJira` recebe a clínica já carregada com:
 
 Colunas já existentes / a adicionar no model `Clinica`:
 
-- `jiraIssueKey: String?` — já existe; armazena a chave retornada pelo Jira (ex.: `ZSCAN-42`).
+- `jiraIssueKey: String?` — já existe; armazena a chave retornada pelo Jira (ex.: `EITATI-42`).
 - `jiraSyncStatus: String?` — **a adicionar** (migration); valores:
   `PENDENTE` (tentando), `SINCRONIZADO` (card criado), `ERRO` (falhou, precisa retry).
 

@@ -5,7 +5,7 @@
 Em `actions/login.ts`:
 - Importar `registrarAcao` e `prisma`
 - Após autenticação bem-sucedida, buscar admin por email
-- Se encontrado, chamar `registrarAcao({ adminId, acao: 'LOGIN', entidade: 'Admin', entidadeId: admin.id })`
+- Se encontrado, chamar `registrarAcao({ userId, acao: 'LOGIN', entidade: 'User', entidadeId: user.id })`
 
 ## Commit
 

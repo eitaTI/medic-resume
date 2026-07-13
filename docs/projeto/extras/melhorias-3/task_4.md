@@ -1,6 +1,6 @@
 # Task 4: Corrigir Feedback e Retry do Jira (Fase 5 T3)
 
-❌ **Pendente**
+✅ **Concluído** — `jiraErro` exibido e retry para `!= SINCRONIZADO`
 
 ## Problema
 

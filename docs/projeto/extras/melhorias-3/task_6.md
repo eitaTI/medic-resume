@@ -1,6 +1,6 @@
 # Task 6: Limpezas Menores e Atualização de Docs Desatualizados
 
-❌ **Pendente**
+✅ **Concluído** — limpezas e docs atualizados
 
 ## Problema
 

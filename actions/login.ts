@@ -41,7 +41,8 @@ export async function login(formData: FormData) {
       userId: session.user.id,
       acao: 'LOGIN',
       entidade: 'User',
-      entidadeId: 0, // User usa String ID, mas entidadeId é Int
+      // User usa String ID; entidadeId é Int, então deixamos nulo e usamos userId.
+      entidadeId: null,
       detalhes: { email, nome: session.user.name }
     })
 

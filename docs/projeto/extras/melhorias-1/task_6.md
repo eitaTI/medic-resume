@@ -1,6 +1,6 @@
 # Task 6: Componente Select.tsx Reutilizável
 
-❌ **Pendente**
+✅ **Concluído**
 
 Extrair o `<select>` inline do `StepUsuarios.tsx` para um componente `Select` reutilizável, seguindo o mesmo padrão do `Input.tsx`.
 

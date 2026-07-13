@@ -18,10 +18,13 @@ done just because a doc mentions it — verify the ✅/❌ status first.
    repo before building on top of it.
 
 ## Current state (verify, may be stale)
-- Fases 1–7: implemented (incl. Jira Fase 5 e Auditoria Fase 7).
-- Fase 8 (Backup): scripts `backup.sh`/`restore.sh` e serviço no docker-compose prontos;
-  resta tornar os scripts compatíveis com Docker (env vars) e testar backup/restore.
-- Fase 9 (Docker): concluído (Dockerfile/.dockerignore/docker-compose.yml; deploy lê o .env padrão).
+- Fases 1–9: implemented, incluindo Jira (Fase 5), Auditoria (Fase 7) e Gerenciar Usuários
+  (Fase 6, via Better Auth `User` — o modelo `Admin` foi removido na migração
+  `reconcile_admin_to_user`).
+- Fase 8 (Backup): scripts `backup.sh`/`restore.sh` validados end-to-end (backup/restore de
+  DB + uploads; fallback `cp` quando `sqlite3` ausente). Concluído.
+- Extras `melhorias-1` (10/10), `melhorias-2` (5/5) e `melhorias-3` (6/6): todos concluídos.
+  Veja `docs/projeto/extras/`.
 
 ## Why this matters
 Tasks often describe the *intended* design (e.g. new columns, new actions) that are not

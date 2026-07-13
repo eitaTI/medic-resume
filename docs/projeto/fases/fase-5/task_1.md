@@ -1,11 +1,11 @@
 # Task 1: Cliente Jira (`lib/jira.ts`)
 
-❌ **Pendente** — criar `lib/jira.ts` usando `jira.js`
+✅ **Concluído** — criar `lib/jira.ts` usando `jira.js`
 
 ## Objetivo
 
 Criar em `lib/jira.ts` um cliente do Jira baseado na biblioteca `jira.js`, com uma
-função `criarCardJira(clinica)` que cria a issue e retorna a chave (ex.: `ZSCAN-42`).
+função `criarCardJira(clinica)` que cria a issue e retorna a chave (ex.: `EITATI-42`).
 
 **Não** criar serviço/servidor separado. Toda a chamada acontece no server (Server Action).
 
@@ -78,14 +78,14 @@ export async function criarCardJira(clinica: DadosClinicaJira): Promise<string> 
   const issue = await jira.issues.createIssue({
     fields: {
       project: { key: JIRA_PROJECT_KEY },
-      summary: `[ZScan] Cadastro - ${clinica.nomeClinica}`,
+      summary: `[EitaTI] Cadastro - ${clinica.nomeClinica}`,
       issuetype: { name: 'Task' },
       labels: ['cadastro', 'clinica'],
       description: montarDescricaoADF(clinica),
     },
   })
 
-  return issue.key // ex: "ZSCAN-42"
+  return issue.key // ex: "EITATI-42"
 }
 ```
 
@@ -93,8 +93,8 @@ export async function criarCardJira(clinica: DadosClinicaJira): Promise<string> 
 
 - Autenticação **Basic Auth** via `authentication.basic` do `jira.js` (`email` + `apiToken`).
 - `host` vem de `JIRA_BASE_URL` (ex.: `https://sua-empresa.atlassian.net`).
-- `project.key` vem de `JIRA_PROJECT_KEY` (ex.: `ZSCAN`).
-- `summary`: `[ZScan] Cadastro - {nomeClinica}`.
+- `project.key` vem de `JIRA_PROJECT_KEY` (ex.: `EITATI`).
+- `summary`: `[EitaTI] Cadastro - {nomeClinica}`.
 - `issuetype`: `Task`.
 - `labels`: `['cadastro', 'clinica']`.
 - `description`: **Atlassian Document Format (ADF)** conforme `montarDescricaoADF`.

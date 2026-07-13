@@ -1,6 +1,6 @@
 # Task 5: Layout Protegido Admin
 
-❌ **Pendente** — criar `app/admin/layout.tsx`
+✅ **Concluído** — criar `app/admin/layout.tsx`
 
 Criar `app/admin/layout.tsx` (Server Component):
 
@@ -8,7 +8,7 @@ Criar `app/admin/layout.tsx` (Server Component):
 - Se não existir sessão, `redirect('/login')` (importar de `next/navigation`)
 - **Navbar fixa no topo**:
   - Fundo: `bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm shadow-sm border-b border-gray-200 dark:border-gray-800`
-  - À esquerda: logo "ZScan Admin" (texto bold)
+  - À esquerda: logo "EitaTI Admin" (texto bold)
   - À direita: links de navegação
     - Dashboard (`/admin`)
     - Admins (`/admin/admins`) — preparar para Fase 6

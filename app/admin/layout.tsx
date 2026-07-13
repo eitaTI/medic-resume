@@ -3,16 +3,20 @@ import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { AdminNavbar } from '@/components/admin/AdminNavbar'
 import { LogoutButton } from '@/components/admin/LogoutButton'
+import { getBranding } from '@/lib/branding'
+import type { CSSProperties } from 'react'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) redirect('/login')
 
+  const branding = getBranding()
+
   return (
     <div
       className="min-h-screen bg-cover bg-center bg-fixed transition-colors duration-300
-        bg-[url('/images/zscan-light-wallpaper.png')]
-        dark:bg-[url('/images/zscan-dark-wallpaper.png')]"
+        [background-image:var(--wp-light)] dark:[background-image:var(--wp-dark)]"
+      style={{ '--wp-light': branding.wallpaperLight, '--wp-dark': branding.wallpaperDark } as CSSProperties}
     >
       <AdminNavbar />
       <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">

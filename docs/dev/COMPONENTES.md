@@ -6,9 +6,10 @@ Guia para criação de componentes React no projeto Medic Resume.
 
 ```
 components/
-├── ui/          # Genéricos reutilizáveis (Button, Input, FileUpload, StatusBadge)
-├── wizard/      # Etapas do formulário (Stepper, StepClinica, StepMedicos, StepExames, StepDispositivos)
-└── admin/       # Painel admin (SubmissaoCard, AprovarRejeitarButtons, AdminForm, AuditLogCard)
+├── ui/          # Genéricos reutilizáveis (Button, Input, FileUpload, Select, StatusBadge, ThemeToggle)
+├── wizard/      # Etapas do formulário (Stepper, StepClinica, StepUsuarios, StepExames, StepEquipamentos)
+├── admin/       # Painel admin (SubmissaoCard, AprovarRejeitarButtons, AdminForm, AdminDeleteButton, AuditLogCard, AdminNavbar, LogoutButton)
+└── providers/   # ThemeProvider (suporte a dark mode via classes `dark:`)
 ```
 
 ## Regras

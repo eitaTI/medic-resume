@@ -1,6 +1,6 @@
 # Task 1: Reconciliar Schema — dropar `Admin` e migrar `AuditLog.adminId → userId`
 
-❌ **Pendente**
+✅ **Concluído** — migração `reconcile_admin_to_user` criada e aplicada
 
 ## Problema
 

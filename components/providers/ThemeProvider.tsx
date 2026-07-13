@@ -1,6 +1,8 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { useBranding } from '@/components/providers/BrandingProvider'
+import type { Branding } from '@/lib/branding'
 
 type Tema = 'claro' | 'escuro'
 
@@ -20,14 +22,14 @@ function getTema(): Tema {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'escuro' : 'claro'
 }
 
-function apply(tema: Tema) {
+function apply(tema: Tema, branding: Branding) {
   const root = document.documentElement
   if (tema === 'escuro') {
     root.classList.add('dark')
   } else {
     root.classList.remove('dark')
   }
-  const href = tema === 'escuro' ? '/icons/zscan-icon-dark.png' : '/icons/zscan-icon-light.png'
+  const href = tema === 'escuro' ? branding.iconDark : branding.iconLight
   const fav = document.getElementById('favicon') as HTMLLinkElement | null
   if (fav) fav.href = href
   const apple = document.getElementById('favicon-apple') as HTMLLinkElement | null
@@ -35,18 +37,19 @@ function apply(tema: Tema) {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
+  const branding = useBranding()
   const [tema, setTema] = useState<Tema>('claro')
 
   useEffect(() => {
     const t = getTema()
     setTema(t)
-    apply(t)
+    apply(t, branding)
   }, [])
 
   const alternarTema = () => {
     setTema((prev) => {
       const next = prev === 'claro' ? 'escuro' : 'claro'
-      apply(next)
+      apply(next, branding)
       localStorage.setItem(CHAVE, next)
       return next
     })

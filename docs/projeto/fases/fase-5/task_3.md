@@ -1,6 +1,6 @@
 # Task 3: Botões Aprovar/Rejeitar com Feedback e Retry Jira
 
-❌ **Pendente** — atualizar `components/admin/AprovarRejeitarButtons.tsx`
+✅ **Concluído** — atualizar `components/admin/AprovarRejeitarButtons.tsx`
 
 ## Objetivo
 
@@ -21,7 +21,7 @@ Props atuais: `clinicaId: number`, `status: string`. É usado em
 2. **Capturar retorno de `aprovarSubmissao`** no `useActionState` e ler `jiraIssueKey` e
    `jiraErro` quando presentes.
 3. **Feedback de sucesso** inline: ao aprovar com sucesso, mostrar
-   `Card Jira criado: {jiraIssueKey}` (ex.: `Card Jira criado: ZSCAN-42`).
+   `Card Jira criado: {jiraIssueKey}` (ex.: `Card Jira criado: EITATI-42`).
 4. **Aviso de falha Jira** inline (nunca `alert`) quando `aprovarSubmissao` retornar
    `{ sucesso: true, jiraErro }` — ex.: `Card Jira pendente: {jiraErro}`.
 5. **Retry**: nova action `sincronizarJira(id)` via `useActionState`; ao clicar, tenta

@@ -9,7 +9,7 @@ import { hashPassword } from '@better-auth/utils/password';
  * O modelo Admin foi removido - agora usamos apenas o User do Better Auth.
  *
  * Credenciais padrão:
- * - Email: admin@zscan.com
+ * - Email: admin@eitati.com
  * - Senha: admin123
  */
 async function main() {
@@ -17,7 +17,7 @@ async function main() {
   const senhaHash = await hashPassword('admin123');
 
   // Verifica se o usuário já existe
-  const userExists = await prisma.user.findUnique({ where: { email: 'admin@zscan.com' } });
+  const userExists = await prisma.user.findUnique({ where: { email: 'admin@eitati.com' } });
 
   if (!userExists) {
     // Cria o usuário + conta de autenticação em uma transação
@@ -26,12 +26,12 @@ async function main() {
       data: {
         id: userId,
         name: 'Administrador',
-        email: 'admin@zscan.com',
+        email: 'admin@eitati.com',
         emailVerified: true,
         accounts: {
           create: {
             id: randomUUID(),
-            accountId: 'admin@zscan.com',
+            accountId: 'admin@eitati.com',
             providerId: 'credential',
             password: senhaHash,
           },
@@ -40,7 +40,7 @@ async function main() {
     });
   }
 
-  console.log('Admin padrão criado: admin@zscan.com / admin123');
+  console.log('Admin padrão criado: admin@eitati.com / admin123');
 }
 
 main();

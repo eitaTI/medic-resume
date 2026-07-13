@@ -13,7 +13,7 @@ actions/
 ├── submeter-formulario.ts    # pública — submissão do wizard
 ├── login.ts                  # pública — autenticação admin
 ├── submissoes.ts             # protegida — listar, aprovar, rejeitar
-├── admins.ts                 # protegida — CRUD de admins
+├── admins.ts             # protegida — criar/excluir admins (via User/Account do Better Auth)
 └── auditoria.ts              # protegida — listar logs
 ```
 
@@ -59,7 +59,7 @@ type Resultado<T> =
 Verifique a sessão no início de cada action:
 
 ```typescript
-const session = await auth()
+const session = await auth.api.getSession({ headers: await headers() })
 if (!session) return { erro: 'Não autenticado' }
 ```
 
@@ -71,15 +71,21 @@ Use o helper `registrarAcao` de `lib/audit.ts` em ações de mutação:
 import { registrarAcao } from '@/lib/audit'
 
 await registrarAcao({
-  adminId: session.user.id,
+  userId: session.user.id,
   acao: 'APROVAR',
   entidade: 'Clinica',
   entidadeId: clinica.id
 })
+
 ```
 
-## Uso com useActionState (Client Component)
+## Sincronização com Jira
 
+A action `sincronizarJira(id)` tenta criar/atualizar o card da clínica no Jira (fail-open). O
+campo `Clinica.jiraSyncStatus` (`PENDENTE`/`SINCRONIZADO`/`ERRO`) e `jiraErro` refletem o estado;
+a UI em `AprovarRejeitarButtons` permite retry para qualquer estado diferente de `SINCRONIZADO`.
+
+## Uso com useActionState (Client Component)
 ```tsx
 'use client'
 

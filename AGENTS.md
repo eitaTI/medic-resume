@@ -5,7 +5,7 @@ Compact guidance for OpenCode sessions. For full context read `docs/dev/ARQUITET
 ## Commands
 - Package manager is **pnpm** (not npm). Use `pnpm install`, `pnpm dev`, `pnpm build`, `pnpm lint`.
 - There is **no test framework / no `test` script** — do not expect or invent `pnpm test`.
-- First-run setup: `cp .env.example .env` → `pnpm prisma migrate dev` → `pnpm prisma db seed` (seed admin: `admin@zscan.com` / `admin123`).
+- First-run setup: `cp .env.example .env` → `pnpm prisma migrate dev` → `pnpm prisma db seed` (seed admin: `admin@eitati.com` / `admin123`).
 - Before committing: `pnpm build && pnpm lint`.
 
 ## Database (Prisma v7 + SQLite)
@@ -16,6 +16,7 @@ Compact guidance for OpenCode sessions. For full context read `docs/dev/ARQUITET
 
 ## Auth
 - Better Auth. Server-side session check inside Server Actions: `auth.api.getSession({ headers: await headers() })` — `headers()` must be awaited.
+- **Admins are Better Auth `User` records** — the legacy `Admin` model/table was dropped in migration `reconcile_admin_to_user`. There is **no `Admin` table and no `adminId` column**; audit/actions use `userId` (→ `User`). Manage admins via `actions/admins.ts` (`criarAdmin`/`excluirAdmin`). See the `admin-management` skill.
 - `middleware.ts` guards `/admin` and `/api/uploads` using the cookie `better-auth.session_token`. Keep that exact name when touching auth.
 - `/login` redirects to `/admin` when already authenticated.
 
@@ -41,3 +42,4 @@ matches its description** — no manual/user command needed. Current skills:
 - `server-action` — Server Actions (`'use server'`, result objects) and `useActionState` UI.
 - `fase-status` — check `docs/projeto/fases/` before assuming a feature is implemented.
 - `jira-integration` — Fase 5 Jira scope (fail-open, `jiraSyncStatus`, `sincronizarJira`).
+- `admin-management` — manage admin users via Better Auth `User` (`actions/admins.ts`, no `Admin` model).
