@@ -1,6 +1,6 @@
 # Task 7: Verificar logs do `migrate` (deploy + seed)
 
-❌ **Pendente**
+✅ **Concluída**
 
 ## O que verificar
 
