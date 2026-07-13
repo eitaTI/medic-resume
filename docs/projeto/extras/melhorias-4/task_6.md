@@ -1,6 +1,6 @@
 # Task 6: Verificar `docker compose up -d` (migrate antes do app)
 
-❌ **Pendente**
+✅ **Concluída**
 
 ## O que verificar
 
