@@ -1,6 +1,6 @@
 # Task 5: Verificar `docker compose build`
 
-❌ **Pendente**
+✅ **Concluída**
 
 ## O que verificar
 
