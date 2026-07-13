@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useState, useActionState, useEffect } from 'react'
+import { useState, useActionState, useEffect, type CSSProperties } from 'react'
 import { useFormStatus } from 'react-dom'
 import { FormProvider, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -16,6 +16,7 @@ import { submeterFormulario } from '@/actions/submeter-formulario'
 import { schemaFormulario } from '@/lib/validacoes'
 import type { FormularioValues } from '@/lib/validacoes'
 import { useDraftPersistence } from '@/hooks/useDraftPersistence'
+import { useBranding } from '@/components/providers/BrandingProvider'
 const LABELS = ['Clínica', 'Usuários', 'Exames', 'Equipamentos']
 
 const defaultValues: FormularioValues = {
@@ -34,6 +35,7 @@ const defaultValues: FormularioValues = {
 }
 
 export default function FormularioPage() {
+  const branding = useBranding()
   const [passoAtual, setPassoAtual] = useState(0)
 
   const formMethods = useForm<FormularioValues>({
@@ -131,23 +133,23 @@ export default function FormularioPage() {
     return (
       <div
         className="min-h-screen bg-cover bg-center bg-fixed transition-colors duration-300
-          bg-[url('/images/zscan-light-wallpaper.png')]
-          dark:bg-[url('/images/zscan-dark-wallpaper.png')]"
+          [background-image:var(--wp-light)] dark:[background-image:var(--wp-dark)]"
+        style={{ '--wp-light': branding.wallpaperLight, '--wp-dark': branding.wallpaperDark } as CSSProperties}
       >
         <ThemeToggle />
         <div className="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
           <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 sm:p-8 text-center">
             <Image
-              src="/images/zscan-logo-light.png"
-              alt="ZScan"
+              src={branding.logoLight}
+              alt="EitaTI"
               width={93}
               height={40}
               className="block dark:hidden mx-auto mb-6"
               priority
             />
             <Image
-              src="/images/zscan-logo-dark.png"
-              alt="ZScan"
+              src={branding.logoDark}
+              alt="EitaTI"
               width={93}
               height={40}
               className="hidden dark:block mx-auto mb-6"
@@ -174,8 +176,8 @@ export default function FormularioPage() {
   return (
     <div
       className="min-h-screen bg-cover bg-center bg-fixed transition-colors duration-300
-        bg-[url('/images/zscan-light-wallpaper.png')]
-        dark:bg-[url('/images/zscan-dark-wallpaper.png')]"
+        [background-image:var(--wp-light)] dark:[background-image:var(--wp-dark)]"
+      style={{ '--wp-light': branding.wallpaperLight, '--wp-dark': branding.wallpaperDark } as CSSProperties}
     >
       <a
         href="/login"
@@ -196,16 +198,16 @@ export default function FormularioPage() {
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4 shrink-0">
               <Image
-                src="/images/zscan-logo-light.png"
-                alt="ZScan"
+                src={branding.logoLight}
+                alt="EitaTI"
                 width={93}
                 height={40}
                 className="block dark:hidden"
                 priority
               />
               <Image
-                src="/images/zscan-logo-dark.png"
-                alt="ZScan"
+                src={branding.logoDark}
+                alt="EitaTI"
                 width={93}
                 height={40}
                 className="hidden dark:block"

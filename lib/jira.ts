@@ -96,7 +96,7 @@ export async function criarCardJira(clinica: ClinicaParaJira): Promise<string> {
   const issue = await client.issues.createIssue({
     fields: {
       summary: `Clínica aprovada: ${clinica.nomeClinica}`,
-      project: { key: process.env.JIRA_PROJECT_KEY || 'ZSCAN' },
+      project: { key: process.env.JIRA_PROJECT_KEY || 'EITATI' },
       issuetype: { name: process.env.JIRA_ISSUE_TYPE || 'Task' },
       labels,
       description: {

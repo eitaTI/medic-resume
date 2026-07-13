@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { BrandingProvider } from "@/components/providers/BrandingProvider";
+import { getBranding } from "@/lib/branding";
+
+const branding = getBranding()
 
 export const metadata: Metadata = {
   title: "Medic Resume",
   description: "Medic Resume - Next.js Application",
   icons: {
-    icon: "/icons/zscan-icon-light.png",
+    icon: branding.iconLight,
   },
 };
 
@@ -21,12 +25,12 @@ export default function RootLayout({
         <link
           id="favicon"
           rel="icon"
-          href="/icons/zscan-icon-light.png"
+          href={branding.iconLight}
         />
         <link
           id="favicon-apple"
           rel="apple-touch-icon"
-          href="/icons/zscan-icon-light.png"
+          href={branding.iconLight}
         />
         <script
           dangerouslySetInnerHTML={{
@@ -39,8 +43,8 @@ export default function RootLayout({
                 var fav = document.getElementById('favicon');
                 var apple = document.getElementById('favicon-apple');
                 if (document.documentElement.classList.contains('dark')) {
-                  if (fav) fav.href = '/icons/zscan-icon-dark.png';
-                  if (apple) apple.href = '/icons/zscan-icon-dark.png';
+                  if (fav) fav.href = '${branding.iconDark}';
+                  if (apple) apple.href = '${branding.iconDark}';
                 }
               } catch(e) {}
             `,
@@ -48,7 +52,9 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <BrandingProvider value={branding}>
+          <ThemeProvider>{children}</ThemeProvider>
+        </BrandingProvider>
       </body>
     </html>
   );

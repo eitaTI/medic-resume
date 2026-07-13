@@ -22,7 +22,7 @@ export function AdminNavbar() {
               href="/admin"
               className="text-lg font-bold text-gray-900 dark:text-gray-100"
             >
-              ZScan Admin
+              EitaTI Admin
             </Link>
 
             <div className="flex items-center gap-1">

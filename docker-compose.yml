@@ -17,7 +17,7 @@ services:
       - JIRA_BASE_URL=${JIRA_BASE_URL:-}
       - JIRA_EMAIL=${JIRA_EMAIL:-}
       - JIRA_API_TOKEN=${JIRA_API_TOKEN:-}
-      - JIRA_PROJECT_KEY=${JIRA_PROJECT_KEY:-ZSCAN}
+      - JIRA_PROJECT_KEY=${JIRA_PROJECT_KEY:-EITATI}
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
       interval: 30s
