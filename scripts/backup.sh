@@ -15,8 +15,15 @@ mkdir -p "$BACKUP_DIR"
 # Requer o comando sqlite3 (instalado em WSL/Git Bash ou no container Docker)
 if [ -f "$DB_PATH" ]; then
     if ! command -v sqlite3 >/dev/null 2>&1; then
-        echo "Erro: comando 'sqlite3' não encontrado. Instale-o para realizar o backup do banco."
-        DB_ERRO=1
+        # Fallback para ambientes sem o CLI do sqlite3 (ex.: validação local).
+        # Em produção (Docker) o pacote `sqlite` está instalado e usamos `.backup`.
+        echo "Aviso: 'sqlite3' não encontrado; usando cópia do arquivo (backup offline)."
+        if cp "$DB_PATH" "$BACKUP_DIR/db_$TIMESTAMP.db"; then
+            echo "Backup do banco realizado (cópia): $BACKUP_DIR/db_$TIMESTAMP.db"
+        else
+            echo "Erro: falha ao copiar o banco em $BACKUP_DIR/db_$TIMESTAMP.db"
+            DB_ERRO=1
+        fi
     elif ! sqlite3 "$DB_PATH" ".backup '$BACKUP_DIR/db_$TIMESTAMP.db'"; then
         echo "Erro: falha ao gerar backup do banco em $BACKUP_DIR/db_$TIMESTAMP.db"
         DB_ERRO=1

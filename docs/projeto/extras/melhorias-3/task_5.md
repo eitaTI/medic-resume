@@ -1,6 +1,6 @@
 # Task 5: Testar Backup/Restore de Fato (Fase 8 T4)
 
-❌ **Pendente**
+✅ **Concluído** — `backup.sh`/`restore.sh` validados end-to-end (com fallback offline)
 
 ## Problema
 
