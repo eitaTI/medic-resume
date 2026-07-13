@@ -8,6 +8,7 @@ RUN apk add --no-cache openssl python3 make g++
 # Copiar apenas arquivos de dependências (cache de camadas)
 COPY package.json pnpm-lock.yaml ./
 RUN corepack enable && pnpm install --frozen-lockfile --ignore-scripts
+RUN pnpm rebuild better-sqlite3
 
 # Copiar o resto e buildar
 COPY . .

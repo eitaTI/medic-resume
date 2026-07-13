@@ -1,6 +1,6 @@
 # Task 3: docker-compose.yml — service migrate + depends_on
 
-❌ **Pendente**
+✅ **Concluída**
 
 ## O que fazer
 

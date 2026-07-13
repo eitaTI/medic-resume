@@ -1,14 +1,27 @@
 services:
+  migrate:
+    build:
+      context: .
+      target: migrator
+    environment:
+      - DATABASE_URL=file:/data/db/dev.db
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+    volumes:
+      - sqlite-data:/data/db
+      - uploads:/data/uploads:ro
+    command: sh -c "pnpm exec prisma migrate deploy && pnpm exec tsx prisma/seed.ts"
+    restart: "no"
+
   app:
-    build: .
+    build:
+      context: .
+      target: runner
     ports:
       - "3000:3000"
     volumes:
       - uploads:/app/data/uploads
       - sqlite-data:/data/db
     environment:
-      # Variáveis lidas do .env padrão do projeto (docker compose carrega .env automaticamente).
-      # Para produção, ajuste BETTER_AUTH_URL e BETTER_AUTH_SECRET no próprio .env antes do deploy.
       - NODE_ENV=production
       - HOSTNAME=0.0.0.0
       - DATABASE_URL=file:/data/db/dev.db
@@ -24,6 +37,9 @@ services:
       timeout: 10s
       retries: 3
     restart: unless-stopped
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
 
   backup:
     image: alpine:latest
