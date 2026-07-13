@@ -1,6 +1,6 @@
 # Task 4: Feedback Visual de Erros por Campo no Input
 
-❌ **Pendente**
+✅ **Concluído**
 
 Exibir mensagens de erro validação inline abaixo de cada campo, com destaque visual (borda vermelha).
 

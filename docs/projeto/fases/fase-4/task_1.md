@@ -1,6 +1,6 @@
 # Task 1: Server Actions de Submissões
 
-❌ **Pendente** — criar `actions/submissoes.ts`
+✅ **Concluído** — criar `actions/submissoes.ts`
 
 Criar `actions/submissoes.ts` (`'use server'`):
 

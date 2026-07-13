@@ -1,6 +1,6 @@
 # Task 10: Persistir Rascunho no localStorage
 
-❌ **Pendente**
+✅ **Concluído**
 
 Salvar automaticamente os dados do formulário no `localStorage` para que o usuário não perca o progresso se fechar o navegador ou recarregar a página acidentalmente.
 

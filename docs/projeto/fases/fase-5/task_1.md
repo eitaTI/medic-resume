@@ -1,6 +1,6 @@
 # Task 1: Cliente Jira (`lib/jira.ts`)
 
-❌ **Pendente** — criar `lib/jira.ts` usando `jira.js`
+✅ **Concluído** — criar `lib/jira.ts` usando `jira.js`
 
 ## Objetivo
 

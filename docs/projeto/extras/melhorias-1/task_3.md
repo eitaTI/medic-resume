@@ -1,6 +1,6 @@
 # Task 3: Validação por Passo (Step Gating)
 
-❌ **Pendente**
+✅ **Concluído**
 
 Impedir que o usuário avance para o próximo passo sem preencher corretamente os campos obrigatórios do passo atual.
 

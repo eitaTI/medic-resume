@@ -1,6 +1,6 @@
 # Task 8: Substituir Contador Mutável por crypto.randomUUID()
 
-❌ **Pendente**
+✅ **Concluído**
 
 O módulo `StepExames.tsx` usa uma variável mutável `let exameIdCounter = 0` para gerar IDs únicos. Isso pode causar problemas em Strict Mode (React 19) e em concorrência. Substituir por `crypto.randomUUID()`.
 

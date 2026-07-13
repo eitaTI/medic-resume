@@ -1,6 +1,6 @@
 # Task 3: Botões Aprovar/Rejeitar com Feedback e Retry Jira
 
-❌ **Pendente** — atualizar `components/admin/AprovarRejeitarButtons.tsx`
+✅ **Concluído** — atualizar `components/admin/AprovarRejeitarButtons.tsx`
 
 ## Objetivo
 

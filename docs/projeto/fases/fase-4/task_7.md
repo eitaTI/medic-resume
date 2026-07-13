@@ -1,6 +1,6 @@
 # Task 7: Página de Detalhe da Submissão
 
-❌ **Pendente** — criar `app/admin/submissao/[id]/page.tsx`
+✅ **Concluído** — criar `app/admin/submissao/[id]/page.tsx`
 
 Criar `app/admin/submissao/[id]/page.tsx` (Server Component):
 

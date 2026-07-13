@@ -1,6 +1,6 @@
 # Task 2: Componente StatusBadge
 
-❌ **Pendente** — criar `components/ui/StatusBadge.tsx`
+✅ **Concluído** — criar `components/ui/StatusBadge.tsx`
 
 Criar `components/ui/StatusBadge.tsx`:
 

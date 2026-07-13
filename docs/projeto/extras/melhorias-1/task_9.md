@@ -1,6 +1,6 @@
 # Task 9: Foco Automático no Primeiro Campo ao Mudar de Passo
 
-❌ **Pendente**
+✅ **Concluído**
 
 Quando o usuário navega entre os passos do wizard, o foco do teclado deve ir automaticamente para o primeiro campo do passo atual, melhorando a acessibilidade e a experiência para usuários de teclado.
 

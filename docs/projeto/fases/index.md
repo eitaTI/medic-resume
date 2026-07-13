@@ -29,7 +29,7 @@ Fase 1 (Setup) — base do projeto
 | Fase | Descrição | Tasks | Status |
 |------|-----------|-------|--------|
 | 1 | Setup do Projeto | 9/9 | ✅ Concluído |
-| 2 | Formulário Público | 9/11 | ✅ Concluído |
+| 2 | Formulário Público | 11/11 | ✅ Concluído |
 | 3 | Autenticação e Login | 4/4 | ✅ Concluído |
 | 4 | Painel Admin | 7/7 | ✅ Concluído |
 | 5 | Integração Jira | 4/4 | ✅ Concluído |
@@ -37,7 +37,9 @@ Fase 1 (Setup) — base do projeto
 | 7 | Sistema de Auditoria | 7/7 | ✅ Concluído |
 | 8 | Sistema de Backup | 6/6 | ✅ Concluído |
 | 9 | Deploy com Docker | 4/4 | ✅ Concluído |
-| | **Total** | **53/55** | **~96%** |
+| | **Total** | **55/55** | **100%** |
+
+> Extras entregues (fora das 9 fases acima): `melhorias-1` (10/10), `melhorias-2` (5/5) e `melhorias-3` (6/6) — todos ✅ Concluído. Veja `docs/projeto/extras/`.
 
 ## Detalhamento
 

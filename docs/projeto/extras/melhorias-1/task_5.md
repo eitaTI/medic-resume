@@ -1,6 +1,6 @@
 # Task 5: FileUpload com Erro Inline em vez de alert()
 
-❌ **Pendente**
+✅ **Concluído**
 
 Substituir o `alert('Arquivo muito grande. Máximo 10MB.')` por uma mensagem de erro estilizada inline.
 

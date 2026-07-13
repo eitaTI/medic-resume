@@ -1,6 +1,6 @@
 # Task 2: Migração Prisma + Server Actions com Jira
 
-❌ **Pendente** — `prisma/schema.prisma`, migration e `actions/submissoes.ts`
+✅ **Concluído** — `prisma/schema.prisma`, migration e `actions/submissoes.ts`
 
 ## Objetivo
 

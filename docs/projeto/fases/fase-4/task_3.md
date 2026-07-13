@@ -1,6 +1,6 @@
 # Task 3: Componente SubmissaoCard
 
-❌ **Pendente** — criar `components/admin/SubmissaoCard.tsx`
+✅ **Concluído** — criar `components/admin/SubmissaoCard.tsx`
 
 Criar `components/admin/SubmissaoCard.tsx`:
 

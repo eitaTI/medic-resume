@@ -4,9 +4,9 @@
 
 Adicionar modelo `AuditLog` no `prisma/schema.prisma`:
 - `id` (Int, autoincrement)
-- `adminId` (Int?, relation com Admin)
+- `userId` (String, relation com User)
 - `acao` (String) — valores: CRIAR, APROVAR, REJEITAR, EXCLUIR, LOGIN
-- `entidade` (String) — Clinica, Medico, Admin, etc.
+- `entidade` (String) — Clinica, Medico, User, etc.
 - `entidadeId` (Int?)
 - `detalhes` (String?)
 - `ipAddress` (String?)

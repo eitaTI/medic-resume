@@ -1,6 +1,6 @@
 # Task 5: Layout Protegido Admin
 
-❌ **Pendente** — criar `app/admin/layout.tsx`
+✅ **Concluído** — criar `app/admin/layout.tsx`
 
 Criar `app/admin/layout.tsx` (Server Component):
 
