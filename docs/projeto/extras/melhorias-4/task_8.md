@@ -1,6 +1,6 @@
 # Task 8: Verificar healthcheck `/api/health`
 
-❌ **Pendente**
+✅ **Concluída**
 
 ## O que verificar
 
