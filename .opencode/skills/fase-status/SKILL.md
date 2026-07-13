@@ -21,7 +21,7 @@ done just because a doc mentions it — verify the ✅/❌ status first.
 - Fases 1–7: implemented (incl. Jira Fase 5 e Auditoria Fase 7).
 - Fase 8 (Backup): scripts `backup.sh`/`restore.sh` e serviço no docker-compose prontos;
   resta tornar os scripts compatíveis com Docker (env vars) e testar backup/restore.
-- Fase 9 (Docker): pendente (sem Dockerfile/.dockerignore/.env.production; compose é placeholder).
+- Fase 9 (Docker): concluído (Dockerfile/.dockerignore/docker-compose.yml; deploy lê o .env padrão).
 
 ## Why this matters
 Tasks often describe the *intended* design (e.g. new columns, new actions) that are not

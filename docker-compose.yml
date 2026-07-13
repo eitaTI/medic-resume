@@ -7,6 +7,8 @@ services:
       - uploads:/app/data/uploads
       - sqlite-data:/data/db
     environment:
+      # Variáveis lidas do .env padrão do projeto (docker compose carrega .env automaticamente).
+      # Para produção, ajuste BETTER_AUTH_URL e BETTER_AUTH_SECRET no próprio .env antes do deploy.
       - NODE_ENV=production
       - HOSTNAME=0.0.0.0
       - DATABASE_URL=file:/data/db/dev.db

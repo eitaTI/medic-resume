@@ -1,36 +1,39 @@
-# Task 4: .env.production + Build/Deploy
+# Task 4: Deploy via Docker (usando .env padrão)
 
-✅ **Concluído** — criar `.env.production` + documentar deploy
+✅ **Concluído** — documentar deploy lendo o `.env` padrão do projeto
 
-Criar `.env.production` com:
+O deploy usa o `.env` padrão (o Docker Compose carrega `.env` automaticamente do
+diretório do projeto para interpolação das variáveis `${VAR}` no bloco `environment`).
+
+Antes de subir em produção, ajuste no `.env` (copiado de `.env.example`):
 
 ```env
-# Better Auth
+# Better Auth — obrigatório definir um segredo real de produção
 BETTER_AUTH_SECRET=<gerar com: openssl rand -base64 32>
 BETTER_AUTH_URL=https://seu-dominio.com
 
-# Jira
+# Jira (opcional, usado apenas na aprovação)
 JIRA_BASE_URL=https://sua-empresa.atlassian.net
 JIRA_EMAIL=seu-email@empresa.com
 JIRA_API_TOKEN=seu_token_aqui
 JIRA_PROJECT_KEY=ZSCAN
 
-# Database
+# Database (em dev; no container o compose sobrescreve para /data/db/dev.db)
 DATABASE_URL=file:./dev.db
 ```
 
 **Comandos de deploy:**
 
 ```bash
-# Primeiro deploy (usa .env.production para as variáveis do compose)
-docker compose --env-file .env.production build
-docker compose --env-file .env.production up -d
+# Primeiro deploy (usa o .env padrão para as variáveis do compose)
+docker compose build
+docker compose up -d
 docker compose logs -f app
 
 # Atualizar
 git pull
-docker compose --env-file .env.production build
-docker compose --env-file .env.production up -d
+docker compose build
+docker compose up -d
 
 # Parar
 docker compose down
@@ -49,13 +52,12 @@ docker compose exec app sh scripts/backup.sh
 > sessão não funciona.
 
 ## Ajustes aplicados
-- `.env.production` é **gitignored** (contém segredos). Foi criado `.env.production.example`
-  (versionado, sem segredos) como template; copie-o para `.env.production` e preecha
-  `BETTER_AUTH_SECRET` (`openssl rand -base64 32`).
-- O compose lê as variáveis via `--env-file .env.production` (interpolação `${VAR}`).
+- Removidos `.env.production` e `.env.production.example` para reduzir complexidade.
+- O compose lê as variáveis do `.env` padrão (interpolação `${VAR}`); basta preencher
+  os valores de produção nele antes do `docker compose up`.
 
 ## Commit
 
 ```
-feat(docker): criar .env.production e documentar comandos de deploy
+feat(docker): documentar deploy usando o .env padrão
 ```

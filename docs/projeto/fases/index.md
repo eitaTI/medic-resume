@@ -130,4 +130,4 @@ Fase 1 (Setup) — base do projeto
 | Dockerfile | ✅ |
 | .dockerignore | ✅ |
 | docker-compose.yml completo | ✅ |
-| .env.production + build/deploy | ✅ |
+| .env padrão + build/deploy | ✅ |
