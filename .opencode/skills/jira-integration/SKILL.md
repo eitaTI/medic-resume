@@ -20,7 +20,7 @@ app** — no microservice, no separate server/port.
   `jiraSyncStatus != 'SINCRONIZADO'`.
 
 ## Data model (`Clinica`)
-- `jiraIssueKey String?` — already exists; stores the issue key (e.g. `ZSCAN-42`).
+- `jiraIssueKey String?` — already exists; stores the issue key (e.g. `EITATI-42`).
 - `jiraSyncStatus String?` — already added (migration `add_jira_sync_status`); values
   `PENDENTE` | `SINCRONIZADO` | `ERRO`.
 
@@ -36,7 +36,7 @@ app** — no microservice, no separate server/port.
 JIRA_BASE_URL=https://sua-empresa.atlassian.net
 JIRA_EMAIL=seu-email@empresa.com
 JIRA_API_TOKEN=seu_token_aqui
-JIRA_PROJECT_KEY=ZSCAN
+JIRA_PROJECT_KEY=EITATI
 ```
 Use these exact names (NOT `JIRA_HOST`). `ofetch` is installed but intentionally NOT used
 for Jira — use `jira.js`.

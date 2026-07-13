@@ -1,6 +1,6 @@
 # Quick Start — Desenvolvimento Local
 
-Guia passo a passo para rodar o **ZScan Formulário** na sua máquina.
+Guia passo a passo para rodar o **EitaTI Formulário** na sua máquina.
 
 ## Pré-requisitos
 
@@ -42,7 +42,7 @@ A integração Jira é **opcional**: sem as variáveis `JIRA_*`, a aprovação a
 
 ```bash
 pnpm prisma migrate dev     # cria as tabelas no SQLite (dev.db)
-pnpm prisma db seed         # cria o admin inicial admin@zscan.com / admin123
+pnpm prisma db seed         # cria o admin inicial admin@eitati.com / admin123
 ```
 
 ## 4. Rodar
@@ -62,7 +62,7 @@ pnpm dev                    # http://localhost:3000
 | `/admin/auditoria` | Log de auditoria das ações administrativas |
 | `/admin/submissao/[id]` | Detalhe de uma submissão |
 
-Credenciais iniciais: **`admin@zscan.com` / `admin123`**. Troque a senha criando um novo admin
+Credenciais iniciais: **`admin@eitati.com` / `admin123`**. Troque a senha criando um novo admin
 e removendo este (ou ajuste o seed em `prisma/seed.ts`).
 
 ## Comandos úteis

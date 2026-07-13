@@ -16,7 +16,7 @@ BETTER_AUTH_URL=https://seu-dominio.com
 JIRA_BASE_URL=https://sua-empresa.atlassian.net
 JIRA_EMAIL=seu-email@empresa.com
 JIRA_API_TOKEN=seu_token_aqui
-JIRA_PROJECT_KEY=ZSCAN
+JIRA_PROJECT_KEY=EITATI
 
 # Database (em dev; no container o compose sobrescreve para /data/db/dev.db)
 DATABASE_URL=file:./dev.db

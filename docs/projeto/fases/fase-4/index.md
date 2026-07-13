@@ -13,7 +13,7 @@ Após as fases 2 e 3, o projeto tem as seguintes características que impactam e
 - **Modelo `Dispositivo`** com campos: `tipo`, `marca`, `modelo`, `numeroSerie`
 - **Auth**: Better Auth — `auth.api.getSession({ headers: await headers() })` para verificar sessão
 - **Componentes UI**: `Button` (`variante`: `primario` | `secundario` | `perigo`; `tamanho`: `normal` | `pequeno`), `Input` (`label`, `erro?`), `Select` (`label`, `opcoes`, `erro?`)
-- **Estilo**: Tailwind v4 com dark mode via classe `.dark`, fundo com wallpaper (`bg-[url('/images/zscan-*-wallpaper.png')]`)
+- **Estilo**: Tailwind v4 com dark mode via classe `.dark`, fundo com wallpaper (`bg-[url('/branding/eitati-*-wallpaper.png')]`)
 - **Middleware**: já protege `/admin/:path*` — o layout server-side reforça a verificação
 
 ## Status Geral

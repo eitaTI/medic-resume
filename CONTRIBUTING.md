@@ -9,7 +9,7 @@ git clone <seu-fork> && cd medic-resume
 pnpm install
 cp .env.example .env
 pnpm prisma migrate dev
-pnpm prisma db seed          # admin@zscan.com / admin123
+pnpm prisma db seed          # admin@eitati.com / admin123
 pnpm dev                     # http://localhost:3000
 ```
 

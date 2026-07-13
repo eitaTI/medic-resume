@@ -1,6 +1,6 @@
 # Deploy — Produção com Docker
 
-Como subir o **ZScan Formulário** em produção usando Docker Compose (aplicação + backup
+Como subir o **EitaTI Formulário** em produção usando Docker Compose (aplicação + backup
 agendado). O build usa a saída **standalone** do Next.js 15.
 
 ## Pré-requisitos
@@ -40,7 +40,7 @@ BETTER_AUTH_SECRET=<seu-segredo-de-32-chars>
 JIRA_BASE_URL=https://sua-empresa.atlassian.net
 JIRA_EMAIL=seu-email@empresa.com
 JIRA_API_TOKEN=seu_token_aqui
-JIRA_PROJECT_KEY=ZSCAN
+JIRA_PROJECT_KEY=EITATI
 ```
 
 O compose sobrescreve `DATABASE_URL` para `file:/data/db/dev.db` (volume persistido) — não

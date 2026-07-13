@@ -1,4 +1,4 @@
-# ZScan Formulário
+# EitaTI Formulário
 
 Sistema de cadastro de clínicas médicas: um **wizard público de 4 etapas** coleta os dados da
 clínica, dos médicos, dos exames e dos equipamentos; um **painel administrativo** revisa,
@@ -29,12 +29,12 @@ aprova/rejeita e sincroniza cada submissão com o **Jira**, com **auditoria** de
 pnpm install
 cp .env.example .env
 pnpm prisma migrate dev
-pnpm prisma db seed        # cria admin@zscan.com / admin123
+pnpm prisma db seed        # cria admin@eitati.com / admin123
 pnpm dev                   # http://localhost:3000
 ```
 
 - Formulário público: `http://localhost:3000/formulario`
-- Login admin: `http://localhost:3000/login` — `admin@zscan.com` / `admin123`
+- Login admin: `http://localhost:3000/login` — `admin@eitati.com` / `admin123`
 - Painel: `http://localhost:3000/admin`
 
 > Guia passo a passo: [`docs/guides/quick-start.md`](docs/guides/quick-start.md).

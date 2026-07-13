@@ -5,7 +5,7 @@ Compact guidance for OpenCode sessions. For full context read `docs/dev/ARQUITET
 ## Commands
 - Package manager is **pnpm** (not npm). Use `pnpm install`, `pnpm dev`, `pnpm build`, `pnpm lint`.
 - There is **no test framework / no `test` script** — do not expect or invent `pnpm test`.
-- First-run setup: `cp .env.example .env` → `pnpm prisma migrate dev` → `pnpm prisma db seed` (seed admin: `admin@zscan.com` / `admin123`).
+- First-run setup: `cp .env.example .env` → `pnpm prisma migrate dev` → `pnpm prisma db seed` (seed admin: `admin@eitati.com` / `admin123`).
 - Before committing: `pnpm build && pnpm lint`.
 
 ## Database (Prisma v7 + SQLite)
