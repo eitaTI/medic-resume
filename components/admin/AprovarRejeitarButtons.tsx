@@ -13,13 +13,21 @@ interface AprovarRejeitarButtonsProps {
   jiraIssueKey?: string | null
 }
 
-type AprovarResult = { sucesso: boolean; jiraIssueKey?: string | null; jiraErro?: string | null } | { erro: string } | null
-type SincronizarResult = { sucesso: boolean; jiraIssueKey: string } | { erro: string } | null
+type AprovarResult = {
+  sucesso: boolean
+  jiraIssueKey?: string | null
+  jiraErro?: string | null
+} | { erro: string } | null
+type SincronizarResult =
+  | { sucesso: boolean; jiraIssueKey: string }
+  | { erro: string }
+  | null
 
 function FeedbackJira({
   clinicaId,
   jiraSyncStatus,
   jiraIssueKey,
+  jiraErro,
   sincResult,
   sincState,
   sincando,
@@ -27,6 +35,7 @@ function FeedbackJira({
   clinicaId: number
   jiraSyncStatus?: string | null
   jiraIssueKey?: string | null
+  jiraErro?: string | null
   sincResult: SincronizarResult
   sincState: (formData: FormData) => void
   sincando: boolean
@@ -39,27 +48,27 @@ function FeedbackJira({
     )
   }
 
-  if (jiraSyncStatus === 'ERRO') {
-    return (
-      <div className="flex flex-col gap-2">
+  return (
+    <div className="flex flex-col gap-2">
+      {jiraErro ? (
+        <p className="text-sm text-red-600 dark:text-red-400">
+          Erro ao sincronizar com o Jira: {jiraErro}
+        </p>
+      ) : (
         <p className="text-sm text-amber-600 dark:text-amber-400">
           Card Jira pendente — tente novamente
         </p>
-        <form action={sincState} className="flex gap-2 items-center">
-          <input type="hidden" name="clinicaId" value={clinicaId} />
-          <Button type="submit" variante="secundario" tamanho="pequeno" disabled={sincando}>
-            {sincando ? 'Sincronizando...' : 'Tentar novamente Jira'}
-          </Button>
-        </form>
-        {sincResult && 'erro' in sincResult && (
-          <p className="text-sm text-red-600 dark:text-red-400">{sincResult.erro}</p>
-        )}
-      </div>
-    )
-  }
-
-  return (
-    <p className="text-sm text-gray-500 dark:text-gray-400">Sincronizando com o Jira...</p>
+      )}
+      <form action={sincState} className="flex gap-2 items-center">
+        <input type="hidden" name="clinicaId" value={clinicaId} />
+        <Button type="submit" variante="secundario" tamanho="pequeno" disabled={sincando}>
+          {sincando ? 'Sincronizando...' : 'Sincronizar novamente'}
+        </Button>
+      </form>
+      {sincResult && 'erro' in sincResult && (
+        <p className="text-sm text-red-600 dark:text-red-400">{sincResult.erro}</p>
+      )}
+    </div>
   )
 }
 
@@ -73,7 +82,10 @@ export function AprovarRejeitarButtons({
   const [mostrarMotivo, setMostrarMotivo] = useState(false)
   const [motivo, setMotivo] = useState('')
 
-  const aprovarAction = async (_prev: AprovarResult, formData: FormData): Promise<AprovarResult> => {
+  const aprovarAction = async (
+    _prev: AprovarResult,
+    formData: FormData,
+  ): Promise<AprovarResult> => {
     const id = parseInt(formData.get('clinicaId') as string)
     const res = await aprovarSubmissao(id)
     if (res && 'sucesso' in res) router.refresh()
@@ -88,16 +100,28 @@ export function AprovarRejeitarButtons({
     return res
   }
 
-  const sincronizarAction = async (_prev: SincronizarResult, formData: FormData): Promise<SincronizarResult> => {
+  const sincronizarAction = async (
+    _prev: SincronizarResult,
+    formData: FormData,
+  ): Promise<SincronizarResult> => {
     const id = parseInt(formData.get('clinicaId') as string)
     const res = await sincronizarJira(id)
     if (res && 'sucesso' in res) router.refresh()
     return res
   }
 
-  const [aprovarResult, aprovarFormAction, aprovando] = useActionState<AprovarResult, FormData>(aprovarAction, null)
+  const [aprovarResult, aprovarFormAction, aprovando] = useActionState<
+    AprovarResult,
+    FormData
+  >(aprovarAction, null)
   const [, rejeitarFormAction, rejeitando] = useActionState(rejeitarAction, null)
-  const [sincResult, sincFormAction, sincando] = useActionState<SincronizarResult, FormData>(sincronizarAction, null)
+  const [sincResult, sincFormAction, sincando] = useActionState<
+    SincronizarResult,
+    FormData
+  >(sincronizarAction, null)
+
+  const jiraErro =
+    aprovarResult && 'sucesso' in aprovarResult ? aprovarResult.jiraErro : undefined
 
   if (status !== 'PENDENTE') {
     return (
@@ -107,6 +131,7 @@ export function AprovarRejeitarButtons({
           clinicaId={clinicaId}
           jiraSyncStatus={jiraSyncStatus}
           jiraIssueKey={jiraIssueKey}
+          jiraErro={jiraErro}
           sincResult={sincResult}
           sincState={sincFormAction}
           sincando={sincando}
