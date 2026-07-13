@@ -20,12 +20,14 @@ const LABELS = ['Clínica', 'Usuários', 'Exames', 'Equipamentos']
 
 const defaultValues: FormularioValues = {
   nomeClinica: '',
+  nomeEmpresa: '',
   nomeTitular: '',
   emailTitular: '',
   celularTitular: '',
   documentoTitular: '',
   cabecalhoLaudo: '',
   rodapeLaudo: '',
+  quantidadeMedicos: 1,
   usuarios: [{ nome: '', documento: '', email: '', tipo: 'examinador', temAssinatura: false }],
   exames: [{ nome: '' }],
   equipamentos: [{ tipo: '', marca: '', modelo: '', numeroSerie: '' }],
@@ -58,12 +60,14 @@ export default function FormularioPage() {
     const dados = getValues()
     const fd = new FormData()
     fd.append('nomeClinica', dados.nomeClinica || '')
+    fd.append('nomeEmpresa', dados.nomeEmpresa || '')
     fd.append('nomeTitular', dados.nomeTitular || '')
     fd.append('emailTitular', dados.emailTitular || '')
     fd.append('celularTitular', dados.celularTitular || '')
     fd.append('documentoTitular', dados.documentoTitular || '')
     fd.append('cabecalhoLaudo', dados.cabecalhoLaudo || '')
     fd.append('rodapeLaudo', dados.rodapeLaudo || '')
+    fd.append('quantidadeMedicos', String(dados.quantidadeMedicos ?? 1))
 
     const raw = dados as Record<string, unknown>
     const logoField = raw.logo

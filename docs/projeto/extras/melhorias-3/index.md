@@ -11,7 +11,7 @@ Consolida as discrepâncias reais encontradas na verificação de `docs/projeto/
 | Integrar auditoria na gestão de usuários (Fase 7 T6) | ✅ Concluído |
 | Corrigir feedback/retry de erro Jira (Fase 5 T3) | ✅ Concluído |
 | Testar backup/restore de fato (Fase 8 T4) | ✅ Concluído |
-| Limpezas menores (audit.ts, entidadeId, docs) | ❌ Pendente |
+| Limpezas menores (audit.ts, entidadeId, docs) | ✅ Concluído |
 
 ## Tasks
 
@@ -22,7 +22,7 @@ Consolida as discrepâncias reais encontradas na verificação de `docs/projeto/
 | 3 | `task_3.md` | Integrar auditoria (CRIAR/EXCLUIR admin) nas novas Server Actions de gestão de usuários | Média | ✅ Concluído |
 | 4 | `task_4.md` | Fase 5 T3: exibir `jiraErro` na UI e oferecer retry para qualquer estado `!= SINCRONIZADO` | Média | ✅ Concluído |
 | 5 | `task_5.md` | Fase 8 T4: executar e validar backup.sh/restore.sh de ponta a ponta | Média | ✅ Concluído |
-| 6 | `task_6.md` | Limpezas: remover `'use server'` em `lib/audit.ts`, corrigir `entidadeId: 0` no login, atualizar docs desatualizados (Fase 2/3) | Baixa | ❌ Pendente |
+| 6 | `task_6.md` | Limpezas: remover `'use server'` em `lib/audit.ts`, corrigir `entidadeId: 0` no login, atualizar docs desatualizados (Fase 2/3) | Baixa | ✅ Concluído |
 
 ## Dependências
 

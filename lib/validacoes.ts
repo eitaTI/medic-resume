@@ -2,10 +2,12 @@ import { z } from 'zod'
 
 export const schemaClinica = z.object({
   nomeClinica: z.string().min(1, 'Nome da clínica é obrigatório'),
+  nomeEmpresa: z.string().optional(),
   nomeTitular: z.string().min(1, 'Nome do titular é obrigatório'),
   emailTitular: z.string().email('Email do titular inválido'),
   celularTitular: z.string().optional(),
   documentoTitular: z.string().optional(),
+  quantidadeMedicos: z.coerce.number().int().min(1, 'Informe ao menos 1 médico').default(1),
 })
 
 export const schemaMedico = z.object({
@@ -28,12 +30,14 @@ export const schemaDispositivo = z.object({
 
 export const schemaFormulario = z.object({
   nomeClinica: z.string().min(1, 'Nome da clínica é obrigatório'),
+  nomeEmpresa: z.string().optional(),
   nomeTitular: z.string().min(1, 'Nome do titular é obrigatório'),
   emailTitular: z.string().email('Email do titular inválido'),
   celularTitular: z.string().optional(),
   documentoTitular: z.string().optional(),
   cabecalhoLaudo: z.string().optional(),
   rodapeLaudo: z.string().optional(),
+  quantidadeMedicos: z.number().int().min(1, 'Informe ao menos 1 médico'),
   usuarios: z
     .array(
       z.object({
