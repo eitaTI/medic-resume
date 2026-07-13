@@ -21,7 +21,7 @@ app** — no microservice, no separate server/port.
 
 ## Data model (`Clinica`)
 - `jiraIssueKey String?` — already exists; stores the issue key (e.g. `ZSCAN-42`).
-- `jiraSyncStatus String?` — **to be added** (migration); values
+- `jiraSyncStatus String?` — already added (migration `add_jira_sync_status`); values
   `PENDENTE` | `SINCRONIZADO` | `ERRO`.
 
 ## Files
@@ -44,5 +44,5 @@ for Jira — use `jira.js`.
 ## Conventions
 - Server Action returns `{ sucesso, jiraIssueKey }` or `{ sucesso: true, jiraIssueKey: null,
   jiraErro }`; never `alert()`. Follow the `server-action` skill.
-- After schema change: `pnpm prisma migrate dev --name add_jira_sync_status` (see
-  `prisma-workflow` skill).
+- The `jiraSyncStatus` column already exists (migration `add_jira_sync_status`); no schema
+  change is needed for the Fase 5 scope. See `prisma-workflow` skill for general migration flow.
