@@ -1,6 +1,6 @@
 # Task 1: Dockerfile — app mínimo (standalone) + estágio migrator
 
-❌ **Pendente**
+✅ **Concluída**
 
 ## Problema
 
