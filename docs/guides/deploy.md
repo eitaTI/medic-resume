@@ -10,8 +10,10 @@ agendado). O build usa a saída **standalone** do Next.js 15.
 
 ## O que o compose sobe
 
-- **`app`**: aplicação em produção (`node server.js` após `prisma migrate deploy` + seed).
-  Porta `3000`, com healthcheck em `GET /api/health`.
+- **`migrate`** (oneshot): executa `prisma migrate deploy` + seed do admin e encerra. Usa o
+  estágio `migrator` da imagem (contém Prisma CLI, `tsx` e `node_modules` completo).
+- **`app`**: aplicação em produção — **apenas o bundle standalone do Next.js** (sem
+  `node_modules` do projeto). Porta `3000`, com healthcheck em `GET /api/health`.
 - **`backup`**: container `alpine` com `cron` que executa `scripts/backup.sh` diariamente às 2h,
   salvando em `./backups` (banco + uploads).
 
@@ -52,11 +54,9 @@ precise alterar no `.env` para produção.
 docker compose up -d --build
 ```
 
-Na inicialização, `scripts/start.sh` executa:
-
-1. `prisma migrate deploy` (aplica migrações no volume)
-2. seed do admin inicial (`prisma/seed.ts`); falhas não interrompem o start
-3. `node server.js`
+O `app` só sobe após o `migrate` concluir com sucesso (`depends_on` com
+`condition: service_completed_successfully` — requer Docker Compose v2). O `start.sh` do app
+executa apenas `node server.js`; migrações e seed ficam a cargo do service `migrate`.
 
 Verifique a saúde:
 
@@ -112,20 +112,13 @@ git pull
 docker compose up -d --build
 ```
 
-As migrações são aplicadas automaticamente no `start.sh` (`migrate deploy`). Os volumes
-(`uploads`, `sqlite-data`) são preservados entre deploys.
+As migrações são aplicadas automaticamente pelo service `migrate` antes do `app` subir. Os
+volumes (`uploads`, `sqlite-data`) são preservados entre deploys.
 
-## Notas técnicas
-
-- **`node_modules` completo no estágio final (necessário, não apenas pelos nativos):** o
-  `start.sh` roda `prisma migrate deploy` e `tsx prisma/seed.ts` **em runtime**. Essas ferramentas
-  (`prisma` CLI e `tsx`) **não** fazem parte do bundle *standalone* do Next.js, então o
-  `Dockerfile` copia o `node_modules` inteiro do builder para o estágio final. Os módulos nativos
-  (`better-sqlite3`, adapter Prisma) também acabam cobertos. **Não remova** essa cópia ou o
-  container não sobe.
-  - *Opcional para enxugar a imagem:* em vez de copiar tudo, instalar só `prisma` + `tsx` no
-    estágio final e ajustar o `start.sh` — exige mexer no `Dockerfile`, mas elimina o resto do
-    `node_modules`.
+O app roda 100% com o bundle standalone do Next.js (`.next/standalone`, ~68 MB). O Prisma CLI,
+`tsx` e o `node_modules` completo ficam apenas no estágio `migrator`, usado pelo service
+`migrate` (oneshot). A imagem do `app` (estágio `runner`) contém **apenas** o necessário para
+rodar `node server.js` — sem `node_modules` do projeto.
 - O app escuta em `0.0.0.0:3000` dentro do container; o **Cloudflare Tunnel** é quem expõe
   publicamente (TLS gerenciado pela Cloudflare) — não é preciso proxy reverso próprio (Nginx/Caddy).
 - `next.config.ts` usa `output: 'standalone'` e `serverExternalPackages` para os módulos nativos.

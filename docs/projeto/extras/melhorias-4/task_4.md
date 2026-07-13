@@ -1,6 +1,6 @@
 # Task 4: Documentar app mínimo + service migrate
 
-❌ **Pendente**
+✅ **Concluída**
 
 ## O que fazer
 

@@ -56,6 +56,13 @@ docker compose exec app sh scripts/backup.sh
 - O compose lê as variáveis do `.env` padrão (interpolação `${VAR}`); basta preencher
   os valores de produção nele antes do `docker compose up`.
 
+## Nota — service migrate (Melhorias-4)
+
+A partir da Melhoria-4, o `docker-compose.yml` inclui um service `migrate` (oneshot, estágio
+`migrator`) que executa `prisma migrate deploy` + seed antes do `app` subir. O `app` usa
+`depends_on: migrate: condition: service_completed_successfully` e o `start.sh` passou a
+executar apenas `node server.js`. Requer Docker Compose v2.
+
 ## Commit
 
 ```
