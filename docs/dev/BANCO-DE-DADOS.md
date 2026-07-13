@@ -23,12 +23,12 @@ prisma.config.ts       # Config do Prisma v7
 
 | Modelo | Descrição |
 |--------|-----------|
-| `Admin` | Administradores do sistema (nome, email, senha hash) |
-| `Clinica` | Clínicas submetidas (dados, status, Jira issue) |
+| `Clinica` | Clínicas submetidas (dados, `status`, `jiraSyncStatus`, `nomeEmpresa`, `quantidadeMedicos`) |
 | `Medico` | Médicos vinculados a uma clínica |
 | `Exame` | Exames vinculados a uma clínica |
 | `Dispositivo` | Dispositivos vinculados a uma clínica |
-| `AuditLog` | Logs de auditoria de ações dos admins |
+| `AuditLog` | Logs de auditoria (userId → `User`, entidade, acao) |
+| `User`/`Session`/`Account`/`Verification` | Modelos do Better Auth (admins são registros `User`) |
 
 O schema completo está em `prisma/schema.prisma`.
 
@@ -87,12 +87,20 @@ const resultados = await prisma.clinica.findMany({
 | `APROVADA` | Aprovada, card criado no Jira |
 | `REJEITADA` | Rejeitada com motivo |
 
+## Status de Sincronização Jira (`Clinica.jiraSyncStatus`)
+
+| Valor | Descrição |
+|-------|-----------|
+| `PENDENTE` | Ainda não sincronizado com o Jira |
+| `SINCRONIZADO` | Card criado no Jira com sucesso |
+| `ERRO` | Falha na sincronização (ver `jiraErro`) |
+
 ## Dicas
 
 - Use `include` para relacionamentos e evite N+1 queries
 - Use `prisma.$transaction()` para operações atômicas (ex: atualizar status + criar audit log)
 - Singleton do Prisma em `lib/prisma.ts` com `PrismaBetterSqlite3` adapter
-- Seed usa `upsert` para evitar duplicatas ao rodar múltiplas vezes
+- Seed cria um `User` admin via Better Auth (`prisma/seed.ts`) para evitar duplicatas
 
 ## Checklist
 

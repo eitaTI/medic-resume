@@ -27,14 +27,15 @@ medic-resume/
 │   ├── globals.css         # Estilos globais (Tailwind)
 │   ├── api/auth/[...all]/  # Handlers HTTP do Better Auth
 │   ├── formulario/         # Rota pública (wizard)
-│   ├── login/              # Rota de login (pendente)
-│   └── admin/              # Rotas protegidas (pendente)
+│   ├── login/              # Rota de login
+│   └── admin/              # Rotas protegidas (painel, usuários, auditoria)
 │
 ├── components/             # Componentes React
-│   ├── ui/                 # Button, Input, FileUpload
-│   └── wizard/             # Stepper, StepClinica, StepMedicos
-│
-├── actions/                # Server Actions (pendente)
+│   ├── ui/                 # Button, Input, FileUpload, Select, StatusBadge, ThemeToggle
+│   ├── wizard/             # Stepper, StepClinica, StepUsuarios, StepExames, StepEquipamentos
+│   ├── admin/              # SubmissaoCard, AprovarRejeitarButtons, AdminForm, AdminDeleteButton, AuditLogCard, AdminNavbar, LogoutButton
+│   └── providers/          # ThemeProvider (dark mode)
+├── actions/                # Server Actions (submeter-formulario, login, submissoes, admins, auditoria)
 ├── lib/                    # Utilitários e configurações
 │   ├── prisma.ts           # Singleton PrismaClient + adapter
 │   └── auth.ts             # Instância Better Auth
@@ -135,7 +136,7 @@ Client Component → Server Action → Prisma → SQLite
 
 ## Segurança
 
-- Senhas hasheadas com scrypt via `@better-auth/utils/password`
+- Senhas hasheadas via `@better-auth/utils/password` (algoritmo do Better Auth)
 - Sessões gerenciadas por Better Auth
 - Rotas /admin protegidas por middleware + layout server-side
 - Uploads fora de `public/` (LGPD)

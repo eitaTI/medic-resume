@@ -44,6 +44,8 @@ import type { Submissao } from '@/types'
 
 ## Constantes do Projeto
 
+> Ilustrativas — não existem como constantes nomeadas no codebase. O projeto usa tipos/union types inline (ex: `type Status = 'PENDENTE' | 'APROVADA' | 'REJEITADA'`).
+
 ```typescript
 export const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 export const ITEMS_PER_PAGE = 50
@@ -53,7 +55,7 @@ export const ACAO_AUDITORIA = { CRIAR: 'CRIAR', APROVAR: 'APROVAR', REJEITAR: 'R
 
 ## Validação com Zod
 
-Schemas definidos junto à Server Action, validados com `safeParse`.
+Schemas Zod centralizados em `lib/validacoes.ts` (`schemaClinica`, `schemaMedico`, `schemaExame`, `schemaDispositivo`, `schemaFormulario`), importados por `actions/submeter-formulario.ts` e `app/formulario/page.tsx` e validados com `safeParse`.
 
 ## Checklist
 
