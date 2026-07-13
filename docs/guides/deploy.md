@@ -30,8 +30,8 @@ Edite o `.env` **antes** do deploy. O `docker-compose.yml` carrega o `.env` auto
 repassa as variáveis para o container:
 
 ```bash
-# URL pública da aplicação
-BETTER_AUTH_URL=https://seu-dominio.com
+# URL pública da aplicação (URL do Cloudflare Tunnel — usada pelo Better Auth)
+BETTER_AUTH_URL=https://formulario.seu-dominio.com
 
 # Segredo forte (gere com: openssl rand -base64 32)
 BETTER_AUTH_SECRET=<seu-segredo-de-32-chars>
@@ -65,6 +65,28 @@ docker compose ps
 curl -f http://localhost:3000/api/health
 ```
 
+## Exposição via Cloudflare Tunnel
+
+O ingresso em produção é feito via **Cloudflare Tunnel** — não é necessário abrir a porta `3000`
+no firewall/host. O que importa no `docker-compose.yml` é a **configuração da porta interna** do
+serviço `app` (padrão `3000`); o tunnel aponta para `http://app:3000` na rede do compose.
+
+Exemplo de `cloudflared` apontando para o serviço (rode no host, com o `cloudflared` já
+autenticado):
+
+```bash
+cloudflared tunnel create eitati-formulario
+cloudflared tunnel route dns eitati-formulario formulario.seu-dominio.com
+cloudflared tunnel run --url http://localhost:3000 eitati-formulario
+```
+
+> Se o `cloudflared` rodar no mesmo `docker compose` (ou na mesma rede Docker), use
+> `http://app:3000` em vez de `http://localhost:3000`. A aplicação escuta em `0.0.0.0:3000`
+> dentro do container.
+>
+> O `ports: "3000:3000"` no compose serve para checagens locais (ex.: `curl` de saúde) e pode
+> ser omitido se o túnel for o único ingress — mas manter não prejudica.
+
 ## 3. Backup
 
 O serviço `backup` agenda `scripts/backup.sh` todo dia às 2h (cron). Os arquivos vão para
@@ -95,9 +117,16 @@ As migrações são aplicadas automaticamente no `start.sh` (`migrate deploy`). 
 
 ## Notas técnicas
 
-- O `Dockerfile` copia `node_modules` inteiro no estágio final para garantir os módulos nativos
-  (`better-sqlite3`, Prisma adapter) em runtime — **não remova** essa cópia.
-- O app escuta em `0.0.0.0:3000` dentro do container; exponha via proxy reverso (Nginx/Caddy) com
-  TLS na frente, se desejar HTTPS.
+- **`node_modules` completo no estágio final (necessário, não apenas pelos nativos):** o
+  `start.sh` roda `prisma migrate deploy` e `tsx prisma/seed.ts` **em runtime**. Essas ferramentas
+  (`prisma` CLI e `tsx`) **não** fazem parte do bundle *standalone* do Next.js, então o
+  `Dockerfile` copia o `node_modules` inteiro do builder para o estágio final. Os módulos nativos
+  (`better-sqlite3`, adapter Prisma) também acabam cobertos. **Não remova** essa cópia ou o
+  container não sobe.
+  - *Opcional para enxugar a imagem:* em vez de copiar tudo, instalar só `prisma` + `tsx` no
+    estágio final e ajustar o `start.sh` — exige mexer no `Dockerfile`, mas elimina o resto do
+    `node_modules`.
+- O app escuta em `0.0.0.0:3000` dentro do container; o **Cloudflare Tunnel** é quem expõe
+  publicamente (TLS gerenciado pela Cloudflare) — não é preciso proxy reverso próprio (Nginx/Caddy).
 - `next.config.ts` usa `output: 'standalone'` e `serverExternalPackages` para os módulos nativos.
 - `.npmrc` com `shamefully-hoist=true` é necessário para essas dependências nativas.
