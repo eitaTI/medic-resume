@@ -2,11 +2,10 @@
 
 ✅ **Concluído** — criar `components/admin/AdminForm.tsx`
 
-Criar `components/admin/AdminForm.tsx` (`'use client'`):
-- `useActionState` com wrapper inline que chama `criarAdmin()` e dá `router.refresh()` em caso de sucesso
+Criado `components/admin/AdminForm.tsx` (`'use client'`):
+- `useActionState` chamando `criarAdmin()` e exibindo feedback inline (sucesso/erro), sem `alert()`
 - Campos: Nome, Email (type email), Senha (type password, minLength 6)
-- Mensagem de erro (vermelho) e sucesso (verde)
-- Botão "Criar Admin" desabilitado enquanto pending ("Criando...")
+- Botão "Criar Admin" desabilitado enquanto pendente ("Criando...")
 
 ## Commit
 

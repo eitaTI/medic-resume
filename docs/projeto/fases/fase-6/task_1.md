@@ -2,34 +2,27 @@
 
 ✅ **Concluído** — criar `actions/admins.ts`
 
-Criar `actions/admins.ts` (`'use server'`):
+Criado `actions/admins.ts` (`'use server'`):
 
-```ts
-import { auth } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
-import { headers } from 'next/headers'
-import bcrypt from 'bcryptjs'
-```
+- **`criarAdmin({ nome, email, senha })`**:
+  - Verifica sessão com `auth.api.getSession({ headers: await headers() })`
+  - Valida campos e tamanho mínimo de senha (6)
+  - Impede email duplicado (`prisma.user.findUnique`)
+  - Cria `User` + `Account` (providerId `credential`) com senha hasheada via
+    `hashPassword` de `@better-auth/utils/password` (mesmo padrão de `prisma/seed.ts`)
+  - Retorna `{ sucesso: true }` ou `{ erro: '...' }`
 
-**Ações:**
+- **`excluirAdmin(id)`**:
+  - Verifica sessão
+  - Impede auto-exclusão (compara com `session.user.id`)
+  - Impede exclusão do último admin (`prisma.user.count`)
+  - Remove o `User` (cascade remove a `Account`)
+  - Retorna `{ sucesso: true }` ou `{ erro: '...' }`
 
-- **`criarAdmin(dados: { nome, email, senha })`**:
-  - Verificar sessão com `auth.api.getSession({ headers: await headers() })`
-  - Checar email duplicado no modelo `Admin`
-  - Hashear senha com `bcrypt.hashSync(senha, 10)` (usar `bcryptjs`, já instalado)
-  - Criar no Prisma (`prisma.admin.create`)
-  - Retornar `{ sucesso: true }` ou `{ erro: '...' }`
-
-- **`excluirAdmin(id: number)`**:
-  - Verificar sessão
-  - Impedir auto-exclusão (comparar com `session.user.id` — notar que o session.user.id é do Better Auth, não do modelo Admin)
-  - Deletar do Prisma
-  - Retornar `{ sucesso: true }` ou `{ erro: '...' }`
-
-**Observações:**
-- O modelo `Admin` do Prisma é **separado** da tabela `user` do Better Auth — o Admin model gerencia os administradores do sistema, enquanto o Better Auth gerencia autenticação
-- A senha é armazenada no campo `senha` do modelo `Admin` (hasheada com bcrypt)
-- `revalidatePath('/admin/admins')` após criar/excluir
+> Observação: o modelo `Admin` foi removido (ver migração `reconcile_admin_to_user`);
+> administradores são registros do `User` do Better Auth. Não há campo `senha` no
+> modelo `User` — a senha vive em `Account` (credential). O hash usa
+> `@better-auth/utils/password`, não `bcryptjs`.
 
 ## Commit
 

@@ -7,7 +7,7 @@ Consolida as discrepâncias reais encontradas na verificação de `docs/projeto/
 | Componente | Status |
 |-----------|--------|
 | Corrigir drift de schema Admin → User (migração) | ✅ Concluído |
-| Implementar CRUD de administradores (Fase 6) | ❌ Pendente |
+| Implementar CRUD de administradores (Fase 6) | ✅ Concluído |
 | Integrar auditoria na gestão de usuários (Fase 7 T6) | ❌ Pendente |
 | Corrigir feedback/retry de erro Jira (Fase 5 T3) | ❌ Pendente |
 | Testar backup/restore de fato (Fase 8 T4) | ❌ Pendente |
@@ -18,7 +18,7 @@ Consolida as discrepâncias reais encontradas na verificação de `docs/projeto/
 | # | Arquivo | Descrição | Prioridade | Status |
 |---|---------|-----------|------------|--------|
 | 1 | `task_1.md` | Criar migração para reconciliar schema: dropar `Admin` e alterar `AuditLog.adminId → userId` (resolve drift que quebra em runtime) | Alta | ✅ Concluído |
-| 2 | `task_2.md` | Implementar Fase 6: `actions/admins.ts`, `AdminForm.tsx`, CRUD real em `/admin/usuarios` | Alta | ❌ Pendente |
+| 2 | `task_2.md` | Implementar Fase 6: `actions/admins.ts`, `AdminForm.tsx`, CRUD real em `/admin/usuarios` | Alta | ✅ Concluído |
 | 3 | `task_3.md` | Integrar auditoria (CRIAR/EXCLUIR admin) nas novas Server Actions de gestão de usuários | Média | ❌ Pendente |
 | 4 | `task_4.md` | Fase 5 T3: exibir `jiraErro` na UI e oferecer retry para qualquer estado `!= SINCRONIZADO` | Média | ❌ Pendente |
 | 5 | `task_5.md` | Fase 8 T4: executar e validar backup.sh/restore.sh de ponta a ponta | Média | ❌ Pendente |

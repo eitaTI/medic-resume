@@ -1,6 +1,6 @@
 # Task 2: Implementar Gestão de Administradores (Fase 6 — CRUD real)
 
-❌ **Pendente**
+✅ **Concluído** — `actions/admins.ts`, `AdminForm.tsx` e CRUD em `/admin/usuarios`
 
 ## Problema
 
