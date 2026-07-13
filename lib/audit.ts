@@ -16,7 +16,7 @@ interface RegistrarAcaoParams {
   userId?: string
   acao: string
   entidade: string
-  entidadeId?: number
+  entidadeId?: number | null
   detalhes?: Record<string, unknown>
   ipAddress?: string
 }

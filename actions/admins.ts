@@ -5,6 +5,7 @@ import { hashPassword } from '@better-auth/utils/password'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { headers } from 'next/headers'
+import { registrarAcao } from '@/lib/audit'
 
 /**
  * Server Actions de gestão de administradores (modelo User do Better Auth).
@@ -62,6 +63,14 @@ export async function criarAdmin(dados: {
       },
     })
 
+    await registrarAcao({
+      userId: session.user.id,
+      acao: 'CRIAR',
+      entidade: 'User',
+      entidadeId: null,
+      detalhes: { email, nome },
+    })
+
     return { sucesso: true }
   } catch {
     return { erro: 'Erro interno ao criar administrador' }
@@ -86,6 +95,14 @@ export async function excluirAdmin(id: string) {
     if (!alvo) return { erro: 'Usuário não encontrado' }
 
     await prisma.user.delete({ where: { id } })
+
+    await registrarAcao({
+      userId: session.user.id,
+      acao: 'EXCLUIR',
+      entidade: 'User',
+      entidadeId: null,
+      detalhes: { email: alvo.email, nome: alvo.name },
+    })
 
     return { sucesso: true }
   } catch {

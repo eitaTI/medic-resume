@@ -1,6 +1,6 @@
 # Task 3: Integrar Auditoria na Gestão de Usuários (Fase 7 T6)
 
-❌ **Pendente**
+✅ **Concluído** — auditoria em `criarAdmin`/`excluirAdmin`
 
 ## Problema
 

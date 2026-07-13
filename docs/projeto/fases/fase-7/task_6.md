@@ -1,19 +1,14 @@
 # Task 6: Integrar Auditoria nas Server Actions
 
-✅ **Concluído**  — atualizar `actions/submissoes.ts` e `actions/admins.ts`
+✅ **Concluído**  — `actions/submissoes.ts` e `actions/admins.ts`
 
 **Em `actions/submissoes.ts`:**
-- Importar `registrarAcao` de `@/lib/audit`
-- Em `aprovarSubmissao`: após atualizar status, registrar ação `APROVAR` na entidade `Clinica` com `detalhes: { jiraIssueKey, nomeClinica }`
-- Em `rejeitarSubmissao`: após atualizar status, registrar ação `REJEITAR` na entidade `Clinica` com `detalhes: { motivo, nomeClinica }`
+- Em `aprovarSubmissao`: após atualizar status, registra `APROVAR` na entidade `Clinica` com `detalhes: { jiraIssueKey, nomeClinica }`
+- Em `rejeitarSubmissao`: após atualizar status, registra `REJEITAR` na entidade `Clinica` com `detalhes: { motivo, nomeClinica }`
 
 **Em `actions/admins.ts`:**
-- Importar `registrarAcao` de `@/lib/audit`
-- Em `criarAdmin`: após criar, registrar ação `CRIAR` na entidade `Admin` com `detalhes: { email }`
-- Em `excluirAdmin`: após deletar, registrar ação `EXCLUIR` na entidade `Admin`
+- Em `criarAdmin`: após criar, registra `CRIAR` na entidade `User` com `detalhes: { email, nome }`
+- Em `excluirAdmin`: após deletar, registra `EXCLUIR` na entidade `User` com `detalhes: { email, nome }`
 
-## Commit
-
-```
-feat(audit): integrar auditoria nas server actions de submissões e admins
-```
+> Observação: eventos de `User` usam `entidadeId: null` (o `User.id` é String e
+> `AuditLog.entidadeId` é `Int`); o autor fica em `userId`.
