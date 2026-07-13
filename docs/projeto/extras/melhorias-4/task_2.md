@@ -1,6 +1,6 @@
 # Task 2: start.sh reduzido a `exec node server.js`
 
-❌ **Pendente**
+✅ **Concluída**
 
 ## Problema
 
