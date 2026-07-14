@@ -29,8 +29,8 @@ export function getBranding(): Branding {
   return {
     logoLight: resolve('eitati-logo-light'),
     logoDark: resolve('eitati-logo-dark'),
-    wallpaperLight: resolve('eitati-light-wallpaper'),
-    wallpaperDark: resolve('eitati-dark-wallpaper'),
+    wallpaperLight: `url('${resolve('eitati-light-wallpaper')}')`,
+    wallpaperDark: `url('${resolve('eitati-dark-wallpaper')}')`,
     iconLight: resolve('eitati-icon-light'),
     iconDark: resolve('eitati-icon-dark'),
   }
