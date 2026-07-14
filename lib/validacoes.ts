@@ -10,6 +10,7 @@ export const schemaClinica = z.object({
   cnpjEmpresa: z.string().optional().refine((val) => !val || val.replace(/\D/g, '').length === 14, 'CNPJ deve ser preenchido integralmente'),
   cepClinica: z.string().optional(),
   enderecoClinica: z.string().optional(),
+  possuiCnpj: z.boolean().optional(),
   quantidadeMedicos: z.coerce.number().int().min(1, 'Informe ao menos 1 médico').default(1),
 })
 
@@ -41,6 +42,7 @@ export const schemaFormulario = z.object({
   cnpjEmpresa: z.string().optional().refine((val) => !val || val.replace(/\D/g, '').length === 14, 'CNPJ deve ser preenchido integralmente'),
   cepClinica: z.string().refine((val) => val.replace(/\D/g, '').length === 8, 'CEP deve ser preenchido integralmente'),
   enderecoClinica: z.string().min(1, 'Endereço é obrigatório'),
+  possuiCnpj: z.boolean().optional(),
   cabecalhoLaudo: z.string().optional(),
   rodapeLaudo: z.string().optional(),
   quantidadeMedicos: z.number().int().min(1, 'Informe ao menos 1 médico'),
