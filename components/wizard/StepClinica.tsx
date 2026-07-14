@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
+import type { ChangeEvent } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { Input } from '@/components/ui/Input'
 import { FileUpload } from '@/components/ui/FileUpload'
@@ -187,6 +188,37 @@ export function StepClinica() {
     }
   }, [watchCnpjEmpresa, isAddressEditable, fetchCNPJ])
 
+  const handleMaskedChange = useCallback((
+    e: ChangeEvent<HTMLInputElement>,
+    field: keyof FormularioValues,
+    max: number,
+    format: (value: string) => string,
+  ) => {
+    const el = e.currentTarget
+    const oldValue = el.value
+    const sel = el.selectionStart ?? oldValue.length
+    let digitsBefore = 0
+    for (let i = 0; i < sel; i++) {
+      if (/\d/.test(oldValue[i])) digitsBefore++
+    }
+    const digits = oldValue.replace(/\D/g, '').slice(0, max)
+    const next = format(digits)
+    setValue(field, next, { shouldValidate: false })
+    let pos = 0
+    let count = 0
+    while (pos < next.length && count < digitsBefore) {
+      if (/\d/.test(next[pos])) count++
+      pos++
+    }
+    requestAnimationFrame(() => {
+      try {
+        el.setSelectionRange(pos, pos)
+      } catch {
+        /* ignore */
+      }
+    })
+  }, [setValue])
+
   const handleCnpjToggle = (value: boolean) => {
     setPossuiCnpj(value)
     setValue('possuiCnpj', value)
@@ -210,6 +242,7 @@ export function StepClinica() {
         <Input
           label="Email do Titular"
           type="email"
+          placeholder="nome@exemplo.com"
           {...register('emailTitular')}
           erro={errors.emailTitular?.message}
           required
@@ -221,9 +254,8 @@ export function StepClinica() {
           label="Celular para contato (whatsapp)"
           placeholder="(62) 99999-8888"
           {...register('celularTitular')}
-          onChange={(e) => {
-            setValue('celularTitular', formatCelular(e.target.value), { shouldValidate: false })
-          }}
+          value={watch('celularTitular') ?? ''}
+          onChange={(e) => handleMaskedChange(e, 'celularTitular', 11, formatCelular)}
           erro={errors.celularTitular?.message}
           required
         />
@@ -231,9 +263,8 @@ export function StepClinica() {
           label="CPF do Titular"
           placeholder="000.000.000-00"
           {...register('documentoTitular')}
-          onChange={(e) => {
-            setValue('documentoTitular', formatCPF(e.target.value), { shouldValidate: false })
-          }}
+          value={watch('documentoTitular') ?? ''}
+          onChange={(e) => handleMaskedChange(e, 'documentoTitular', 11, formatCPF)}
           erro={errors.documentoTitular?.message}
           required
         />
@@ -268,10 +299,8 @@ export function StepClinica() {
               label="CNPJ da Empresa"
               placeholder="00.000.000/0000-00"
               {...register('cnpjEmpresa')}
-              onChange={(e) => {
-                const formatted = formatCNPJ(e.target.value)
-                setValue('cnpjEmpresa', formatted, { shouldValidate: false })
-              }}
+              value={watch('cnpjEmpresa') ?? ''}
+              onChange={(e) => handleMaskedChange(e, 'cnpjEmpresa', 14, formatCNPJ)}
               erro={errors.cnpjEmpresa?.message}
               required
             />
@@ -294,10 +323,8 @@ export function StepClinica() {
               label="CEP"
               placeholder="00000-000"
               {...register('cepClinica')}
-              onChange={(e) => {
-                const formatted = formatCEP(e.target.value)
-                setValue('cepClinica', formatted, { shouldValidate: false })
-              }}
+              value={watch('cepClinica') ?? ''}
+              onChange={(e) => handleMaskedChange(e, 'cepClinica', 8, formatCEP)}
               erro={errors.cepClinica?.message}
               required
             />
@@ -324,10 +351,8 @@ export function StepClinica() {
               label="CEP"
               placeholder="00000-000"
               {...register('cepClinica')}
-              onChange={(e) => {
-                const formatted = formatCEP(e.target.value)
-                setValue('cepClinica', formatted, { shouldValidate: false })
-              }}
+              value={watch('cepClinica') ?? ''}
+              onChange={(e) => handleMaskedChange(e, 'cepClinica', 8, formatCEP)}
               erro={errors.cepClinica?.message}
               required
             />
