@@ -11,6 +11,9 @@ export interface ClinicaParaJira {
   emailTitular: string
   celularTitular: string | null
   documentoTitular: string | null
+  cnpjEmpresa: string | null
+  cepClinica: string | null
+  enderecoClinica: string | null
   quantidadeMedicos: number
   logoPath?: string | null
   cabecalhoLaudo?: string | null
@@ -36,7 +39,11 @@ function montarDescricao(clinica: ClinicaParaJira): ADFParagraph[] {
   bloco.push(paragrafo(`Titular: ${clinica.nomeTitular}`))
   bloco.push(paragrafo(`E-mail do titular: ${clinica.emailTitular}`))
   bloco.push(paragrafo(`Celular do titular: ${clinica.celularTitular ?? '—'}`))
-  bloco.push(paragrafo(`Documento do titular: ${clinica.documentoTitular ?? '—'}`))
+  bloco.push(paragrafo(`Documento do titular (CPF): ${clinica.documentoTitular ?? '—'}`))
+  bloco.push(paragrafo(`Tipo de cadastro: ${clinica.cnpjEmpresa ? 'Pessoa Jurídica (CNPJ)' : 'Pessoa Física'}`))
+  if (clinica.cnpjEmpresa) bloco.push(paragrafo(`CNPJ da empresa: ${clinica.cnpjEmpresa}`))
+  if (clinica.cepClinica) bloco.push(paragrafo(`CEP: ${clinica.cepClinica}`))
+  if (clinica.enderecoClinica) bloco.push(paragrafo(`Endereço: ${clinica.enderecoClinica}`))
   bloco.push(paragrafo(`Quantidade de médicos: ${clinica.quantidadeMedicos}`))
   if (clinica.logoPath) bloco.push(paragrafo(`Logo: ${clinica.logoPath} (anexo)`))
   if (clinica.cabecalhoLaudo) bloco.push(paragrafo(`Cabeçalho do laudo: ${clinica.cabecalhoLaudo}`))

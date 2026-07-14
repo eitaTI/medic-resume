@@ -73,8 +73,40 @@ export default async function DetalheSubmissaoPage({ params }: Props) {
           )}
           {clinica.documentoTitular && (
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Documento</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">CPF do Titular</p>
               <p className="text-sm text-gray-900 dark:text-gray-100 mt-0.5">{clinica.documentoTitular}</p>
+            </div>
+          )}
+          <div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Tipo de Cadastro</p>
+            <p className="text-sm text-gray-900 dark:text-gray-100 mt-0.5">
+              {clinica.cnpjEmpresa ? 'Pessoa Jurídica (CNPJ)' : 'Pessoa Física'}
+            </p>
+          </div>
+          {clinica.cnpjEmpresa && (
+            <>
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">CNPJ da Empresa</p>
+                <p className="text-sm text-gray-900 dark:text-gray-100 mt-0.5">{clinica.cnpjEmpresa}</p>
+              </div>
+              {clinica.nomeEmpresa && (
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Nome da Empresa</p>
+                  <p className="text-sm text-gray-900 dark:text-gray-100 mt-0.5">{clinica.nomeEmpresa}</p>
+                </div>
+              )}
+            </>
+          )}
+          {clinica.cepClinica && (
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">CEP</p>
+              <p className="text-sm text-gray-900 dark:text-gray-100 mt-0.5">{clinica.cepClinica}</p>
+            </div>
+          )}
+          {clinica.enderecoClinica && (
+            <div className="sm:col-span-2">
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Endereço</p>
+              <p className="text-sm text-gray-900 dark:text-gray-100 mt-0.5">{clinica.enderecoClinica}</p>
             </div>
           )}
           {clinica.logoPath && (
