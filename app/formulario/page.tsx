@@ -248,9 +248,14 @@ export default function FormularioPage() {
             )}
 
             <div className="flex justify-between mt-8 pt-6 border-t border-gray-200 dark:border-gray-800">
-              <Button variante="secundario" onClick={passoAnterior} disabled={passoAtual === 0}>
-                ← Anterior
-              </Button>
+              <div className="flex gap-2">
+                <Button variante="perigo" tamanho="pequeno" onClick={limparTudo}>
+                  Limpar formulário
+                </Button>
+                <Button variante="secundario" onClick={passoAnterior} disabled={passoAtual === 0}>
+                  ← Anterior
+                </Button>
+              </div>
               {passoAtual === 3 ? (
                 <SubmitButton onClick={handleSubmit(() => formAction())} isPending={isPending} />
               ) : (
@@ -273,6 +278,12 @@ export default function FormularioPage() {
     reset(defaultValues)
     limparRascunho()
     setPassoAtual(0)
+  }
+
+  function limparTudo() {
+    if (window.confirm('Deseja limpar todos os campos do formulário? Esta ação não pode ser desfeita.')) {
+      resetarFormulario()
+    }
   }
 }
 
