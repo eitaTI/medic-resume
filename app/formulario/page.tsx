@@ -206,21 +206,22 @@ export default function FormularioPage() {
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4 shrink-0">
               <Image
-                src={branding.logoLight}
-                alt="EitaTI"
-                width={93}
-                height={40}
-                className="block dark:hidden"
-                priority
-              />
+              src={branding.logoLight}
+              alt="EitaTI"
+              width={93}
+              height={40}
+              className="block dark:hidden"
+              priority
+            />
               <Image
-                src={branding.logoDark}
-                alt="EitaTI"
-                width={93}
-                height={40}
-                className="hidden dark:block"
-                priority
-              />
+              src={branding.logoDark}
+              alt="EitaTI"
+              width={93}
+              height={40}
+              className="hidden dark:block"
+              priority
+              unoptimized
+            />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   Cadastro da Clínica

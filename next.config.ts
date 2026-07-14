@@ -4,10 +4,10 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
-  images: {
-    localPatterns: [
-      { pathname: "/**", search: "/.*/" },
-    ],
+  async rewrites() {
+    return [
+      { source: "/branding/v:version/:path*", destination: "/branding/:path*" },
+    ];
   },
 };
 

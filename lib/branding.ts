@@ -14,11 +14,11 @@ function resolve(name: string): string {
     let version = ''
     try {
       const mtime = Math.floor(fs.statSync(path.join(BRANDING_DIR, file)).mtimeMs)
-      version = `?v=${mtime}`
+      version = `v${mtime}`
     } catch {
       version = ''
     }
-    return `/branding/${file}${version}`
+    return version ? `/branding/${version}/${file}` : `/branding/${file}`
   } catch {
     return `/branding/${name}.png`
   }
