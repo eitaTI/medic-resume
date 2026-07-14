@@ -119,12 +119,13 @@ export default function FormularioPage() {
 
   const proximoPasso = async () => {
     const camposPorPasso: Record<number, (keyof FormularioValues)[]> = {
-      0: ['nomeClinica', 'nomeTitular', 'emailTitular'],
+      0: ['nomeTitular', 'emailTitular', 'celularTitular', 'documentoTitular', 'cepClinica', 'enderecoClinica'],
       1: ['usuarios'],
       2: ['exames'],
       3: ['equipamentos'],
     }
-    const campos = camposPorPasso[passoAtual]
+    const campos = [...camposPorPasso[passoAtual]]
+    if (passoAtual === 0 && getValues('possuiCnpj') === true) campos.push('cnpjEmpresa')
     const valido = await formMethods.trigger(campos)
     if (valido && passoAtual < 3) setPassoAtual(passoAtual + 1)
   }

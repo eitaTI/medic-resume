@@ -33,7 +33,7 @@ export const schemaDispositivo = z.object({
 })
 
 export const schemaFormulario = z.object({
-  nomeClinica: z.string().min(1, 'Nome da clínica é obrigatório'),
+  nomeClinica: z.string().optional(),
   nomeEmpresa: z.string().optional(),
   nomeTitular: z.string().min(10, 'O nome completo do titular deve ter no mínimo 10 caracteres'),
   emailTitular: z.string().email('Email do titular inválido'),
