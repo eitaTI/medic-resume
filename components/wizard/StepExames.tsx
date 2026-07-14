@@ -76,23 +76,45 @@ export function StepExames() {
                 required
               />
 
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600 dark:text-gray-300">Possui PDF do Laudo?</span>
-                <div className="inline-flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => setValue(`exames.${index}.temLaudo`, true, { shouldValidate: true })}
-                    className={`px-3 py-1 text-sm font-medium transition-colors ${temLaudo ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'}`}
-                  >
-                    Sim
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setValue(`exames.${index}.temLaudo`, false, { shouldValidate: true })}
-                    className={`px-3 py-1 text-sm font-medium border-l border-gray-300 dark:border-gray-600 transition-colors ${!temLaudo ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'}`}
-                  >
-                    Não
-                  </button>
+              <div className="flex flex-wrap items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600 dark:text-gray-300">Possui PDF do Laudo?</span>
+                  <div className="inline-flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => setValue(`exames.${index}.temLaudo`, true, { shouldValidate: true })}
+                      className={`px-3 py-1 text-sm font-medium transition-colors ${temLaudo ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'}`}
+                    >
+                      Sim
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setValue(`exames.${index}.temLaudo`, false, { shouldValidate: true })}
+                      className={`px-3 py-1 text-sm font-medium border-l border-gray-300 dark:border-gray-600 transition-colors ${!temLaudo ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'}`}
+                    >
+                      Não
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600 dark:text-gray-300">Possui Tópicos de conteúdo?</span>
+                  <div className="inline-flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => setValue(`exames.${index}.temTopicos`, true, { shouldValidate: true })}
+                      className={`px-3 py-1 text-sm font-medium transition-colors ${temTopicos ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'}`}
+                    >
+                      Sim
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setValue(`exames.${index}.temTopicos`, false, { shouldValidate: true })}
+                      className={`px-3 py-1 text-sm font-medium border-l border-gray-300 dark:border-gray-600 transition-colors ${!temTopicos ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'}`}
+                    >
+                      Não
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -104,26 +126,6 @@ export function StepExames() {
                   onFile={(file) => setValue(`exames.${index}.laudo`, file)}
                 />
               )}
-
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600 dark:text-gray-300">Possui Tópicos de conteúdo?</span>
-                <div className="inline-flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => setValue(`exames.${index}.temTopicos`, true, { shouldValidate: true })}
-                    className={`px-3 py-1 text-sm font-medium transition-colors ${temTopicos ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'}`}
-                  >
-                    Sim
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setValue(`exames.${index}.temTopicos`, false, { shouldValidate: true })}
-                    className={`px-3 py-1 text-sm font-medium border-l border-gray-300 dark:border-gray-600 transition-colors ${!temTopicos ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'}`}
-                  >
-                    Não
-                  </button>
-                </div>
-              </div>
 
               {temTopicos && (
                 <div className="space-y-2">

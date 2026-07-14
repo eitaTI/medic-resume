@@ -17,13 +17,15 @@ export function StepEquipamentos() {
         <div key={field.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3 bg-gray-50 dark:bg-gray-800/50">
           <div className="flex justify-between items-center">
             <h3 className="font-medium text-gray-900 dark:text-gray-100">Equipamento {index + 1}</h3>
-            <Button
-              variante="perigo"
-              tamanho="pequeno"
-              onClick={() => remove(index)}
-            >
-              Remover
-            </Button>
+            {index > 0 && (
+              <Button
+                variante="perigo"
+                tamanho="pequeno"
+                onClick={() => remove(index)}
+              >
+                Remover
+              </Button>
+            )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
