@@ -254,7 +254,7 @@ export function StepClinica() {
           label="Celular para contato (whatsapp)"
           placeholder="(62) 99999-8888"
           {...register('celularTitular')}
-          value={watch('celularTitular') ?? ''}
+          value={formatCelular(watch('celularTitular') ?? '')}
           onChange={(e) => handleMaskedChange(e, 'celularTitular', 11, formatCelular)}
           erro={errors.celularTitular?.message}
           required
@@ -263,7 +263,7 @@ export function StepClinica() {
           label="CPF do Titular"
           placeholder="000.000.000-00"
           {...register('documentoTitular')}
-          value={watch('documentoTitular') ?? ''}
+          value={formatCPF(watch('documentoTitular') ?? '')}
           onChange={(e) => handleMaskedChange(e, 'documentoTitular', 11, formatCPF)}
           erro={errors.documentoTitular?.message}
           required
@@ -299,7 +299,7 @@ export function StepClinica() {
               label="CNPJ da Empresa"
               placeholder="00.000.000/0000-00"
               {...register('cnpjEmpresa')}
-              value={watch('cnpjEmpresa') ?? ''}
+              value={formatCNPJ(watch('cnpjEmpresa') ?? '')}
               onChange={(e) => handleMaskedChange(e, 'cnpjEmpresa', 14, formatCNPJ)}
               erro={errors.cnpjEmpresa?.message}
               required
@@ -323,7 +323,7 @@ export function StepClinica() {
               label="CEP"
               placeholder="00000-000"
               {...register('cepClinica')}
-              value={watch('cepClinica') ?? ''}
+              value={formatCEP(watch('cepClinica') ?? '')}
               onChange={(e) => handleMaskedChange(e, 'cepClinica', 8, formatCEP)}
               erro={errors.cepClinica?.message}
               required
@@ -351,7 +351,7 @@ export function StepClinica() {
               label="CEP"
               placeholder="00000-000"
               {...register('cepClinica')}
-              value={watch('cepClinica') ?? ''}
+              value={formatCEP(watch('cepClinica') ?? '')}
               onChange={(e) => handleMaskedChange(e, 'cepClinica', 8, formatCEP)}
               erro={errors.cepClinica?.message}
               required
