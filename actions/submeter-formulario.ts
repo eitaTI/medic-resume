@@ -60,24 +60,43 @@ export async function submeterFormulario(formData: FormData) {
     const cabecalhoLaudo = (formData.get('cabecalhoLaudo') as string) || ''
     const rodapeLaudo = (formData.get('rodapeLaudo') as string) || ''
 
+    const medicosRaw = extrairArray(formData, 'medicos')
+    const medicoIndices = Object.keys(medicosRaw).map(Number).sort()
+
+    const medicosArray = medicoIndices.map((i) => medicosRaw[i])
+    const quantidadeMedicos = Math.max(
+      1,
+      medicosArray.filter((m) => {
+        const tipo = m.tipo as string | undefined
+        return !tipo || tipo === 'examinador'
+      }).length
+    )
+
+    const cnpjEmpresaRaw = formData.get('cnpjEmpresa') as string | null
+    const cnpjEmpresa = cnpjEmpresaRaw && cnpjEmpresaRaw.trim() !== '' ? cnpjEmpresaRaw : undefined
+
+    let nomeClinica = (formData.get('nomeClinica') as string) || ''
+    const nomeTitular = (formData.get('nomeTitular') as string) || ''
+
+    if (!cnpjEmpresa || cnpjEmpresa.trim() === '') {
+      nomeClinica = nomeTitular
+    }
+
     const dadosClinica = {
-      nomeClinica: (formData.get('nomeClinica') as string) || '',
+      nomeClinica,
       nomeEmpresa: (formData.get('nomeEmpresa') as string) || undefined,
-      nomeTitular: (formData.get('nomeTitular') as string) || '',
+      nomeTitular,
       emailTitular: (formData.get('emailTitular') as string) || '',
       celularTitular: (formData.get('celularTitular') as string) || '',
       documentoTitular: (formData.get('documentoTitular') as string) || '',
-      cnpjEmpresa: (formData.get('cnpjEmpresa') as string) || undefined,
+      cnpjEmpresa,
       cepClinica: (formData.get('cepClinica') as string) || undefined,
       enderecoClinica: (formData.get('enderecoClinica') as string) || undefined,
-      quantidadeMedicos: Number(formData.get('quantidadeMedicos')) || 1,
+      quantidadeMedicos,
     }
 
     const validacao = schemaClinica.safeParse(dadosClinica)
     if (!validacao.success) return { erro: validacao.error.issues[0].message }
-
-    const medicosRaw = extrairArray(formData, 'medicos')
-    const medicoIndices = Object.keys(medicosRaw).map(Number).sort()
 
     for (const i of medicoIndices) {
       const v = schemaMedico.safeParse(medicosRaw[i])
