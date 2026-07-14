@@ -119,12 +119,17 @@ export function StepExames() {
               </div>
 
               {temLaudo && (
-                <FileUpload
-                  label="PDF do Laudo"
-                  accept=".pdf"
-                  acceptHint="Apenas arquivos PDF"
-                  onFile={(file) => setValue(`exames.${index}.laudo`, file)}
-                />
+                <div className="space-y-1">
+                  <FileUpload
+                    label="PDF do Laudo"
+                    accept=".pdf"
+                    acceptHint="Apenas arquivos PDF"
+                    onFile={(file) => setValue(`exames.${index}.laudo`, file, { shouldValidate: true })}
+                  />
+                  {errors.exames?.[index]?.temLaudo?.message && (
+                    <p className="text-red-500 text-xs mt-1" role="alert">{errors.exames?.[index]?.temLaudo?.message}</p>
+                  )}
+                </div>
               )}
 
               {temTopicos && (

@@ -40,6 +40,7 @@ export function StepEquipamentos() {
               label="Marca"
               {...register(`equipamentos.${index}.marca`)}
               erro={errors.equipamentos?.[index]?.marca?.message}
+              placeholder="Ex: GE, Philips, Siemens"
               required
             />
           </div>
@@ -49,12 +50,14 @@ export function StepEquipamentos() {
               label="Modelo"
               {...register(`equipamentos.${index}.modelo`)}
               erro={errors.equipamentos?.[index]?.modelo?.message}
+              placeholder="Ex: Logiq P9, Acuson Sequoia"
               required
             />
             <Input
               label="Nº de Série"
               {...register(`equipamentos.${index}.numeroSerie`)}
               erro={errors.equipamentos?.[index]?.numeroSerie?.message}
+              placeholder="Ex: SN123456789"
               required
             />
           </div>

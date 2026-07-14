@@ -26,6 +26,7 @@ export const schemaExame = z.object({
   temLaudo: z.boolean().optional(),
   temTopicos: z.boolean().optional(),
   topicos: z.string().optional(),
+  laudo: z.any().optional(),
 })
 
 export const schemaDispositivo = z.object({
@@ -67,6 +68,7 @@ export const schemaFormulario = z.object({
         temLaudo: z.boolean().optional(),
         temTopicos: z.boolean().optional(),
         topicos: z.string().optional(),
+        laudo: z.any().optional(),
       }),
     )
     .min(1),
@@ -91,6 +93,15 @@ export const schemaFormulario = z.object({
           message: 'Selecione "PDF do Laudo" ou "Tópicos de conteúdo"',
           path: ['exames', i, 'temTopicos'],
         })
+      }
+      if (temPdf) {
+        if (!(exame.laudo instanceof File)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Envie o arquivo PDF do Laudo',
+            path: ['exames', i, 'temLaudo'],
+          })
+        }
       }
       if (temTop) {
         const nomes = (exame.topicos ?? '').split('-').map((t) => t.trim()).filter(Boolean)
