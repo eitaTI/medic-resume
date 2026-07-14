@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, type CSSProperties } from 'react'
+import { useActionState, useEffect, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
@@ -38,8 +38,13 @@ export default function LoginPage() {
   )
 
   // Se o login foi bem-sucedido, redireciona para o admin
+  useEffect(() => {
+    if (state && 'sucesso' in state && state.sucesso) {
+      router.push('/admin')
+    }
+  }, [state, router])
+
   if (state && 'sucesso' in state && state.sucesso) {
-    router.push('/admin')
     return null
   }
 
