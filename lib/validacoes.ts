@@ -3,10 +3,13 @@ import { z } from 'zod'
 export const schemaClinica = z.object({
   nomeClinica: z.string().min(1, 'Nome da clínica é obrigatório'),
   nomeEmpresa: z.string().optional(),
-  nomeTitular: z.string().min(1, 'Nome do titular é obrigatório'),
+  nomeTitular: z.string().min(10, 'O nome completo do titular deve ter no mínimo 10 caracteres'),
   emailTitular: z.string().email('Email do titular inválido'),
-  celularTitular: z.string().optional(),
-  documentoTitular: z.string().optional(),
+  celularTitular: z.string().refine((val) => val.replace(/\D/g, '').length === 11, 'Celular deve ser preenchido integralmente'),
+  documentoTitular: z.string().refine((val) => val.replace(/\D/g, '').length === 11, 'CPF do titular deve ser preenchido integralmente'),
+  cnpjEmpresa: z.string().optional().refine((val) => !val || val.replace(/\D/g, '').length === 14, 'CNPJ deve ser preenchido integralmente'),
+  cepClinica: z.string().optional(),
+  enderecoClinica: z.string().optional(),
   quantidadeMedicos: z.coerce.number().int().min(1, 'Informe ao menos 1 médico').default(1),
 })
 
@@ -31,10 +34,13 @@ export const schemaDispositivo = z.object({
 export const schemaFormulario = z.object({
   nomeClinica: z.string().min(1, 'Nome da clínica é obrigatório'),
   nomeEmpresa: z.string().optional(),
-  nomeTitular: z.string().min(1, 'Nome do titular é obrigatório'),
+  nomeTitular: z.string().min(10, 'O nome completo do titular deve ter no mínimo 10 caracteres'),
   emailTitular: z.string().email('Email do titular inválido'),
-  celularTitular: z.string().optional(),
-  documentoTitular: z.string().optional(),
+  celularTitular: z.string().refine((val) => val.replace(/\D/g, '').length === 11, 'Celular deve ser preenchido integralmente'),
+  documentoTitular: z.string().refine((val) => val.replace(/\D/g, '').length === 11, 'CPF do titular deve ser preenchido integralmente'),
+  cnpjEmpresa: z.string().optional().refine((val) => !val || val.replace(/\D/g, '').length === 14, 'CNPJ deve ser preenchido integralmente'),
+  cepClinica: z.string().refine((val) => val.replace(/\D/g, '').length === 8, 'CEP deve ser preenchido integralmente'),
+  enderecoClinica: z.string().min(1, 'Endereço é obrigatório'),
   cabecalhoLaudo: z.string().optional(),
   rodapeLaudo: z.string().optional(),
   quantidadeMedicos: z.number().int().min(1, 'Informe ao menos 1 médico'),

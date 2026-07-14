@@ -26,6 +26,9 @@ const defaultValues: FormularioValues = {
   emailTitular: '',
   celularTitular: '',
   documentoTitular: '',
+  cnpjEmpresa: '',
+  cepClinica: '',
+  enderecoClinica: '',
   cabecalhoLaudo: '',
   rodapeLaudo: '',
   quantidadeMedicos: 1,
@@ -67,6 +70,9 @@ export default function FormularioPage() {
     fd.append('emailTitular', dados.emailTitular || '')
     fd.append('celularTitular', dados.celularTitular || '')
     fd.append('documentoTitular', dados.documentoTitular || '')
+    fd.append('cnpjEmpresa', dados.cnpjEmpresa || '')
+    fd.append('cepClinica', dados.cepClinica || '')
+    fd.append('enderecoClinica', dados.enderecoClinica || '')
     fd.append('cabecalhoLaudo', dados.cabecalhoLaudo || '')
     fd.append('rodapeLaudo', dados.rodapeLaudo || '')
     fd.append('quantidadeMedicos', String(dados.quantidadeMedicos ?? 1))

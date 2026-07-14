@@ -65,8 +65,11 @@ export async function submeterFormulario(formData: FormData) {
       nomeEmpresa: (formData.get('nomeEmpresa') as string) || undefined,
       nomeTitular: (formData.get('nomeTitular') as string) || '',
       emailTitular: (formData.get('emailTitular') as string) || '',
-      celularTitular: (formData.get('celularTitular') as string) || undefined,
-      documentoTitular: (formData.get('documentoTitular') as string) || undefined,
+      celularTitular: (formData.get('celularTitular') as string) || '',
+      documentoTitular: (formData.get('documentoTitular') as string) || '',
+      cnpjEmpresa: (formData.get('cnpjEmpresa') as string) || undefined,
+      cepClinica: (formData.get('cepClinica') as string) || undefined,
+      enderecoClinica: (formData.get('enderecoClinica') as string) || undefined,
       quantidadeMedicos: Number(formData.get('quantidadeMedicos')) || 1,
     }
 
