@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Script de Restauração de Backup
 # Uso: ./scripts/restore.sh <TIMESTAMP>
@@ -40,9 +40,8 @@ echo "Banco restaurado com sucesso."
 
 # Restauração dos Uploads
 echo "Restaurando uploads..."
-# Remove diretório de uploads atual para evitar conflitos antes de extrair
-rm -rf "$UPLOADS_DIR"
-mkdir -p "$UPLOADS_DIR"
+# Remove o conteúdo do diretório de uploads atual para evitar conflitos (sem remover o ponto de montagem)
+find "$UPLOADS_DIR" -mindepth 1 -delete 2>/dev/null || true
 tar -xzf "$UPLOADS_BACKUP" -C "$UPLOADS_DIR"
 echo "Uploads restaurados com sucesso."
 
