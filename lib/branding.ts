@@ -10,7 +10,15 @@ function resolve(name: string): string {
   try {
     const files = fs.readdirSync(BRANDING_DIR)
     const hit = files.find((f) => f.replace(/\.[^.]+$/, '') === name)
-    return hit ? `/branding/${hit}` : `/branding/${name}.png`
+    const file = hit ? hit : `${name}.png`
+    let version = ''
+    try {
+      const mtime = Math.floor(fs.statSync(path.join(BRANDING_DIR, file)).mtimeMs)
+      version = `?v=${mtime}`
+    } catch {
+      version = ''
+    }
+    return `/branding/${file}${version}`
   } catch {
     return `/branding/${name}.png`
   }
