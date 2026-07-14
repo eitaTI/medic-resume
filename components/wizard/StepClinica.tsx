@@ -36,10 +36,61 @@ function formatCEP(value: string): string {
   return `${digits.slice(0, 5)}-${digits.slice(5)}`
 }
 
+function CampoComLapis({
+  name,
+  label,
+  placeholder,
+  required,
+  editavel,
+  onEditar,
+}: {
+  name: keyof FormularioValues
+  label: string
+  placeholder?: string
+  required?: boolean
+  editavel: boolean
+  onEditar: () => void
+}) {
+  const { register, formState: { errors }, watch } = useFormContext<FormularioValues>()
+  const erro = errors[name]?.message as string | undefined
+  const bloqueado = !!watch(name) && !editavel
+
+  return (
+    <div className="space-y-1">
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">{label}</label>
+      <div className="relative">
+        <input
+          {...register(name)}
+          placeholder={placeholder}
+          disabled={bloqueado}
+          required={required}
+          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 ${bloqueado ? 'pr-10 bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed' : ''} ${erro ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+        />
+        {bloqueado && (
+          <button
+            type="button"
+            onClick={onEditar}
+            aria-label={`Editar ${label}`}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </button>
+        )}
+      </div>
+      {erro && (
+        <p className="text-red-500 text-xs mt-1" role="alert">{erro}</p>
+      )}
+    </div>
+  )
+}
+
 export function StepClinica() {
   const { register, setValue, watch, formState: { errors } } = useFormContext<FormularioValues>()
   const [possuiCnpj, setPossuiCnpj] = useState<boolean | null>(null)
   const [isAddressEditable, setIsAddressEditable] = useState(false)
+  const [isNomeFantasiaEditable, setIsNomeFantasiaEditable] = useState(false)
   const [cepError, setCepError] = useState<string | null>(null)
   const [cnpjError, setCnpjError] = useState<string | null>(null)
 
@@ -212,115 +263,87 @@ export function StepClinica() {
         <div className="space-y-4 p-4 border rounded-lg bg-gray-50 dark:bg-gray-800/50">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Dados da Empresa</h3>
 
-          <Input
-            label="CNPJ da Empresa"
-            placeholder="00.000.000/0000-00"
-            {...register('cnpjEmpresa')}
-            onChange={(e) => {
-              const formatted = formatCNPJ(e.target.value)
-              setValue('cnpjEmpresa', formatted, { shouldValidate: false })
-            }}
-            erro={errors.cnpjEmpresa?.message}
-            required
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="CNPJ da Empresa"
+              placeholder="00.000.000/0000-00"
+              {...register('cnpjEmpresa')}
+              onChange={(e) => {
+                const formatted = formatCNPJ(e.target.value)
+                setValue('cnpjEmpresa', formatted, { shouldValidate: false })
+              }}
+              erro={errors.cnpjEmpresa?.message}
+              required
+            />
+
+            <CampoComLapis
+              name="nomeClinica"
+              label="Nome Fantasia"
+              required
+              editavel={isNomeFantasiaEditable}
+              onEditar={() => setIsNomeFantasiaEditable(true)}
+            />
+          </div>
 
           {cnpjError && (
             <p className="text-red-500 text-sm" role="alert">{cnpjError}</p>
           )}
 
-          <div className="space-y-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
-              label="Nome Fantasia"
-              {...register('nomeClinica')}
-              erro={errors.nomeClinica?.message}
+              label="CEP"
+              placeholder="00000-000"
+              {...register('cepClinica')}
+              onChange={(e) => {
+                const formatted = formatCEP(e.target.value)
+                setValue('cepClinica', formatted, { shouldValidate: false })
+              }}
+              erro={errors.cepClinica?.message}
               required
-              disabled
+            />
+
+            <CampoComLapis
+              name="enderecoClinica"
+              label="Endereço"
+              required
+              editavel={isAddressEditable}
+              onEditar={handleEditAddress}
             />
           </div>
 
-          <Input
-            label="CEP"
-            placeholder="00000-000"
-            {...register('cepClinica')}
-            onChange={(e) => {
-              const formatted = formatCEP(e.target.value)
-              setValue('cepClinica', formatted, { shouldValidate: false })
-            }}
-            erro={errors.cepClinica?.message}
-            required
-          />
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Endereço</label>
-              {(watchCnpjEmpresa || watchCepClinica) && (
-                <button
-                  type="button"
-                  onClick={handleEditAddress}
-                  className="flex items-center gap-2 px-3 py-1 text-sm rounded-lg border border-gray-300 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                  Editar
-                </button>
-              )}
-            </div>
-            <Input
-              label=""
-              {...register('enderecoClinica')}
-              erro={errors.enderecoClinica?.message}
-              required
-              disabled={!isAddressEditable && !!(watchCnpjEmpresa || watchCepClinica)}
-            />
-            {(cnpjError || cepError) && (
-              <p className="text-red-500 text-sm" role="alert">{cnpjError || cepError}</p>
-            )}
-          </div>
+          {cepError && (
+            <p className="text-red-500 text-sm" role="alert">{cepError}</p>
+          )}
         </div>
       )}
 
       {possuiCnpj === false && (
         <div className="space-y-4">
-          <Input
-            label="CEP"
-            placeholder="00000-000"
-            {...register('cepClinica')}
-            onChange={(e) => {
-              const formatted = formatCEP(e.target.value)
-              setValue('cepClinica', formatted, { shouldValidate: false })
-            }}
-            erro={errors.cepClinica?.message}
-            required
-          />
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Endereço</label>
-              {watchCepClinica && (
-                <button
-                  type="button"
-                  onClick={handleEditAddress}
-                  className="flex items-center gap-2 px-3 py-1 text-sm rounded-lg border border-gray-300 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                  Editar
-                </button>
-              )}
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
-              label=""
-              {...register('enderecoClinica')}
-              erro={errors.enderecoClinica?.message}
+              label="CEP"
+              placeholder="00000-000"
+              {...register('cepClinica')}
+              onChange={(e) => {
+                const formatted = formatCEP(e.target.value)
+                setValue('cepClinica', formatted, { shouldValidate: false })
+              }}
+              erro={errors.cepClinica?.message}
               required
-              disabled={!isAddressEditable}
             />
-            {cepError && (
-              <p className="text-red-500 text-sm" role="alert">{cepError}</p>
-            )}
+
+            <CampoComLapis
+              name="enderecoClinica"
+              label="Endereço"
+              required
+              editavel={isAddressEditable}
+              onEditar={handleEditAddress}
+            />
           </div>
+
+          {cepError && (
+            <p className="text-red-500 text-sm" role="alert">{cepError}</p>
+          )}
         </div>
       )}
 
