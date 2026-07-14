@@ -1,14 +1,17 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      network: host
+      
     ports:
       - "3000:3000"
+
     volumes:
       - uploads:/app/data/uploads
       - sqlite-data:/data/db
+
     environment:
-      # Variáveis lidas do .env padrão do projeto (docker compose carrega .env automaticamente).
-      # Para produção, ajuste BETTER_AUTH_URL e BETTER_AUTH_SECRET no próprio .env antes do deploy.
       - NODE_ENV=production
       - HOSTNAME=0.0.0.0
       - DATABASE_URL=file:/data/db/dev.db
@@ -18,33 +21,13 @@ services:
       - JIRA_EMAIL=${JIRA_EMAIL:-}
       - JIRA_API_TOKEN=${JIRA_API_TOKEN:-}
       - JIRA_PROJECT_KEY=${JIRA_PROJECT_KEY:-EITATI}
+
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
     restart: unless-stopped
-
-  backup:
-    image: alpine:latest
-    environment:
-      DB_PATH: /data/db/dev.db
-      UPLOADS_DIR: /data/uploads
-      BACKUP_DIR: /backups
-    volumes:
-      - sqlite-data:/data/db:ro
-      - uploads:/data/uploads:ro
-      - ./backups:/backups
-      - ./scripts:/scripts:ro
-    entrypoint: |
-      sh -c "
-        apk add --no-cache sqlite bash &&
-        echo '0 2 * * * cd /scripts && DB_PATH=/data/db/dev.db UPLOADS_DIR=/data/uploads BACKUP_DIR=/backups bash backup.sh' | crontab - &&
-        crond -f -l 2
-      "
-    restart: unless-stopped
-    depends_on:
-      - app
 
 volumes:
   uploads:
