@@ -26,11 +26,14 @@ const defaultValues: FormularioValues = {
   emailTitular: '',
   celularTitular: '',
   documentoTitular: '',
+  cnpjEmpresa: '',
+  cepClinica: '',
+  enderecoClinica: '',
   cabecalhoLaudo: '',
   rodapeLaudo: '',
   quantidadeMedicos: 1,
   usuarios: [{ nome: '', documento: '', email: '', tipo: 'examinador', temAssinatura: false }],
-  exames: [{ nome: '' }],
+  exames: [{ nome: '', temLaudo: false, temTopicos: false }],
   equipamentos: [{ tipo: '', marca: '', modelo: '', numeroSerie: '' }],
 }
 
@@ -67,6 +70,9 @@ export default function FormularioPage() {
     fd.append('emailTitular', dados.emailTitular || '')
     fd.append('celularTitular', dados.celularTitular || '')
     fd.append('documentoTitular', dados.documentoTitular || '')
+    fd.append('cnpjEmpresa', dados.cnpjEmpresa || '')
+    fd.append('cepClinica', dados.cepClinica || '')
+    fd.append('enderecoClinica', dados.enderecoClinica || '')
     fd.append('cabecalhoLaudo', dados.cabecalhoLaudo || '')
     fd.append('rodapeLaudo', dados.rodapeLaudo || '')
     fd.append('quantidadeMedicos', String(dados.quantidadeMedicos ?? 1))
@@ -85,9 +91,10 @@ export default function FormularioPage() {
       if (ass instanceof File) fd.append(`medicos[${i}].assinatura`, ass)
     })
 
-    const examesArr = raw.exames as (Record<string, unknown> & { nome: string })[]
+    const examesArr = raw.exames as (Record<string, unknown> & { nome: string; topicos?: string })[]
     examesArr.forEach((exame, i) => {
       fd.append(`exames[${i}].nome`, exame.nome)
+      if (exame.topicos) fd.append(`exames[${i}].topicos`, exame.topicos)
       const laudoFile = exame.laudo
       if (laudoFile instanceof File) fd.append(`exames[${i}].laudo`, laudoFile)
     })
@@ -113,12 +120,13 @@ export default function FormularioPage() {
 
   const proximoPasso = async () => {
     const camposPorPasso: Record<number, (keyof FormularioValues)[]> = {
-      0: ['nomeClinica', 'nomeTitular', 'emailTitular'],
+      0: ['nomeTitular', 'emailTitular', 'celularTitular', 'documentoTitular', 'cepClinica', 'enderecoClinica'],
       1: ['usuarios'],
-      2: ['exames'],
+       2: ['exames', 'cabecalhoLaudo', 'rodapeLaudo'],
       3: ['equipamentos'],
     }
-    const campos = camposPorPasso[passoAtual]
+    const campos = [...camposPorPasso[passoAtual]]
+    if (passoAtual === 0 && getValues('possuiCnpj') === true) campos.push('cnpjEmpresa')
     const valido = await formMethods.trigger(campos)
     if (valido && passoAtual < 3) setPassoAtual(passoAtual + 1)
   }
@@ -198,21 +206,22 @@ export default function FormularioPage() {
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4 shrink-0">
               <Image
-                src={branding.logoLight}
-                alt="EitaTI"
-                width={93}
-                height={40}
-                className="block dark:hidden"
-                priority
-              />
+              src={branding.logoLight}
+              alt="EitaTI"
+              width={93}
+              height={40}
+              className="block dark:hidden"
+              priority
+            />
               <Image
-                src={branding.logoDark}
-                alt="EitaTI"
-                width={93}
-                height={40}
-                className="hidden dark:block"
-                priority
-              />
+              src={branding.logoDark}
+              alt="EitaTI"
+              width={93}
+              height={40}
+              className="hidden dark:block"
+              priority
+              unoptimized
+            />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   Cadastro da Clínica
@@ -241,9 +250,14 @@ export default function FormularioPage() {
             )}
 
             <div className="flex justify-between mt-8 pt-6 border-t border-gray-200 dark:border-gray-800">
-              <Button variante="secundario" onClick={passoAnterior} disabled={passoAtual === 0}>
-                ← Anterior
-              </Button>
+              <div className="flex gap-2">
+                <Button variante="perigo" tamanho="pequeno" onClick={limparTudo}>
+                  Limpar formulário
+                </Button>
+                <Button variante="secundario" onClick={passoAnterior} disabled={passoAtual === 0}>
+                  ← Anterior
+                </Button>
+              </div>
               {passoAtual === 3 ? (
                 <SubmitButton onClick={handleSubmit(() => formAction())} isPending={isPending} />
               ) : (
@@ -266,6 +280,12 @@ export default function FormularioPage() {
     reset(defaultValues)
     limparRascunho()
     setPassoAtual(0)
+  }
+
+  function limparTudo() {
+    if (window.confirm('Deseja limpar todos os campos do formulário? Esta ação não pode ser desfeita.')) {
+      resetarFormulario()
+    }
   }
 }
 

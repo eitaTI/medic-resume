@@ -152,3 +152,4 @@ backups/
 
 # Uploads de clínicas (LGPD — fora do versionamento)
 data/uploads/
+docs/superpowers/*

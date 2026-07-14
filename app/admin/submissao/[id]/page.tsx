@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { StatusBadge } from '@/components/ui/StatusBadge'
@@ -73,18 +74,53 @@ export default async function DetalheSubmissaoPage({ params }: Props) {
           )}
           {clinica.documentoTitular && (
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Documento</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">CPF do Titular</p>
               <p className="text-sm text-gray-900 dark:text-gray-100 mt-0.5">{clinica.documentoTitular}</p>
+            </div>
+          )}
+          <div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Tipo de Cadastro</p>
+            <p className="text-sm text-gray-900 dark:text-gray-100 mt-0.5">
+              {clinica.cnpjEmpresa ? 'Pessoa Jurídica (CNPJ)' : 'Pessoa Física'}
+            </p>
+          </div>
+          {clinica.cnpjEmpresa && (
+            <>
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">CNPJ da Empresa</p>
+                <p className="text-sm text-gray-900 dark:text-gray-100 mt-0.5">{clinica.cnpjEmpresa}</p>
+              </div>
+              {clinica.nomeEmpresa && (
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Nome da Empresa</p>
+                  <p className="text-sm text-gray-900 dark:text-gray-100 mt-0.5">{clinica.nomeEmpresa}</p>
+                </div>
+              )}
+            </>
+          )}
+          {clinica.cepClinica && (
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">CEP</p>
+              <p className="text-sm text-gray-900 dark:text-gray-100 mt-0.5">{clinica.cepClinica}</p>
+            </div>
+          )}
+          {clinica.enderecoClinica && (
+            <div className="sm:col-span-2">
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Endereço</p>
+              <p className="text-sm text-gray-900 dark:text-gray-100 mt-0.5">{clinica.enderecoClinica}</p>
             </div>
           )}
           {clinica.logoPath && (
             <div className="sm:col-span-2">
               <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Logo</p>
-              <img
-                src={`/${clinica.logoPath}`}
-                alt="Logo da clínica"
-                className="mt-1 max-h-20 object-contain"
-              />
+                <Image
+                  src={`/${clinica.logoPath}`}
+                  alt="Logo da clínica"
+                  width={200}
+                  height={100}
+                  unoptimized
+                  className="mt-1 max-h-20 w-auto object-contain"
+                />
             </div>
           )}
           <div>

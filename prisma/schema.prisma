@@ -66,6 +66,9 @@ model Clinica {
   emailTitular      String
   celularTitular    String?
   documentoTitular  String?
+  cnpjEmpresa       String?
+  cepClinica        String?
+  enderecoClinica   String?
   quantidadeMedicos Int @default(1)
   logoPath          String?
   cabecalhoLaudo    String?   @default("")
@@ -99,6 +102,7 @@ model Exame {
   clinica    Clinica @relation(fields: [clinicaId], references: [id])
   nome       String
   laudoPath  String?
+  topicos    String?
 }
 
 model Dispositivo {

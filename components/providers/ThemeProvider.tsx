@@ -44,7 +44,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const t = getTema()
     setTema(t)
     apply(t, branding)
-  }, [])
+  }, [branding])
 
   const alternarTema = () => {
     setTema((prev) => {

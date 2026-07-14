@@ -3,10 +3,14 @@ import { z } from 'zod'
 export const schemaClinica = z.object({
   nomeClinica: z.string().min(1, 'Nome da clínica é obrigatório'),
   nomeEmpresa: z.string().optional(),
-  nomeTitular: z.string().min(1, 'Nome do titular é obrigatório'),
+  nomeTitular: z.string().min(10, 'O nome completo do titular deve ter no mínimo 10 caracteres'),
   emailTitular: z.string().email('Email do titular inválido'),
-  celularTitular: z.string().optional(),
-  documentoTitular: z.string().optional(),
+  celularTitular: z.string().refine((val) => val.replace(/\D/g, '').length === 11, 'Celular deve ser preenchido integralmente'),
+  documentoTitular: z.string().refine((val) => val.replace(/\D/g, '').length === 11, 'CPF do titular deve ser preenchido integralmente'),
+  cnpjEmpresa: z.string().optional().refine((val) => !val || val.replace(/\D/g, '').length === 14, 'CNPJ deve ser preenchido integralmente'),
+  cepClinica: z.string().optional(),
+  enderecoClinica: z.string().optional(),
+  possuiCnpj: z.boolean().optional(),
   quantidadeMedicos: z.coerce.number().int().min(1, 'Informe ao menos 1 médico').default(1),
 })
 
@@ -19,6 +23,10 @@ export const schemaMedico = z.object({
 
 export const schemaExame = z.object({
   nome: z.string().min(1, 'Nome do exame é obrigatório'),
+  temLaudo: z.boolean().optional(),
+  temTopicos: z.boolean().optional(),
+  topicos: z.string().optional(),
+  laudo: z.any().optional(),
 })
 
 export const schemaDispositivo = z.object({
@@ -29,14 +37,18 @@ export const schemaDispositivo = z.object({
 })
 
 export const schemaFormulario = z.object({
-  nomeClinica: z.string().min(1, 'Nome da clínica é obrigatório'),
+  nomeClinica: z.string().optional(),
   nomeEmpresa: z.string().optional(),
-  nomeTitular: z.string().min(1, 'Nome do titular é obrigatório'),
+  nomeTitular: z.string().min(10, 'O nome completo do titular deve ter no mínimo 10 caracteres'),
   emailTitular: z.string().email('Email do titular inválido'),
-  celularTitular: z.string().optional(),
-  documentoTitular: z.string().optional(),
-  cabecalhoLaudo: z.string().optional(),
-  rodapeLaudo: z.string().optional(),
+  celularTitular: z.string().refine((val) => val.replace(/\D/g, '').length === 11, 'Celular deve ser preenchido integralmente'),
+  documentoTitular: z.string().refine((val) => val.replace(/\D/g, '').length === 11, 'CPF do titular deve ser preenchido integralmente'),
+  cnpjEmpresa: z.string().optional().refine((val) => !val || val.replace(/\D/g, '').length === 14, 'CNPJ deve ser preenchido integralmente'),
+  cepClinica: z.string().refine((val) => val.replace(/\D/g, '').length === 8, 'CEP deve ser preenchido integralmente'),
+  enderecoClinica: z.string().min(1, 'Endereço é obrigatório'),
+  possuiCnpj: z.boolean().optional(),
+  cabecalhoLaudo: z.string().min(1, 'Cabeçalho do laudo é obrigatório'),
+  rodapeLaudo: z.string().min(1, 'Rodapé do laudo é obrigatório'),
   quantidadeMedicos: z.number().int().min(1, 'Informe ao menos 1 médico'),
   usuarios: z
     .array(
@@ -53,6 +65,10 @@ export const schemaFormulario = z.object({
     .array(
       z.object({
         nome: z.string().min(1, 'Nome do exame é obrigatório'),
+        temLaudo: z.boolean().optional(),
+        temTopicos: z.boolean().optional(),
+        topicos: z.string().optional(),
+        laudo: z.any().optional(),
       }),
     )
     .min(1),
@@ -67,6 +83,38 @@ export const schemaFormulario = z.object({
     )
     .min(1),
 })
+  .superRefine((data, ctx) => {
+    data.exames?.forEach((exame, i) => {
+      const temPdf = exame.temLaudo === true
+      const temTop = exame.temTopicos === true
+      if (!temPdf && !temTop) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Selecione "PDF do Laudo" ou "Tópicos de conteúdo"',
+          path: ['exames', i, 'temTopicos'],
+        })
+      }
+      if (temPdf) {
+        if (!(exame.laudo instanceof File)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Envie o arquivo PDF do Laudo',
+            path: ['exames', i, 'temLaudo'],
+          })
+        }
+      }
+      if (temTop) {
+        const nomes = (exame.topicos ?? '').split('-').map((t) => t.trim()).filter(Boolean)
+        if (nomes.length < 1) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Informe ao menos 1 tópico',
+            path: ['exames', i, 'topicos'],
+          })
+        }
+      }
+    })
+  })
 
 export type FormularioValues = z.infer<typeof schemaFormulario> & {
   logo?: File

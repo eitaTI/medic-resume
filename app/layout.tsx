@@ -4,14 +4,9 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { BrandingProvider } from "@/components/providers/BrandingProvider";
 import { getBranding } from "@/lib/branding";
 
-const branding = getBranding()
-
 export const metadata: Metadata = {
   title: "Medic Resume",
   description: "Medic Resume - Next.js Application",
-  icons: {
-    icon: branding.iconLight,
-  },
 };
 
 export default function RootLayout({
@@ -19,6 +14,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const branding = getBranding()
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
