@@ -1,38 +1,38 @@
 # Deploy — Produção com Docker
 
-Como subir o **EitaTI Formulário** em produção usando Docker Compose (aplicação + backup
-agendado). O build usa a saída **standalone** do Next.js 15.
+Como subir o **EitaTI Formulário** em produção com Docker Compose. É um app Next.js 15
+que roda via `next start`; as migrações do banco e o seed do admin rodam automaticamente
+na inicialização (script `scripts/start.sh`).
 
 ## Pré-requisitos
 
-- **Docker** + **Docker Compose**
-- Acesso ao repositório (para `docker compose up --build`)
+- Docker + Docker Compose v2
 
 ## O que o compose sobe
 
-- **`migrate`** (oneshot): executa `prisma migrate deploy` + seed do admin e encerra. Usa o
-  estágio `migrator` da imagem (contém Prisma CLI, `tsx` e `node_modules` completo).
-- **`app`**: aplicação em produção — **apenas o bundle standalone do Next.js** (sem
-  `node_modules` do projeto). Porta `3000`, com healthcheck em `GET /api/health`.
-- **`backup`**: container `alpine` com `cron` que executa `scripts/backup.sh` diariamente às 2h,
-  salvando em `./backups` (banco + uploads).
+Um único serviço `app`, construído a partir do `Dockerfile`:
 
-Volumes persistidos:
+- Compila a aplicação (etapa `builder`) e roda com o `node_modules` completo
+  (etapa `runner`, imagem `node:22-alpine`).
+- Ao iniciar, `scripts/start.sh` executa `prisma migrate deploy` + seed do admin e sobe
+  o servidor (`next start`) na porta `3000`.
+- Healthcheck em `GET /api/health`.
 
-| Volume | Conteúdo |
-|--------|----------|
-| `uploads` | arquivos enviados (`/app/data/uploads`) |
-| `sqlite-data` | banco SQLite (`/data/db/dev.db`) |
+Volumes persistidos (não remova ou perderá submissões e arquivos):
 
-> ⚠️ Não remova esses volumes ou você perderá submissões e arquivos.
+| Volume        | Conteúdo                                  |
+|---------------|-------------------------------------------|
+| `uploads`     | arquivos enviados (`/app/data/uploads`)   |
+| `sqlite-data` | banco SQLite (`/data/db/dev.db`)          |
 
-## 1. Variáveis de produção
+## 1. Variáveis de ambiente
 
-Edite o `.env` **antes** do deploy. O `docker-compose.yml` carrega o `.env` automaticamente e
-repassa as variáveis para o container:
+Crie/edite o `.env` (baseie-se em `.env.example`) **antes** do deploy. O compose repassa
+as variáveis para o container e sobrescreve `DATABASE_URL` para `file:/data/db/dev.db`
+(volume persistido).
 
 ```bash
-# URL pública da aplicação (URL do Cloudflare Tunnel — usada pelo Better Auth)
+# URL pública da aplicação (usada pelo Better Auth — ex.: URL do Cloudflare Tunnel)
 BETTER_AUTH_URL=https://formulario.seu-dominio.com
 
 # Segredo forte (gere com: openssl rand -base64 32)
@@ -45,18 +45,14 @@ JIRA_API_TOKEN=seu_token_aqui
 JIRA_PROJECT_KEY=EITATI
 ```
 
-O compose sobrescreve `DATABASE_URL` para `file:/data/db/dev.db` (volume persistido) — não
-precise alterar no `.env` para produção.
+> O `.env.example` traz também `JIRA_ISSUE_TYPE`, `JIRA_LABELS` e `DATABASE_URL`. Estes
+> não são lidos pelo compose em produção (o `DATABASE_URL` é fixado no volume).
 
 ## 2. Subir a aplicação
 
 ```bash
 docker compose up -d --build
 ```
-
-O `app` só sobe após o `migrate` concluir com sucesso (`depends_on` com
-`condition: service_completed_successfully` — requer Docker Compose v2). O `start.sh` do app
-executa apenas `node server.js`; migrações e seed ficam a cargo do service `migrate`.
 
 Verifique a saúde:
 
@@ -65,46 +61,37 @@ docker compose ps
 curl -f http://localhost:3000/api/health
 ```
 
-## Exposição via Cloudflare Tunnel
+## 3. Exposição (opcional)
 
-O ingresso em produção é feito via **Cloudflare Tunnel** — não é necessário abrir a porta `3000`
-no firewall/host. O que importa no `docker-compose.yml` é a **configuração da porta interna** do
-serviço `app` (padrão `3000`); o tunnel aponta para `http://app:3000` na rede do compose.
+O ingresso em produção pode ser feito via **Cloudflare Tunnel**, sem abrir a porta `3000`
+no host. O tunnel aponta para `http://app:3000` (rede do compose). O `ports: "3000:3000"`
+serve para checagens locais (`curl`) e pode ser omitido se o túnel for o único ingress.
 
-Exemplo de `cloudflared` apontando para o serviço (rode no host, com o `cloudflared` já
-autenticado):
+## 4. Backup e restauração
 
-```bash
-cloudflared tunnel create eitati-formulario
-cloudflared tunnel route dns eitati-formulario formulario.seu-dominio.com
-cloudflared tunnel run --url http://localhost:3000 eitati-formulario
-```
+Os scripts `scripts/backup.sh` e `scripts/restore.sh` são **manuais** (não há serviço
+agendado no compose). Eles fazem cópia fria do banco e dos uploads.
 
-> Se o `cloudflared` rodar no mesmo `docker compose` (ou na mesma rede Docker), use
-> `http://app:3000` em vez de `http://localhost:3000`. A aplicação escuta em `0.0.0.0:3000`
-> dentro do container.
->
-> O `ports: "3000:3000"` no compose serve para checagens locais (ex.: `curl` de saúde) e pode
-> ser omitido se o túnel for o único ingress — mas manter não prejudica.
-
-## 3. Backup
-
-O serviço `backup` agenda `scripts/backup.sh` todo dia às 2h (cron). Os arquivos vão para
-`./backups`. Para rodar manualmente:
+Backup:
 
 ```bash
-docker compose exec backup sh -c \
-  "DB_PATH=/data/db/dev.db UPLOADS_DIR=/data/uploads BACKUP_DIR=/backups bash /scripts/backup.sh"
+docker compose exec app sh -c \
+  "DB_PATH=/data/db/dev.db UPLOADS_DIR=/app/data/uploads BACKUP_DIR=/backups sh /app/scripts/backup.sh /backups"
 ```
 
-Para restaurar (em caso de desastre), use `scripts/restore.sh` — veja
-[`docs/dev/BANCO-DE-DADOS.md`](../../docs/dev/BANCO-DE-DADOS.md) e a Fase 8
-(`docs/projeto/fases/fase-8/`).
+> Para persistir os backups no host, monte um volume no `BACKUP_DIR` (ex.:
+> `./backups:/backups` no serviço `app`) ou copie o arquivo com `docker compose cp`.
 
-> Sem o `sqlite3` instalado no container de restore, o script usa `cp` como fallback (cópia
-> fria do arquivo + uploads).
+Restauração (informe o `<TIMESTAMP>` do backup, visto no nome do arquivo):
 
-## 4. Atualizar / redeploy
+```bash
+docker compose exec app sh -c \
+  "DB_PATH=/data/db/dev.db UPLOADS_DIR=/app/data/uploads BACKUP_DIR=/backups sh /app/scripts/restore.sh <TIMESTAMP>"
+```
+
+Detalhes do banco: [`docs/dev/BANCO-DE-DADOS.md`](../../docs/dev/BANCO-DE-DADOS.md).
+
+## 5. Atualizar / redeploy
 
 ```bash
 docker compose down
@@ -112,14 +99,13 @@ git pull
 docker compose up -d --build
 ```
 
-As migrações são aplicadas automaticamente pelo service `migrate` antes do `app` subir. Os
-volumes (`uploads`, `sqlite-data`) são preservados entre deploys.
+As migrações rodam automaticamente no startup (`start.sh`). Os volumes (`uploads`,
+`sqlite-data`) são preservados entre deploys.
 
-O app roda 100% com o bundle standalone do Next.js (`.next/standalone`, ~68 MB). O Prisma CLI,
-`tsx` e o `node_modules` completo ficam apenas no estágio `migrator`, usado pelo service
-`migrate` (oneshot). A imagem do `app` (estágio `runner`) contém **apenas** o necessário para
-rodar `node server.js` — sem `node_modules` do projeto.
-- O app escuta em `0.0.0.0:3000` dentro do container; o **Cloudflare Tunnel** é quem expõe
-  publicamente (TLS gerenciado pela Cloudflare) — não é preciso proxy reverso próprio (Nginx/Caddy).
-- `next.config.ts` usa `output: 'standalone'` e `serverExternalPackages` para os módulos nativos.
-- `.npmrc` com `shamefully-hoist=true` é necessário para essas dependências nativas.
+## Notas técnicas
+
+- A imagem usa `node:22-alpine` e reconstrói `better-sqlite3` no build; o `.npmrc` com
+  `shamefully-hoist=true` é necessário para os módulos nativos.
+- `next.config.ts` **não** usa `output: 'standalone'` — o container roda com o
+  `node_modules` completo do projeto.
+- O app escuta em `0.0.0.0:3000` dentro do container.
