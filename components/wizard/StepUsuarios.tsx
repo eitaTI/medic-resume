@@ -27,20 +27,42 @@ export function StepUsuarios() {
 
       {fields.map((field, index) => {
         const isPrimeiro = index === 0
+        const temAssinatura = watch(`usuarios.${index}.temAssinatura`)
 
         return (
           <div key={field.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3 bg-gray-50 dark:bg-gray-800/50">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center gap-3 flex-wrap">
               <h3 className="font-medium text-gray-900 dark:text-gray-100">Usuário {index + 1}</h3>
-              {!isPrimeiro && (
-                <Button
-                  variante="perigo"
-                  tamanho="pequeno"
-                  onClick={() => remove(index)}
-                >
-                  Remover
-                </Button>
-              )}
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600 dark:text-gray-300">Assinatura</span>
+                  <div className="inline-flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => setValue(`usuarios.${index}.temAssinatura`, true, { shouldValidate: true })}
+                      className={`px-3 py-1 text-sm font-medium transition-colors ${temAssinatura ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'}`}
+                    >
+                      Sim
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setValue(`usuarios.${index}.temAssinatura`, false, { shouldValidate: true })}
+                      className={`px-3 py-1 text-sm font-medium border-l border-gray-300 dark:border-gray-600 transition-colors ${!temAssinatura ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'}`}
+                    >
+                      Não
+                    </button>
+                  </div>
+                </div>
+                {!isPrimeiro && (
+                  <Button
+                    variante="perigo"
+                    tamanho="pequeno"
+                    onClick={() => remove(index)}
+                  >
+                    Remover
+                  </Button>
+                )}
+              </div>
             </div>
 
             <Input
@@ -68,6 +90,7 @@ export function StepUsuarios() {
 
               <Input
                 label="Documento (CRM/CPF)"
+                placeholder="000.000.000-00 (CPF) ou CRM 000000"
                 {...register(`usuarios.${index}.documento`)}
                 erro={errors.usuarios?.[index]?.documento?.message}
                 required
@@ -81,15 +104,6 @@ export function StepUsuarios() {
               erro={errors.usuarios?.[index]?.email?.message}
               required
             />
-
-            <label className="flex items-center gap-2 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                {...register(`usuarios.${index}.temAssinatura`)}
-                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Possui assinatura digitalizada</span>
-            </label>
 
             {watch(`usuarios.${index}.temAssinatura`) && (
               <FileUpload
