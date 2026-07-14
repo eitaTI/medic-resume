@@ -51,6 +51,7 @@ export function StepExames() {
 
         {fields.map((field, index) => {
           const temLaudo = watch(`exames.${index}.temLaudo`)
+          const temTopicos = watch(`exames.${index}.temTopicos`)
 
           return (
             <div key={field.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3 bg-gray-50 dark:bg-gray-800/50">
@@ -103,13 +104,58 @@ export function StepExames() {
                   onFile={(file) => setValue(`exames.${index}.laudo`, file)}
                 />
               )}
+
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600 dark:text-gray-300">Possui Tópicos de conteúdo?</span>
+                <div className="inline-flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setValue(`exames.${index}.temTopicos`, true, { shouldValidate: true })}
+                    className={`px-3 py-1 text-sm font-medium transition-colors ${temTopicos ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'}`}
+                  >
+                    Sim
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setValue(`exames.${index}.temTopicos`, false, { shouldValidate: true })}
+                    className={`px-3 py-1 text-sm font-medium border-l border-gray-300 dark:border-gray-600 transition-colors ${!temTopicos ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'}`}
+                  >
+                    Não
+                  </button>
+                </div>
+              </div>
+
+              {temTopicos && (
+                <div className="space-y-2">
+                  <Input
+                    label="Tópicos de conteúdo"
+                    {...register(`exames.${index}.topicos`)}
+                    erro={errors.exames?.[index]?.topicos?.message}
+                    placeholder="Descrição - Biopsia - Duodeno - Conclusão - etc"
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    {watch(`exames.${index}.topicos`)?.split('-').map((t) => t.trim()).filter(Boolean).map((topico, ti) => (
+                      <span
+                        key={ti}
+                        className="inline-flex items-center rounded-full bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 dark:bg-blue-900/40 dark:text-blue-200"
+                      >
+                        {topico}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {errors.exames?.[index]?.temTopicos?.message && (
+                <p className="text-red-500 text-xs mt-1" role="alert">{errors.exames?.[index]?.temTopicos?.message}</p>
+              )}
             </div>
           )
         })}
 
         <Button
           variante="secundario"
-          onClick={() => append({ nome: '', temLaudo: false })}
+          onClick={() => append({ nome: '', temLaudo: false, temTopicos: false })}
         >
           + Adicionar Exame
         </Button>

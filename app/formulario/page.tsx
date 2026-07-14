@@ -33,7 +33,7 @@ const defaultValues: FormularioValues = {
   rodapeLaudo: '',
   quantidadeMedicos: 1,
   usuarios: [{ nome: '', documento: '', email: '', tipo: 'examinador', temAssinatura: false }],
-  exames: [{ nome: '', temLaudo: false }],
+  exames: [{ nome: '', temLaudo: false, temTopicos: false }],
   equipamentos: [{ tipo: '', marca: '', modelo: '', numeroSerie: '' }],
 }
 
@@ -91,9 +91,10 @@ export default function FormularioPage() {
       if (ass instanceof File) fd.append(`medicos[${i}].assinatura`, ass)
     })
 
-    const examesArr = raw.exames as (Record<string, unknown> & { nome: string })[]
+    const examesArr = raw.exames as (Record<string, unknown> & { nome: string; topicos?: string })[]
     examesArr.forEach((exame, i) => {
       fd.append(`exames[${i}].nome`, exame.nome)
+      if (exame.topicos) fd.append(`exames[${i}].topicos`, exame.topicos)
       const laudoFile = exame.laudo
       if (laudoFile instanceof File) fd.append(`exames[${i}].laudo`, laudoFile)
     })

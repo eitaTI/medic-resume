@@ -24,6 +24,8 @@ export const schemaMedico = z.object({
 export const schemaExame = z.object({
   nome: z.string().min(1, 'Nome do exame é obrigatório'),
   temLaudo: z.boolean().optional(),
+  temTopicos: z.boolean().optional(),
+  topicos: z.string().optional(),
 })
 
 export const schemaDispositivo = z.object({
@@ -63,6 +65,8 @@ export const schemaFormulario = z.object({
       z.object({
         nome: z.string().min(1, 'Nome do exame é obrigatório'),
         temLaudo: z.boolean().optional(),
+        temTopicos: z.boolean().optional(),
+        topicos: z.string().optional(),
       }),
     )
     .min(1),
@@ -77,6 +81,29 @@ export const schemaFormulario = z.object({
     )
     .min(1),
 })
+  .superRefine((data, ctx) => {
+    data.exames?.forEach((exame, i) => {
+      const temPdf = exame.temLaudo === true
+      const temTop = exame.temTopicos === true
+      if (!temPdf && !temTop) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Selecione "PDF do Laudo" ou "Tópicos de conteúdo"',
+          path: ['exames', i, 'temTopicos'],
+        })
+      }
+      if (temTop) {
+        const nomes = (exame.topicos ?? '').split('-').map((t) => t.trim()).filter(Boolean)
+        if (nomes.length < 1) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Informe ao menos 1 tópico',
+            path: ['exames', i, 'topicos'],
+          })
+        }
+      }
+    })
+  })
 
 export type FormularioValues = z.infer<typeof schemaFormulario> & {
   logo?: File

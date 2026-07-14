@@ -102,6 +102,7 @@ model Exame {
   clinica    Clinica @relation(fields: [clinicaId], references: [id])
   nome       String
   laudoPath  String?
+  topicos    String?
 }
 
 model Dispositivo {

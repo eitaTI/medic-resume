@@ -150,9 +150,11 @@ export async function submeterFormulario(formData: FormData) {
               const e = examesRaw[i]
               const laudo = formData.get(`exames[${i}].laudo`) as File | null
               const laudoPath = await salvarArquivo(laudo, submissionFolder, 'laudos')
+              const topicos = (formData.get(`exames[${i}].topicos`) as string | null)?.trim() || null
               return {
                 nome: e.nome as string,
                 laudoPath,
+                topicos,
               }
             })
           ),
