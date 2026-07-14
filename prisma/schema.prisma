@@ -6,28 +6,77 @@ datasource db {
   provider = "sqlite"
 }
 
-model Admin {
-  id        Int        @id @default(autoincrement())
-  nome      String
-  email     String     @unique
-  senha     String
-  createdAt DateTime   @default(now())
+model User {
+  id           String    @id
+  name         String
+  email        String    @unique
+  emailVerified Boolean  @default(false)
+  image        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  sessions  Session[]
+  accounts  Account[]
   auditLogs AuditLog[]
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Clinica {
   id                Int       @id @default(autoincrement())
-  nomeEmpresa       String
+  nomeEmpresa       String?
   nomeClinica       String
   nomeTitular       String
   emailTitular      String
-  quantidadeMedicos Int
+  celularTitular    String?
+  documentoTitular  String?
+  cnpjEmpresa       String?
+  cepClinica        String?
+  enderecoClinica   String?
+  quantidadeMedicos Int @default(1)
   logoPath          String?
   cabecalhoLaudo    String?   @default("")
   rodapeLaudo       String?   @default("")
   status            String    @default("PENDENTE")
   motivoRejeicao    String?
   jiraIssueKey      String?
+  jiraSyncStatus    String?
   createdAt         DateTime  @default(now())
   reviewedAt        DateTime?
 
@@ -43,6 +92,7 @@ model Medico {
   nome           String
   documento      String
   email          String
+  tipo          String  @default("examinador")
   assinaturaPath String?
 }
 
@@ -52,6 +102,7 @@ model Exame {
   clinica    Clinica @relation(fields: [clinicaId], references: [id])
   nome       String
   laudoPath  String?
+  topicos    String?
 }
 
 model Dispositivo {
@@ -66,8 +117,8 @@ model Dispositivo {
 
 model AuditLog {
   id         Int      @id @default(autoincrement())
-  adminId    Int?
-  admin      Admin?   @relation(fields: [adminId], references: [id])
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
   acao       String
   entidade   String
   entidadeId Int?

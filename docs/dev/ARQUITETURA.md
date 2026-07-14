@@ -1,6 +1,6 @@
 # Arquitetura do Projeto
 
-Decisões de arquitetura e estrutura do projeto ZScan Formulário.
+Decisões de arquitetura e estrutura do projeto Medic Resume.
 
 ## Visão Geral
 
@@ -25,23 +25,24 @@ medic-resume/
 │   ├── layout.tsx          # Layout raiz
 │   ├── page.tsx            # Página inicial
 │   ├── globals.css         # Estilos globais (Tailwind)
-│   ├── formulario/         # Rota pública
+│   ├── api/auth/[...all]/  # Handlers HTTP do Better Auth
+│   ├── formulario/         # Rota pública (wizard)
 │   ├── login/              # Rota de login
-│   └── admin/              # Rotas protegidas
-│       ├── layout.tsx      # Layout com verificação de auth
-│       ├── page.tsx        # Dashboard
-│       ├── submissao/      # Detalhe de submissão
-│       └── admins/         # Gerenciar admins
+│   └── admin/              # Rotas protegidas (painel, usuários, auditoria)
 │
 ├── components/             # Componentes React
-│   ├── wizard/             # Componentes do formulário
-│   ├── admin/              # Componentes do painel admin
-│   └── ui/                 # Componentes genéricos
-│
-├── actions/                # Server Actions (lógica do servidor)
+│   ├── ui/                 # Button, Input, FileUpload, Select, StatusBadge, ThemeToggle
+│   ├── wizard/             # Stepper, StepClinica, StepUsuarios, StepExames, StepEquipamentos
+│   ├── admin/              # SubmissaoCard, AprovarRejeitarButtons, AdminForm, AdminDeleteButton, AuditLogCard, AdminNavbar, LogoutButton
+│   └── providers/          # ThemeProvider (dark mode)
+├── actions/                # Server Actions (submeter-formulario, login, submissoes, admins, auditoria)
 ├── lib/                    # Utilitários e configurações
-├── prisma/                 # Schema e migrations do banco
+│   ├── prisma.ts           # Singleton PrismaClient + adapter
+│   └── auth.ts             # Instância Better Auth
+├── prisma/                 # Schema, migrations, seed
 ├── data/uploads/           # Arquivos enviados (fora de public/)
+├── eslint.config.mjs       # ESLint flat config
+├── prisma.config.ts        # Config Prisma v7
 └── docs/                   # Documentação
 ```
 
@@ -135,11 +136,12 @@ Client Component → Server Action → Prisma → SQLite
 
 ## Segurança
 
-- Senhas hasheadas com bcryptjs
+- Senhas hasheadas via `@better-auth/utils/password` (algoritmo do Better Auth)
 - Sessões gerenciadas por Better Auth
-- Rotas /admin protegidas por middleware
+- Rotas /admin protegidas por middleware + layout server-side
 - Uploads fora de `public/` (LGPD)
 - Variáveis sensíveis em `.env` (não commitado)
+- Cloudflare Tunnel para exposição segura
 
 ## Performance
 
