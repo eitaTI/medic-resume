@@ -109,3 +109,52 @@ export async function excluirAdmin(id: string) {
     return { erro: 'Erro interno ao excluir administrador' }
   }
 }
+
+export async function alterarSenha(dados: {
+  senhaAtual: string
+  novaSenha: string
+  confirmarSenha: string
+}) {
+  const session = await obterSessaoAdmin()
+  if (!session) return { erro: 'Não autenticado' }
+
+  const { senhaAtual, novaSenha, confirmarSenha } = dados
+
+  if (!senhaAtual || !novaSenha || !confirmarSenha) {
+    return { erro: 'Todos os campos são obrigatórios' }
+  }
+
+  if (novaSenha !== confirmarSenha) {
+    return { erro: 'A nova senha e a confirmação não coincidem' }
+  }
+
+  // Regra de senha: 8 dígitos, letras, números, caractere especial
+  const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/
+  if (!regex.test(novaSenha)) {
+    return {
+      erro: 'A senha deve ter no mínimo 8 caracteres, incluindo letras, números e um caractere especial',
+    }
+  }
+
+  try {
+    await auth.api.changePassword({
+      headers: await headers(),
+      body: {
+        newPassword: novaSenha,
+        currentPassword: senhaAtual,
+      },
+    })
+    
+    await registrarAcao({
+      userId: session.user.id,
+      acao: 'ALTERAR_SENHA',
+      entidade: 'User',
+      entidadeId: null,
+      detalhes: { userId: session.user.id },
+    })
+
+    return { sucesso: true }
+  } catch (e) {
+    return { erro: 'Senha atual incorreta ou erro ao alterar senha' }
+  }
+}

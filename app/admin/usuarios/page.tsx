@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { AdminForm } from '@/components/admin/AdminForm'
 import { AdminDeleteButton } from '@/components/admin/AdminDeleteButton'
+import { MudarSenhaButton } from '@/components/admin/MudarSenhaButton'
 
 /**
  * Página de Gerenciamento de Usuários.
@@ -21,9 +22,12 @@ export default async function UsuariosPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-        Gerenciar Usuários
-      </h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          Gerenciar Usuários
+        </h1>
+        <MudarSenhaButton />
+      </div>
 
       <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-6 shadow-lg">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
