@@ -121,7 +121,7 @@ export default function FormularioPage() {
     const camposPorPasso: Record<number, (keyof FormularioValues)[]> = {
       0: ['nomeTitular', 'emailTitular', 'celularTitular', 'documentoTitular', 'cepClinica', 'enderecoClinica'],
       1: ['usuarios'],
-      2: ['exames'],
+       2: ['exames', 'cabecalhoLaudo', 'rodapeLaudo'],
       3: ['equipamentos'],
     }
     const campos = [...camposPorPasso[passoAtual]]

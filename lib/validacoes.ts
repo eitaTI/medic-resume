@@ -43,8 +43,8 @@ export const schemaFormulario = z.object({
   cepClinica: z.string().refine((val) => val.replace(/\D/g, '').length === 8, 'CEP deve ser preenchido integralmente'),
   enderecoClinica: z.string().min(1, 'Endereço é obrigatório'),
   possuiCnpj: z.boolean().optional(),
-  cabecalhoLaudo: z.string().optional(),
-  rodapeLaudo: z.string().optional(),
+  cabecalhoLaudo: z.string().min(1, 'Cabeçalho do laudo é obrigatório'),
+  rodapeLaudo: z.string().min(1, 'Rodapé do laudo é obrigatório'),
   quantidadeMedicos: z.number().int().min(1, 'Informe ao menos 1 médico'),
   usuarios: z
     .array(

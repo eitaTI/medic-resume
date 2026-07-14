@@ -16,28 +16,34 @@ export function StepExames() {
 
       <div className="space-y-1">
         <label htmlFor="cabecalho-laudo" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Cabeçalho do Laudo
+          Cabeçalho do Laudo <span className="text-red-500">*</span>
         </label>
         <textarea
           id="cabecalho-laudo"
           rows={3}
           {...register('cabecalhoLaudo')}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600"
+          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 ${errors.cabecalhoLaudo ? 'border-red-500' : 'border-gray-300'}`}
           placeholder="Ex: Clínica Médica de Gastro EitaTI, Dr. João Silva - CRM 1234..."
         />
+        {errors.cabecalhoLaudo && (
+          <p className="text-red-500 text-xs mt-1" role="alert">{errors.cabecalhoLaudo.message}</p>
+        )}
       </div>
 
       <div className="space-y-1">
         <label htmlFor="rodape-laudo" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Rodapé do Laudo
+          Rodapé do Laudo <span className="text-red-500">*</span>
         </label>
         <textarea
           id="rodape-laudo"
           rows={3}
           {...register('rodapeLaudo')}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600"
+          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 ${errors.rodapeLaudo ? 'border-red-500' : 'border-gray-300'}`}
           placeholder="Ex: Endereço Rua X, nº 123 - Bairro, Cidade/UF - Contato: (62) 99999-8888"
         />
+        {errors.rodapeLaudo && (
+          <p className="text-red-500 text-xs mt-1" role="alert">{errors.rodapeLaudo.message}</p>
+        )}
       </div>
 
       <div className="space-y-4">
@@ -47,13 +53,15 @@ export function StepExames() {
           <div key={field.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3 bg-gray-50 dark:bg-gray-800/50">
             <div className="flex justify-between items-center">
               <h4 className="font-medium text-gray-700 dark:text-gray-300">Exame {index + 1}</h4>
-              <Button
-                variante="perigo"
-                tamanho="pequeno"
-                onClick={() => remove(index)}
-              >
-                Remover
-              </Button>
+              {fields.length > 1 && (
+                <Button
+                  variante="perigo"
+                  tamanho="pequeno"
+                  onClick={() => remove(index)}
+                >
+                  Remover
+                </Button>
+              )}
             </div>
 
             <Input
