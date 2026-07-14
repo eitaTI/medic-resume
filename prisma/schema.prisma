@@ -66,6 +66,9 @@ model Clinica {
   emailTitular      String
   celularTitular    String?
   documentoTitular  String?
+  cnpjEmpresa       String?
+  cepClinica        String?
+  enderecoClinica   String?
   quantidadeMedicos Int @default(1)
   logoPath          String?
   cabecalhoLaudo    String?   @default("")
