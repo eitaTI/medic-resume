@@ -33,7 +33,7 @@ const defaultValues: FormularioValues = {
   rodapeLaudo: '',
   quantidadeMedicos: 1,
   usuarios: [{ nome: '', documento: '', email: '', tipo: 'examinador', temAssinatura: false }],
-  exames: [{ nome: '' }],
+  exames: [{ nome: '', temLaudo: false }],
   equipamentos: [{ tipo: '', marca: '', modelo: '', numeroSerie: '' }],
 }
 

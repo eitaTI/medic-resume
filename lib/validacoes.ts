@@ -23,6 +23,7 @@ export const schemaMedico = z.object({
 
 export const schemaExame = z.object({
   nome: z.string().min(1, 'Nome do exame é obrigatório'),
+  temLaudo: z.boolean().optional(),
 })
 
 export const schemaDispositivo = z.object({
@@ -61,6 +62,7 @@ export const schemaFormulario = z.object({
     .array(
       z.object({
         nome: z.string().min(1, 'Nome do exame é obrigatório'),
+        temLaudo: z.boolean().optional(),
       }),
     )
     .min(1),
