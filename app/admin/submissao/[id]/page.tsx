@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { StatusBadge } from '@/components/ui/StatusBadge'
@@ -112,11 +113,14 @@ export default async function DetalheSubmissaoPage({ params }: Props) {
           {clinica.logoPath && (
             <div className="sm:col-span-2">
               <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Logo</p>
-              <img
-                src={`/${clinica.logoPath}`}
-                alt="Logo da clínica"
-                className="mt-1 max-h-20 object-contain"
-              />
+                <Image
+                  src={`/${clinica.logoPath}`}
+                  alt="Logo da clínica"
+                  width={200}
+                  height={100}
+                  unoptimized
+                  className="mt-1 max-h-20 w-auto object-contain"
+                />
             </div>
           )}
           <div>
