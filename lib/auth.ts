@@ -10,6 +10,13 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true
   },
+  trustedOrigins: [
+    'http://localhost:3000',
+    'http://localhost:3001',
+  ],
+  advanced: {
+    trustedProxyHeaders: true
+  },
   plugins: [nextCookies()]
 })
 
