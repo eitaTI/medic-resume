@@ -1,7 +1,5 @@
 services:
   app:
-    build:
-      context: .
     image: ghcr.io/eitati/medic-resume:latest
 
     ports:
