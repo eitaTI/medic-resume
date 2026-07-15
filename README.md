@@ -132,26 +132,43 @@ Para substituir as marcas e fundos da aplicação por uma nova marca visual sem 
 
 ## 🐳 Deploy com Docker Compose
 
-O projeto é empacotado através de um `Dockerfile` multi-stage que constrói a aplicação e inclui as dependências nativas (como `better-sqlite3` e `prisma`) de forma totalmente otimizada.
+O projeto é empacotado através de um `Dockerfile` multi-stage que constrói a aplicação de forma otimizada e inclui as dependências nativas (como `better-sqlite3` e `prisma`).
 
-O Docker Compose oferece suporte a duas estratégias de deploy principais:
+O Docker Compose oferece duas estratégias de deploy principais:
 
-### Modo A — Puxando a Imagem do GHCR (Recomendado para VPS limitadas)
-A imagem docker é automaticamente buildada e testada no CI (GitHub Actions) a cada push na branch `main` e publicada como pacote público no GitHub Packages (GHCR). Desta forma, sua máquina de produção não sofre com alto uso de CPU/RAM para buildar o projeto.
+### Modo A — Imagem de Produção do GHCR (Deploy Simplificado em 1 Minuto)
+
+Ideal para servidores de produção ou VPS limitadas, pois você **não precisa clonar o repositório**. A imagem oficial é automaticamente compilada no CI (GitHub Actions) a cada push na branch `main` e publicada no GitHub Container Registry (GHCR).
+
+Siga os passos abaixo para implantar a aplicação de forma extremamente rápida:
+
+1. **Baixar o arquivo de configuração única:**
+   ```bash
+   curl -sSL https://raw.githubusercontent.com/eitati/medic-resume/main/docker-compose.yml -o docker-compose.yml
+   ```
+
+2. **(Opcional) Configurar Variáveis de Ambiente:**
+   Crie um arquivo `.env` no mesmo diretório caso queira personalizar as credenciais e parâmetros de integração (como as chaves do Jira ou variáveis do Better Auth):
+   ```bash
+   # Exemplo de arquivo .env
+   BETTER_AUTH_SECRET=um_segredo_gerado_com_openssl_rand_base64_32
+   BETTER_AUTH_URL=https://formulario.seu-dominio.com
+   ```
+   > 💡 **Como funciona a mesclagem:** O Docker Compose lerá automaticamente qualquer arquivo `.env` presente no mesmo diretório e mesclará as configurações de forma transparente, sobrescrevendo as variáveis padrão do container.
+
+3. **Subir a Aplicação:**
+   ```bash
+   docker compose up -d
+   ```
+
+---
+
+### Modo B — Compilação e Build Local (Para Desenvolvedores)
+
+Se você fez alterações customizadas no código ou deseja rodar o container construído diretamente a partir do código-fonte local, utilize o arquivo de configuração local dedicado:
 
 ```bash
-# 1. Puxe as imagens mais recentes do repositório
-docker compose pull
-
-# 2. Inicie a aplicação em background
-docker compose up -d
-```
-
-### Modo B — Buildando Localmente (Recomendado para customizações)
-Se você fez alterações no código ou deseja rodar o container buildado diretamente a partir do código fonte local:
-
-```bash
-docker compose up -d --build
+docker compose -f docker-compose.local.yml up -d --build
 ```
 
 ---
