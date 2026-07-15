@@ -3,7 +3,7 @@
 Sistema de cadastro de clínicas médicas: um **wizard público de 4 etapas** coleta os dados da
 clínica, dos médicos, dos exames e dos equipamentos; um **painel administrativo** revisa,
 aprova/rejeita e sincroniza cada submissão com o **Jira**, com **auditoria** de todas as ações e
-**backup** automatizado.
+**backup** (manual, via scripts Docker).
 
 **Next.js 15 · TypeScript · Prisma v7 (SQLite) · Better Auth · Tailwind v4 · Docker**
 
@@ -15,7 +15,7 @@ aprova/rejeita e sincroniza cada submissão com o **Jira**, com **auditoria** de
 - 🧩 **Integração com Jira** (fail-open): cria/atualiza o card na aprovação, com retry
 - 📝 **Auditoria completa** das ações administrativas (inclui criar/excluir admins)
 - 👥 **Gestão de administradores** (criar/excluir) com guardas contra auto-exclusão/último admin
-- 💾 **Backup automático** (banco + uploads) via Docker
+- 💾 **Backup** (banco + uploads) via scripts Docker (manual)
 - 🌙 **Modo escuro**
 
 ## Pré-requisitos
@@ -60,7 +60,7 @@ pnpm dev                   # http://localhost:3000
 app/            Rotas (formulário, login, admin) + api (auth, health, uploads)
 components/     ui/ (genéricos), wizard/ (etapas), admin/ (painel), providers/ (tema)
 actions/        Server Actions (submissão, login, submissões, admins, auditoria)
-lib/            prisma.ts, auth.ts, audit.ts, validacoes.ts, jira.ts
+lib/            prisma.ts, auth.ts, auth-client.ts, audit.ts, validacoes.ts, branding.ts, jira.ts
 prisma/         schema.prisma, migrations/, seed.ts
 data/uploads/   arquivos enviados (fora de public/, LGPD)
 scripts/        start.sh, backup.sh, restore.sh
