@@ -1,0 +1,34 @@
+services:
+  app:
+    build:
+      context: .
+    image: medic-resume:local
+
+    ports:
+      - "3000:3000"
+
+    volumes:
+      - uploads:/app/data/uploads
+      - sqlite-data:/data/db
+
+    environment:
+      - NODE_ENV=development
+      - HOSTNAME=0.0.0.0
+      - DATABASE_URL=file:/data/db/dev.db
+      - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3000}
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET:-dev_secret_32_chars_minimum_len_example}
+      - JIRA_BASE_URL=${JIRA_BASE_URL:-}
+      - JIRA_EMAIL=${JIRA_EMAIL:-}
+      - JIRA_API_TOKEN=${JIRA_API_TOKEN:-}
+      - JIRA_PROJECT_KEY=${JIRA_PROJECT_KEY:-EITATI}
+
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+volumes:
+  uploads:
+  sqlite-data:
