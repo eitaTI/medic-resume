@@ -2,8 +2,8 @@ services:
   app:
     build:
       context: .
-      network: host
-      
+    image: ghcr.io/eitati/medic-resume:latest
+
     ports:
       - "3000:3000"
 
@@ -16,7 +16,7 @@ services:
       - HOSTNAME=0.0.0.0
       - DATABASE_URL=file:/data/db/dev.db
       - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3000}
-      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET:-dev_secret_32_chars_minimum_len_example}
       - JIRA_BASE_URL=${JIRA_BASE_URL:-}
       - JIRA_EMAIL=${JIRA_EMAIL:-}
       - JIRA_API_TOKEN=${JIRA_API_TOKEN:-}

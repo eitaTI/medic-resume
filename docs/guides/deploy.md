@@ -10,7 +10,13 @@ na inicialização (script `scripts/start.sh`).
 
 ## O que o compose sobe
 
-Um único serviço `app`, construído a partir do `Dockerfile`:
+Um único serviço `app`. O `docker-compose.yml` define **ambos** `build:` e
+`image: ghcr.io/eitati/medic-resume:latest`:
+
+- **Local / build na máquina:** `docker compose up -d` constrói a imagem a partir do
+  `Dockerfile` (como antes).
+- **VPS limitada (sem build):** a imagem é **buildada no CI (GitHub Actions) e publicada
+  no GHCR**. Basta `docker compose pull` para baixá-la — nenhum build acontece na VPS.
 
 - Compila a aplicação (etapa `builder`) e roda com o `node_modules` completo
   (etapa `runner`, imagem `node:22-alpine`).
@@ -50,9 +56,32 @@ JIRA_PROJECT_KEY=EITATI
 
 ## 2. Subir a aplicação
 
+**Modo A — build local (dev / máquina com recursos):**
+
 ```bash
 docker compose up -d --build
 ```
+
+**Modo B — imagem pré-buildada do GHCR (VPS limitada, sem build):**
+
+```bash
+docker compose pull        # baixa ghcr.io/eitati/medic-resume:latest
+docker compose up -d       # sobe usando a imagem baixada
+```
+
+> A imagem é pública, então **nenhum `docker login` é necessário** na VPS. O build
+> ocorre no CI a cada push em `main` (workflow `.github/workflows/build.yml`).
+> Para rollback, use a tag por commit: `ghcr.io/eitati/medic-resume:sha-<curto>`.
+>
+> **Atenção (1ª vez):** o GHCR cria o pacote como **privado** por padrão. Após o
+> primeiro build, torne-o público em *repo → Packages → medic-resume → Settings →
+> Change visibility → Public*, ou via `gh`:
+> `gh api -X PATCH "packages/container/medic-resume/visibility" -f visibility=public`.
+
+**Teste zero-config (sem criar `.env`):** o compose já traz defaults de ambiente
+(`BETTER_AUTH_SECRET` de dev, `BETTER_AUTH_URL=http://localhost:3000`, etc.), então um
+clone fresco sobe com `docker compose up -d` sem nenhuma configuração. O segredo dev
+padrão é **inseguro** — sobrescreva `BETTER_AUTH_SECRET` num `.env` em produção.
 
 Verifique a saúde:
 
@@ -93,10 +122,19 @@ Detalhes do banco: [`docs/dev/BANCO-DE-DADOS.md`](../../docs/dev/BANCO-DE-DADOS.
 
 ## 5. Atualizar / redeploy
 
+**Local (rebuild):**
+
 ```bash
 docker compose down
 git pull
 docker compose up -d --build
+```
+
+**VPS (só puxar a nova imagem do CI):**
+
+```bash
+docker compose pull
+docker compose up -d
 ```
 
 As migrações rodam automaticamente no startup (`start.sh`). Os volumes (`uploads`,
