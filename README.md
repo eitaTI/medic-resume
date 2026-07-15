@@ -44,7 +44,7 @@ pnpm dev                   # http://localhost:3000
 | Comando | Descrição |
 |---------|-----------|
 | `pnpm dev` | Servidor de desenvolvimento (HMR) |
-| `pnpm build` | Build de produção (`output: standalone`) |
+| `pnpm build` | Build de produção (`next build`) |
 | `pnpm start` | Inicia o build de produção |
 | `pnpm lint` | ESLint |
 | `pnpm prisma migrate dev` | Cria/executa migrações |
@@ -68,7 +68,10 @@ scripts/        start.sh, backup.sh, restore.sh
 
 ## Deploy
 
-Deploy em produção com Docker Compose (aplicação + backup agendado). Veja
+A imagem Docker é **buildada no CI** (GitHub Actions) e publicada em
+`ghcr.io/eitati/medic-resume`. Em uma VPS limitada, basta **puxar** a imagem
+(`docker compose pull && docker compose up -d`) — nenhum build acontece no servidor.
+Para build local ou detalhes (volumes, ambiente, backup, atualização), veja
 [`docs/guides/deploy.md`](docs/guides/deploy.md).
 
 ## Documentação
