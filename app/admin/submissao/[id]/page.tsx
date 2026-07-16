@@ -15,6 +15,14 @@ const labelsTipo: Record<string, string> = {
   recepcao: 'Recepção',
 }
 
+// Helper para converter o caminho de armazenamento (data/uploads/...)
+// em uma URL segura da API (/api/uploads/...)
+function getSecureUrl(path: string | null) {
+  if (!path) return null
+  // Substitui 'data/uploads/' por 'api/uploads/' e garante que comece com '/'
+  return `/${path.replace('data/uploads/', 'api/uploads/')}`
+}
+
 export default async function DetalheSubmissaoPage({ params }: Props) {
   const { id } = await params
   const clinica = await prisma.clinica.findUnique({
@@ -110,11 +118,11 @@ export default async function DetalheSubmissaoPage({ params }: Props) {
               <p className="text-sm text-gray-900 dark:text-gray-100 mt-0.5">{clinica.enderecoClinica}</p>
             </div>
           )}
-          {clinica.logoPath && (
+            {clinica.logoPath && (
             <div className="sm:col-span-2">
               <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Logo</p>
                 <Image
-                  src={`/${clinica.logoPath}`}
+                  src={getSecureUrl(clinica.logoPath) || ''}
                   alt="Logo da clínica"
                   width={200}
                   height={100}
@@ -123,6 +131,7 @@ export default async function DetalheSubmissaoPage({ params }: Props) {
                 />
             </div>
           )}
+
           <div>
             <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Data de Cadastro</p>
             <p className="text-sm text-gray-900 dark:text-gray-100 mt-0.5">
@@ -194,7 +203,7 @@ export default async function DetalheSubmissaoPage({ params }: Props) {
                     <div className="sm:col-span-2">
                       <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Assinatura</p>
                       <a
-                        href={`/${medico.assinaturaPath}`}
+                        href={getSecureUrl(medico.assinaturaPath) || '#'}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
@@ -224,7 +233,7 @@ export default async function DetalheSubmissaoPage({ params }: Props) {
                   <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{exame.nome}</p>
                   {exame.laudoPath && (
                     <a
-                      href={`/${exame.laudoPath}`}
+                      href={getSecureUrl(exame.laudoPath) || '#'}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
