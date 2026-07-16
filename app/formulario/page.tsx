@@ -172,9 +172,6 @@ export default function FormularioPage() {
             <p className="text-gray-500 dark:text-gray-400 mb-8">
               Agradecemos pelo cadastro. Sua clínica será revisada em breve.
             </p>
-            <Button onClick={resetarFormulario}>
-              Novo Cadastro
-            </Button>
           </div>
         </div>
       </div>
