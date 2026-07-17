@@ -10,6 +10,7 @@ services:
     volumes:
       - uploads:/app/data/uploads
       - sqlite-data:/data/db
+      - branding:/app/data/branding
 
     environment:
       - NODE_ENV=development
@@ -32,3 +33,4 @@ services:
 volumes:
   uploads:
   sqlite-data:
+  branding:

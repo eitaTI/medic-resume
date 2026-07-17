@@ -17,7 +17,7 @@ Compact guidance for OpenCode sessions. For full context read `docs/dev/ARQUITET
 ## Auth
 - Better Auth. Server-side session check inside Server Actions: `auth.api.getSession({ headers: await headers() })` — `headers()` must be awaited.
 - **Admins are Better Auth `User` records** — the legacy `Admin` model/table was dropped in migration `reconcile_admin_to_user`. There is **no `Admin` table and no `adminId` column**; audit/actions use `userId` (→ `User`). Manage admins via `actions/admins.ts` (`criarAdmin`/`excluirAdmin`). See the `admin-management` skill.
-- `middleware.ts` guards `/admin` and `/api/uploads` using the cookie `better-auth.session_token`. Keep that exact name when touching auth.
+- `proxy.ts` guards `/admin` and `/api/uploads` using the cookie `better-auth.session_token`. Keep that exact name when touching auth.
 - `/login` redirects to `/admin` when already authenticated.
 
 ## Server Actions & UI conventions
@@ -26,7 +26,7 @@ Compact guidance for OpenCode sessions. For full context read `docs/dev/ARQUITET
 - Import alias `@/*` → repo root (`tsconfig.json`).
 
 ## Build / deploy quirks
-- `next.config.ts` sets `output: 'standalone'` and `serverExternalPackages` includes `better-sqlite3` and `@prisma/adapter-better-sqlite3`. Keep these — removing breaks native module loading in the standalone build.
+- `next.config.ts` must not remove `rewrites` (branding cache-busting). The Docker build copies full `node_modules` (no standalone output).
 - `.npmrc` has `shamefully-hoist=true` (required for native deps like `better-sqlite3`/`prisma`). Keep it.
 - Uploads live in `data/uploads/` (outside `public/`, LGPD) and are served via `/api/uploads`.
 

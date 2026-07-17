@@ -66,19 +66,13 @@ pnpm prisma studio           # Abre interface web (http://localhost:5555)
 
 ## Otimizações de Performance no Dev
 
-### serverExternalPackages
+### Turbopack (default no Next.js 16)
 
-O `next.config.ts` está configurado com:
+O Next.js 16 usa Turbopack por padrão para `dev` e `build`. Módulos nativos como `better-sqlite3` e `@prisma/adapter-better-sqlite3` são automaticamente excluídos do bundle do Turbopack.
 
-```ts
-serverExternalPackages: ['better-sqlite3', '@prisma/adapter-better-sqlite3']
-```
+### Proxy otimizado
 
-Isso impede que o Turbopack tente empacotar módulos nativos, evitando recompilações desnecessárias e acelerando o HMR.
-
-### Middleware otimizado
-
-O `middleware.ts` verifica o cookie de sessão antes de consultar o banco. Rotas sem sessão são redirecionadas imediatamente sem bater no SQLite, agilizando o refresh.
+O `proxy.ts` (anteriormente `middleware.ts`) verifica o cookie de sessão antes de consultar o banco. Rotas sem sessão são redirecionadas imediatamente sem bater no SQLite, agilizando o refresh.
 
 ## Antes de Commitar
 

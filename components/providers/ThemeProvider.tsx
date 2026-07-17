@@ -8,6 +8,7 @@ type Tema = 'claro' | 'escuro'
 
 interface ThemeContextValue {
   tema: Tema
+  mounted: boolean
   alternarTema: () => void
 }
 
@@ -39,11 +40,13 @@ function apply(tema: Tema, branding: Branding) {
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const branding = useBranding()
   const [tema, setTema] = useState<Tema>('claro')
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     const t = getTema()
     setTema(t)
     apply(t, branding)
+    setMounted(true)
   }, [branding])
 
   const alternarTema = () => {
@@ -56,7 +59,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <ThemeContext.Provider value={{ tema, alternarTema }}>
+    <ThemeContext.Provider value={{ tema, mounted, alternarTema }}>
       {children}
     </ThemeContext.Provider>
   )

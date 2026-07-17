@@ -3,7 +3,7 @@
 import { useTheme } from "@/components/providers/ThemeProvider"
 
 export function ThemeToggle() {
-  const { tema, alternarTema } = useTheme()
+  const { tema, mounted, alternarTema } = useTheme()
 
   return (
     <button
@@ -17,15 +17,20 @@ export function ThemeToggle() {
         transition-all duration-200"
       aria-label="Alternar tema"
     >
-      {tema === 'claro' ? (
+      {mounted && tema === 'claro' ? (
         <>
           <span className="text-lg">🌙</span>
           <span className="hidden sm:inline">Modo escuro</span>
         </>
-      ) : (
+      ) : mounted && tema === 'escuro' ? (
         <>
           <span className="text-lg">☀️</span>
           <span className="hidden sm:inline">Modo claro</span>
+        </>
+      ) : (
+        <>
+          <span className="text-lg">{'\u200B'}</span>
+          <span className="hidden sm:inline">Tema</span>
         </>
       )}
     </button>

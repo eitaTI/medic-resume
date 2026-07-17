@@ -89,23 +89,15 @@ function CampoComLapis({
 
 export function StepClinica() {
   const { register, setValue, watch, formState: { errors } } = useFormContext<FormularioValues>()
-  const [possuiCnpj, setPossuiCnpj] = useState<boolean | null>(null)
   const [isAddressEditable, setIsAddressEditable] = useState(false)
   const [isNomeFantasiaEditable, setIsNomeFantasiaEditable] = useState(false)
   const [cepError, setCepError] = useState<string | null>(null)
   const [cnpjError, setCnpjError] = useState<string | null>(null)
 
   const watchPossuiCnpj = watch('possuiCnpj') as boolean | undefined
+  const possuiCnpj = watchPossuiCnpj ?? null
   const watchCepClinica = watch('cepClinica') as string | undefined
   const watchCnpjEmpresa = watch('cnpjEmpresa') as string | undefined
-
-  useEffect(() => {
-    if (watchPossuiCnpj === true) {
-      setPossuiCnpj(true)
-    } else if (watchPossuiCnpj === false) {
-      setPossuiCnpj(false)
-    }
-  }, [watchPossuiCnpj])
 
   const fetchCEP = useCallback(async (cep: string) => {
     const digits = cep.replace(/\D/g, '')
@@ -220,7 +212,6 @@ export function StepClinica() {
   }, [setValue])
 
   const handleCnpjToggle = (value: boolean) => {
-    setPossuiCnpj(value)
     setValue('possuiCnpj', value)
   }
 

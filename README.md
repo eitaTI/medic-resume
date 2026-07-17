@@ -1,7 +1,7 @@
 # Medic Resume — EitaTI Formulário
 
 [![Build and Push Image](https://github.com/eitati/medic-resume/actions/workflows/build.yml/badge.svg)](https://github.com/eitati/medic-resume/actions/workflows/build.yml)
-[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-7-2D3748?style=flat-square&logo=prisma)](https://www.prisma.io/)
@@ -94,14 +94,16 @@ Crie ou configure o arquivo `.env` com as seguintes variáveis:
 
 ## 🎨 Branding Personalizado
 
-Para substituir as marcas e fundos da aplicação por uma nova marca visual sem alterar uma única linha de código, basta trocar os arquivos correspondentes na pasta `public/branding/`:
+Para substituir as marcas e fundos da aplicação por uma nova marca visual sem alterar uma única linha de código, utilize o **painel administrativo** em `/admin/branding`:
 
 - `eitati-logo-light.png` / `eitati-logo-dark.png`: Logotipo exibido na barra superior.
 - `eitati-light-wallpaper.png` / `eitati-dark-wallpaper.png`: Imagem de fundo da tela de login e de sucesso.
-- `eitati-icon-light.png` / `eitati-icon-dark.png`: Ícones do sistema.
+- `eitati-icon-light.png` / `eitati-icon-dark.png`: Ícones do sistema (favicon e abas).
 
-> 🛠️ **Mecanismo de Cache-Busting:**  
-> O arquivo `lib/branding.ts` lê essa pasta dinamicamente em runtime e anexa um sufixo de versão `v<mtime>` (baseado na data de modificação física do arquivo) em conjunto com os rewrites do `next.config.ts`, garantindo que navegadores e CDNs atualizem instantaneamente as imagens ao serem substituídas.
+> **Armazenamento Privado:** Os assets ficam em `data/branding/` (fora do `public/`, alinhado à LGPD) e são servidos pela rota controlada `/api/branding`. Em Docker, o volume `branding` persiste entre deploys.
+>
+> **Mecanismo de Cache-Busting:**  
+> O arquivo `lib/branding.ts` resolve os assets por prefixo (override → default) e anexa um sufixo de versão `v<mtime>` (baseado na data de modificação física do arquivo), garantindo que navegadores e CDNs atualizem instantaneamente as imagens ao serem substituídas. As alterações são refletidas imediatamente, sem necessidade de reiniciar o servidor.
 
 ---
 

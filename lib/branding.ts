@@ -1,27 +1,39 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-// Server-only: lê a pasta public/branding em runtime. Trocar a marca = apenas
-// substituir os arquivos (ex.: eitati-logo-light.png) sem mexer no código.
+// Server-only: resolve branding assets from data/branding (overrides) first,
+// then public/branding (defaults). Assets are served via /api/branding route.
 
-const BRANDING_DIR = path.join(process.cwd(), 'public', 'branding')
+const OVERRIDE_DIR = path.join(process.cwd(), 'data', 'branding')
+const DEFAULT_DIR = path.join(process.cwd(), 'public', 'branding')
+
+function findFile(dir: string, name: string): string | null {
+  try {
+    const files = fs.readdirSync(dir)
+    const hit = files.find((f) => f.replace(/\.[^.]+$/, '') === name)
+    return hit ?? null
+  } catch {
+    return null
+  }
+}
 
 function resolve(name: string): string {
+  const overrideFile = findFile(OVERRIDE_DIR, name)
+  const defaultFile = findFile(DEFAULT_DIR, name)
+  const file = overrideFile ?? defaultFile
+  const dir = overrideFile ? OVERRIDE_DIR : DEFAULT_DIR
+
+  if (!file) return `/api/branding/${name}.png`
+
+  let version = ''
   try {
-    const files = fs.readdirSync(BRANDING_DIR)
-    const hit = files.find((f) => f.replace(/\.[^.]+$/, '') === name)
-    const file = hit ? hit : `${name}.png`
-    let version = ''
-    try {
-      const mtime = Math.floor(fs.statSync(path.join(BRANDING_DIR, file)).mtimeMs)
-      version = `v${mtime}`
-    } catch {
-      version = ''
-    }
-    return version ? `/branding/${version}/${file}` : `/branding/${file}`
+    const mtime = Math.floor(fs.statSync(path.join(dir, file)).mtimeMs)
+    version = `${mtime}`
   } catch {
-    return `/branding/${name}.png`
+    version = ''
   }
+
+  return version ? `/api/branding/v${version}/${file}` : `/api/branding/${file}`
 }
 
 export interface Branding {
