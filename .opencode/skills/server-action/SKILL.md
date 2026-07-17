@@ -27,7 +27,7 @@ compatibility: opencode
   `revalidatePath(...)` inside the action.
 
 ## Auth / routing
-- `middleware.ts` guards `/admin` and `/api/uploads` using the cookie
+- `proxy.ts` (anteriormente `middleware.ts`) guards `/admin` and `/api/uploads` using the cookie
   `better-auth.session_token`. Keep that exact name if you touch auth.
 - `/login` redirects to `/admin` when already authenticated.
 

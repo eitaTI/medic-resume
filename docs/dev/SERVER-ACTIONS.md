@@ -4,7 +4,7 @@ Guia para criação de Server Actions no projeto Medic Resume.
 
 ## Visão Geral
 
-Server Actions são funções executadas no servidor chamadas de Client Components. Substituem API Routes tradicionais no Next.js 15.
+Server Actions são funções executadas no servidor chamadas de Client Components. Substituem API Routes tradicionais no Next.js 16.
 
 ## Arquivos
 

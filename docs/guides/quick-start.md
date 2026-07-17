@@ -9,7 +9,7 @@ Guia passo a passo para rodar o **EitaTI Formulário** na sua máquina.
 - Git
 
 > No Windows, leia primeiro [`docs/dev/WINDOWS-SETUP.md`](../dev/WINDOWS-SETUP.md) (ative o Modo
-> Desenvolvedor para os symlinks do build `standalone` e o `better-sqlite3`).
+> Desenvolvedor para symlinks de módulos nativos como `better-sqlite3`).
 
 ## 1. Clonar e instalar
 
@@ -80,7 +80,7 @@ pnpm build                 # build de produção
 - **Erro de build com `better-sqlite3`**: rode `pnpm prisma generate`. No Windows, ative o Modo
   Desenvolvedor (veja `docs/dev/WINDOWS-SETUP.md`).
 - **Sessão não persiste / redireciona para login**: confirme `BETTER_AUTH_URL` e que o cookie
-  `better-auth.session_token` está sendo enviado (middleware protege `/admin` e `/api/uploads`).
+  `better-auth.session_token` está sendo enviado (proxy protege `/admin` e `/api/uploads`).
 - **Jira não cria card**: verifique `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN` e
   `JIRA_PROJECT_KEY`. A aprovação continua mesmo com erro (`jiraSyncStatus = ERRO`, com retry no
   painel).

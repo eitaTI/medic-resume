@@ -4,13 +4,13 @@ Decisões de arquitetura e estrutura do projeto Medic Resume.
 
 ## Visão Geral
 
-O projeto é uma aplicação **Next.js 15 (App Router)** que funciona como um sistema de formulário para coleta de dados de clínicas médicas, com painel administrativo e integração com Jira.
+O projeto é uma aplicação **Next.js 16 (App Router)** que funciona como um sistema de formulário para coleta de dados de clínicas médicas, com painel administrativo e integração com Jira.
 
 ## Stack Tecnológica
 
 | Camada | Tecnologia | Justificativa |
 |--------|------------|---------------|
-| Framework | Next.js 15 | App Router, Server Components, Server Actions |
+| Framework | Next.js 16 | App Router, Server Components, Server Actions, Turbopack |
 | Linguagem | TypeScript | Tipagem estática, melhor DX |
 | Banco | SQLite + Prisma v7 | Simplicidade, ORM robusto |
 | Auth | Better Auth | Leve, integrado com Prisma |
@@ -138,7 +138,7 @@ Client Component → Server Action → Prisma → SQLite
 
 - Senhas hasheadas via `@better-auth/utils/password` (algoritmo do Better Auth)
 - Sessões gerenciadas por Better Auth
-- Rotas /admin protegidas por middleware + layout server-side
+- Rotas /admin protegidas por proxy (antes middleware) + layout server-side
 - Uploads fora de `public/` (LGPD)
 - Variáveis sensíveis em `.env` (não commitado)
 - Cloudflare Tunnel para exposição segura

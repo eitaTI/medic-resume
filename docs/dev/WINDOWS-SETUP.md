@@ -4,7 +4,7 @@ Guia de configuração do ambiente de desenvolvimento no Windows para evitar err
 
 ## Modo Desenvolvedor (obrigatório)
 
-O Next.js `standalone` cria symlinks durante o `pnpm build`. No Windows, criar symlinks requer o **Modo Desenvolvedor** ativado ou privilégios de Administrator.
+O build do Next.js cria symlinks durante o `pnpm build`. No Windows, criar symlinks requer o **Modo Desenvolvedor** ativado ou privilégios de Administrator.
 
 Sem isso, o build falha com:
 

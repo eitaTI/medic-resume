@@ -1,7 +1,7 @@
 # Deploy — Produção com Docker
 
 Como subir o **EitaTI Formulário** em produção com Docker Compose. É um app
-Next.js 15 que roda via `next start`; as migrações e o seed do admin rodam
+Next.js 16 que roda via `next start`; as migrações e o seed do admin rodam
 automaticamente na inicialização (`scripts/start.sh`).
 
 ## Pré-requisitos
