@@ -154,7 +154,7 @@ export async function alterarSenha(dados: {
     })
 
     return { sucesso: true }
-  } catch (e) {
+  } catch {
     return { erro: 'Senha atual incorreta ou erro ao alterar senha' }
   }
 }

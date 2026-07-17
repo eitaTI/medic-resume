@@ -16,5 +16,5 @@ RUN apk add --no-cache openssl && corepack enable
 ENV NODE_ENV=production
 # Tudo da etapa de build (incluindo todos os node_modules)
 COPY --from=builder /app ./
-RUN chmod +x scripts/*.sh
+RUN mkdir -p /app/data/branding && chmod +x scripts/*.sh
 CMD ["sh", "scripts/start.sh"]

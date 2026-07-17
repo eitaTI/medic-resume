@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return [
-      { source: "/branding/v:version/:path*", destination: "/branding/:path*" },
+      { source: "/api/branding/v:version/:path*", destination: "/api/branding/:path*" },
     ];
   },
 };

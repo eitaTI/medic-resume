@@ -111,6 +111,42 @@ O ingresso em produção pode ser feito via **Cloudflare Tunnel**, sem abrir a p
 `ports: "3000:3000"` serve para checagens locais (`curl`) e pode ser omitido se o
 túnel for o único ingress.
 
+## Branding pós-deploy
+
+O sistema permite personalizar logotipos, papéis de parede e ícones **sem rebuild da imagem**.
+Os assets são servidos a partir do volume `branding` (privado, fora do `public/`), com fallback
+automático para os defaults EitaTI gravados na imagem.
+
+### Via painel administrativo (recomendado para o cliente)
+
+1. Acesse `/admin/branding` (protegido por sessão).
+2. Para cada slot (logo claro/escuro, fundo claro/escuro, ícone claro/escuro), selecione o
+   arquivo (PNG, JPEG ou WebP, até 5 MB) e clique em **Salvar**.
+3. Para reverter um slot ao padrão de fábrica, clique em **Restaurar Padrão**.
+4. Para reverter tudo de uma vez, use **Restaurar Todos os Padrões** no rodapé.
+
+> As alterações são refletidas imediatamente (sem restart) graças ao cache-busting por `mtime`.
+> O volume `branding` persiste entre `docker compose pull` e redeploys.
+
+### Via CLI (`docker cp`)
+
+Para operadores com acesso ao servidor:
+
+```bash
+# Copiar o novo logo (manter o mesmo nome de arquivo!)
+docker compose cp ./novo-logo-light.png app:/app/data/branding/eitati-logo-light.png
+
+# Verificar os arquivos no volume
+docker compose exec app ls -la /app/data/branding/
+
+# Restaurar todos os defaults (remove o volume e recria vazio)
+docker compose exec app sh -c "rm -f /app/data/branding/*"
+```
+
+> **Importante:** os nomes de arquivo devem ser mantidos — o sistema resolve por prefixo
+> (`eitati-logo-light`, `eitati-logo-dark`, etc.). Se renomear, o fallback para o default
+> será ativado automaticamente.
+
 ## Backup e restauração
 
 Os scripts `scripts/backup.sh` e `scripts/restore.sh` são **manuais** (não há
