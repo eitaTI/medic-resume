@@ -64,13 +64,19 @@ export async function submeterFormulario(formData: FormData) {
     const medicoIndices = Object.keys(medicosRaw).map(Number).sort()
 
     const medicosArray = medicoIndices.map((i) => medicosRaw[i])
-    const quantidadeMedicos = Math.max(
+    const quantidadeMedicosComputada = Math.max(
       1,
       medicosArray.filter((m) => {
         const tipo = m.tipo as string | undefined
         return !tipo || tipo === 'examinador'
       }).length
     )
+
+    const quantidadeMedicosEnviada = Number(formData.get('quantidadeMedicos'))
+    const quantidadeMedicos =
+      Number.isInteger(quantidadeMedicosEnviada) && quantidadeMedicosEnviada >= 1
+        ? quantidadeMedicosEnviada
+        : quantidadeMedicosComputada
 
     const cnpjEmpresaRaw = formData.get('cnpjEmpresa') as string | null
     const cnpjEmpresa = cnpjEmpresaRaw && cnpjEmpresaRaw.trim() !== '' ? cnpjEmpresaRaw : undefined
