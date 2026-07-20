@@ -109,6 +109,23 @@ export async function submeterFormulario(formData: FormData) {
     for (const i of exameIndices) {
       const v = schemaExame.safeParse(examesRaw[i])
       if (!v.success) return { erro: v.error.issues[0].message }
+
+      const laudo = formData.get(`exames[${i}].laudo`) as File | null
+      const topicos = (formData.get(`exames[${i}].topicos`) as string | null)?.trim() || null
+
+      const temPdf = laudo instanceof File && laudo.size > 0
+      const temTopicos = !!topicos && topicos.length > 0
+
+      if (!temPdf && !temTopicos) {
+        return { erro: 'Cada exame precisa de um laudo (PDF) ou de tópicos de conteúdo.' }
+      }
+
+      if (temPdf) {
+        const isPdf = laudo!.type === 'application/pdf' || laudo!.name.toLowerCase().endsWith('.pdf')
+        if (!isPdf) {
+          return { erro: 'O laudo deve ser um arquivo PDF.' }
+        }
+      }
     }
 
     const dispositivosRaw = extrairArray(formData, 'dispositivos')
