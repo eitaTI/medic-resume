@@ -15,6 +15,14 @@ const eslintConfig = [
     },
   },
   {
+    // Test files use `as any` for mocking server-action sessions/responses.
+    files: ['tests/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+    },
+  },
+  {
     ignores: [
       'node_modules/**',
       '.next/**',
