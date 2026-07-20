@@ -33,7 +33,7 @@ O formulário de cadastro de clínicas é composto por 4 etapas estruturadas:
 - 👥 **Gestão de Administradores**: Interface interna para cadastrar ou excluir outros administradores, contendo validações contra auto-exclusão e exclusão do último administrador remanescente.
 - 📝 **Auditoria Total (Audit Logs)**: Registro inalterável de todas as ações administrativas executadas por qualquer administrador (autenticações, criações, aprovações, rejeições e exclusões) salvando o IP e detalhes relevantes.
 - 💾 **Rotinas de Backup Integradas**: Scripts inteligentes (`backup.sh` e `restore.sh`) para compactar o arquivo SQLite e a pasta de uploads com políticas automáticas de expiração (retenção de 30 dias).
-- 🎨 **Branding Dinâmico e Modo Escuro**: Suporte completo a tema escuro/claro nativo via Tailwind CSS v4, com personalização de logotipos e papéis de parede em runtime na pasta `public/branding`.
+- 🎨 **Branding Dinâmico e Modo Escuro**: Suporte completo a tema escuro/claro nativo via Tailwind CSS v4, com personalização de logotipos e papéis de parede em runtime na pasta `data/branding` (com fallback `public/branding`).
 
 ---
 

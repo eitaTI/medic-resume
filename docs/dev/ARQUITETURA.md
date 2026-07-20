@@ -138,7 +138,7 @@ Client Component → Server Action → Prisma → SQLite
 
 - Senhas hasheadas via `@better-auth/utils/password` (algoritmo do Better Auth)
 - Sessões gerenciadas por Better Auth
-- Rotas /admin protegidas por proxy (antes middleware) + layout server-side
+- Rotas `/admin` protegidas por verificação de sessão server-side em `app/admin/layout.tsx` (redirect → `/login`); rotas de API protegidas checam a sessão inline (ex.: `/api/uploads` → 401)
 - Uploads fora de `public/` (LGPD)
 - Variáveis sensíveis em `.env` (não commitado)
 - Cloudflare Tunnel para exposição segura

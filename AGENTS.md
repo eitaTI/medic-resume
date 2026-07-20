@@ -4,7 +4,7 @@ Compact guidance for OpenCode sessions. For full context read `docs/dev/ARQUITET
 
 ## Commands
 - Package manager is **pnpm** (not npm). Use `pnpm install`, `pnpm dev`, `pnpm build`, `pnpm lint`.
-- There is **no test framework / no `test` script** — do not expect or invent `pnpm test`.
+- Tests: Vitest (unit/api) via `pnpm test` / `pnpm test:unit`, Playwright e2e via `pnpm test:e2e`. Live Jira test is gated by `RUN_JIRA_LIVE=1`.
 - First-run setup: `cp .env.example .env` → `pnpm prisma migrate dev` → `pnpm prisma db seed` (seed admin: `admin@eitati.com` / `admin123`).
 - Before committing: `pnpm build && pnpm lint`.
 
@@ -17,7 +17,7 @@ Compact guidance for OpenCode sessions. For full context read `docs/dev/ARQUITET
 ## Auth
 - Better Auth. Server-side session check inside Server Actions: `auth.api.getSession({ headers: await headers() })` — `headers()` must be awaited.
 - **Admins are Better Auth `User` records** — the legacy `Admin` model/table was dropped in migration `reconcile_admin_to_user`. There is **no `Admin` table and no `adminId` column**; audit/actions use `userId` (→ `User`). Manage admins via `actions/admins.ts` (`criarAdmin`/`excluirAdmin`). See the `admin-management` skill.
-- `proxy.ts` guards `/admin` and `/api/uploads` using the cookie `better-auth.session_token`. Keep that exact name when touching auth.
+- `/admin` is guarded by a server-side session check in `app/admin/layout.tsx` (redirects to `/login` when unauthenticated). Protected API routes (e.g. `/api/uploads`) check the session inline and return 401. The session cookie is Better Auth's default `better-auth.session_token` — keep that exact name when touching auth.
 - `/login` redirects to `/admin` when already authenticated.
 
 ## Server Actions & UI conventions

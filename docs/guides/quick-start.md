@@ -80,7 +80,7 @@ pnpm build                 # build de produção
 - **Erro de build com `better-sqlite3`**: rode `pnpm prisma generate`. No Windows, ative o Modo
   Desenvolvedor (veja `docs/dev/WINDOWS-SETUP.md`).
 - **Sessão não persiste / redireciona para login**: confirme `BETTER_AUTH_URL` e que o cookie
-  `better-auth.session_token` está sendo enviado (proxy protege `/admin` e `/api/uploads`).
+  `better-auth.session_token` está sendo enviado (o layout de `/admin` e a rota `/api/uploads` verificam a sessão).
 - **Jira não cria card**: verifique `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN` e
   `JIRA_PROJECT_KEY`. A aprovação continua mesmo com erro (`jiraSyncStatus = ERRO`, com retry no
   painel).

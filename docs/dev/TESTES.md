@@ -41,6 +41,10 @@ Medida pelo Vitest (`@vitest/coverage-v8`) em `pnpm test:unit --coverage`.
 Refere-se às camadas **unit/integration** (actions + libs + rotas de API); o
 Playwright E2E não é contabilizado pela ferramenta de cobertura.
 
+> **Snapshot:** números de `main` em `53a2887`, 84 testes unitários. Reexecute
+> `pnpm test:unit --coverage` para valores atuais — o relatório HTML em
+> `coverage/` traz o detalhe por arquivo.
+
 ```
 Statements   : 89.72% ( 463/516 )
 Branches     : 76.05% ( 235/309 )

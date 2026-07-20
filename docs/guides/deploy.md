@@ -101,8 +101,7 @@ JIRA_API_TOKEN=seu_token_aqui
 JIRA_PROJECT_KEY=EITATI
 ```
 
-> O `.env.example` traz também `JIRA_ISSUE_TYPE`, `JIRA_LABELS` e `DATABASE_URL`.
-> Estes não são lidos pelo compose em produção.
+> O `.env.example` traz também `JIRA_ISSUE_TYPE` e `JIRA_LABELS`. Estes **são** lidos em runtime pela aplicação (via `lib/jira.ts`) quando presentes no `.env` carregado pelo compose — apenas `DATABASE_URL` é sobrescrito pelo compose (forçado para o volume de banco).
 
 ## Exposição (opcional)
 

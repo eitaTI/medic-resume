@@ -70,9 +70,9 @@ pnpm prisma studio           # Abre interface web (http://localhost:5555)
 
 O Next.js 16 usa Turbopack por padrão para `dev` e `build`. Módulos nativos como `better-sqlite3` e `@prisma/adapter-better-sqlite3` são automaticamente excluídos do bundle do Turbopack.
 
-### Proxy otimizado
+### Proteção de rotas
 
-O `proxy.ts` (anteriormente `middleware.ts`) verifica o cookie de sessão antes de consultar o banco. Rotas sem sessão são redirecionadas imediatamente sem bater no SQLite, agilizando o refresh.
+Não há `proxy.ts`/`middleware.ts` no projeto. A proteção é feita por Server Component: `app/admin/layout.tsx` chama `auth.api.getSession` e redireciona para `/login` quando não há sessão. Rotas de API protegidas (ex.: `/api/uploads`) validam a sessão inline e retornam 401. O cookie de sessão é o padrão do Better Auth (`better-auth.session_token`).
 
 ## Antes de Commitar
 
