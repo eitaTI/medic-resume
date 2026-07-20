@@ -165,6 +165,37 @@ a partir de `.env.example` → `pnpm lint` → `pnpm build` → `pnpm test` (Vit
 `playwright install --with-deps` → `pnpm test:e2e`. O workflow de Docker
 (`build.yml`) permanece inalterado.
 
+## 7. Teste live do Jira (criação real de card)
+
+Verifica a integração ponta a ponta com o Jira real: cria e remove um card de teste.
+Exige **credenciais reais no `.env`** (gitignored — não são commitadas).
+
+Pré-requisitos:
+- `JIRA_BASE_URL`, `JIRA_EMAIL` e `JIRA_API_TOKEN` preenchidos com valores reais (não os
+  placeholders do `.env.example`).
+- Flag de opt-in `RUN_JIRA_LIVE=1`.
+
+Comando:
+
+```bash
+RUN_JIRA_LIVE=1 pnpm test:jira:live
+```
+
+O que acontece:
+1. **Self-check:** valida o token chamando `myself.getCurrentUser()`.
+2. **Cria** um card dummy via `criarCardJira` e asserte a `issue.key` (ex.: `NCZ-1`).
+3. **Remove** o card automaticamente (`deleteIssue`) para não poluir o board. Se o bot não
+   tiver permissão de exclusão, emite `console.warn` e o card deve ser removido manualmente.
+
+Observações:
+- O teste vive em `tests/integration/` e **nunca** roda no `pnpm test:unit`/CI. Só executa
+  quando `RUN_JIRA_LIVE=1` **e** as credenciais não são placeholders/dummy.
+- O Vitest carrega `.env.test` (modo "test"), que contém credenciais dummy; o arquivo de teste
+  sobrescreve com o `.env` real via `dotenv` (`override: true`).
+- `pnpm test:integration` roda o arquivo mas **pula** os casos sem a flag.
+
+---
+
 ## Adendo — Roadmap futuro: cobertura de 100%
 
 O próximo passo natural desta suíte é elevar a **cobertura de código para 100%**

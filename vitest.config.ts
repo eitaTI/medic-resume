@@ -13,7 +13,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
-    include: ['tests/unit/**/*.test.ts', 'tests/api/**/*.test.ts'],
+    include: ['tests/unit/**/*.test.ts', 'tests/api/**/*.test.ts', 'tests/integration/**/*.test.ts'],
     setupFiles: ['tests/setup.ts'],
     // Test files share a single `test.db`. Each file resets the DB via
     // `prisma db push --force-reset`, which drops/recreates the file.
