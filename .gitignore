@@ -144,7 +144,15 @@ vite.config.ts.timestamp-*
 
 /app/generated/prisma
 *dev.db
-.playwright-mcp/
+test.db
+e2e.db
+data/uploads_test/
+
+# Testes
+.env.test
+test-results/
+playwright-report/
+.playwright/.playwright-mcp/
 *jira-ts/
 
 # Backups gerados pelos scripts de backup
@@ -153,3 +161,5 @@ backups/
 # Uploads de clínicas (LGPD — fora do versionamento)
 data/uploads/
 docs/superpowers/*
+# Branding runtime override (defaults em public/branding)
+data/branding/
