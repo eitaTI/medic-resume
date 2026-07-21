@@ -2,6 +2,7 @@
   "name": "medic-resume",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.13.1",
   "prisma": {
     "seed": "pnpm tsx prisma/seed.ts"
   },
