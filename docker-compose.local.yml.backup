@@ -22,19 +22,26 @@ services:
       - JIRA_EMAIL=${JIRA_EMAIL:-}
       - JIRA_API_TOKEN=${JIRA_API_TOKEN:-}
       - JIRA_PROJECT_KEY=${JIRA_PROJECT_KEY:-EITATI}
-      # Healthcheck configuration (can be overridden via environment)
+      # Healthcheck configuration
       - HEALTHCHECK_INTERVAL=${HEALTHCHECK_INTERVAL:-30s}
       - HEALTHCHECK_TIMEOUT=${HEALTHCHECK_TIMEOUT:-10s}
       - HEALTHCHECK_RETRIES=${HEALTHCHECK_RETRIES:-3}
-      - HEALTHCHECK_START_PERIOD=${HEALTHCHECK_START_PERIOD:-40s}
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
     
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3000/api/health"]
       interval: ${HEALTHCHECK_INTERVAL:-30s}
       timeout: ${HEALTHCHECK_TIMEOUT:-10s}
       retries: ${HEALTHCHECK_RETRIES:-3}
-      start_period: ${HEALTHCHECK_START_PERIOD:-40s}
-    
     restart: unless-stopped
 
 volumes:

@@ -1,8 +1,6 @@
 services:
   app:
-    build:
-      context: .
-    image: medic-resume:local
+    image: ghcr.io/eitati/medic-resume:latest
     
     ports:
       - "3000:3000"
@@ -13,7 +11,7 @@ services:
       - branding:/app/data/branding
     
     environment:
-      - NODE_ENV=${NODE_ENV:-development}
+      - NODE_ENV=${NODE_ENV:-production}
       - HOSTNAME=${HOSTNAME:-0.0.0.0}
       - DATABASE_URL=${DATABASE_URL:-file:/data/db/dev.db}
       - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3000}
@@ -23,21 +21,69 @@ services:
       - JIRA_API_TOKEN=${JIRA_API_TOKEN:-}
       - JIRA_PROJECT_KEY=${JIRA_PROJECT_KEY:-EITATI}
       # Healthcheck configuration (can be overridden via environment)
-      - HEALTHCHECK_INTERVAL=${HEALTHCHECK_INTERVAL:-30s}
+      - HEALTHCHECK_INTERVAL=${HEALTHCHECK_INTERVAL:-30s:-30s}
       - HEALTHCHECK_TIMEOUT=${HEALTHCHECK_TIMEOUT:-10s}
       - HEALTHCHECK_RETRIES=${HEALTHCHECK_RETRIES:-3}
-      - HEALTHCHECK_START_PERIOD=${HEALTHCHECK_START_PERIOD:-40s}
-    
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3000/api/health"]
-      interval: ${HEALTHCHECK_INTERVAL:-30s}
-      timeout: ${HEALTHCHECK_TIMEOUT:-10s}
-      retries: ${HEALTHCHECK_RETRIES:-3}
-      start_period: ${HEALTHCHECK_START_PERIOD:-40s}
-    
-    restart: unless-stopped
-
-volumes:
-  uploads:
-  sqlite-data:
-  branding:
+      - HEA   C HCHECK_THEHEAL
+C
+H
+E
+L
+P
+:H
+ E
+A
+L
+T
+H
+C
+H
+E
+C
+K
+_
+S
+T
+A
+R
+T
+_
+P
+E
+R
+I
+O
+D
+=
+$
+{
+H
+E
+A
+L
+T
+H
+C
+H
+E
+C
+K
+_
+S
+T
+A
+R
+T
+_
+P
+E
+R
+I
+O
+D
+:
+-
+4
+0
+s
+}
