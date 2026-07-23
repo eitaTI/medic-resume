@@ -43,6 +43,4 @@ LABEL org.opencontainers.image.licenses=MIT
 LABEL org.opencontainers.image.version="latest"
 LABEL org.opencontainers.image.created=${BUILD_DATE:-}
 
-C_DATE:-}
-
 CMD ["sh", "scripts/start.sh"]
