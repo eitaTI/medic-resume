@@ -3,31 +3,38 @@ services:
     build:
       context: .
     image: medic-resume:local
-
+    
     ports:
       - "3000:3000"
-
+    
     volumes:
       - uploads:/app/data/uploads
       - sqlite-data:/data/db
       - branding:/app/data/branding
-
+    
     environment:
-      - NODE_ENV=development
-      - HOSTNAME=0.0.0.0
-      - DATABASE_URL=file:/data/db/dev.db
+      - NODE_ENV=${NODE_ENV:-development}
+      - HOSTNAME=${HOSTNAME:-0.0.0.0}
+      - DATABASE_URL=${DATABASE_URL:-file:/data/db/dev.db}
       - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3000}
       - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET:-dev_secret_32_chars_minimum_len_example}
       - JIRA_BASE_URL=${JIRA_BASE_URL:-}
       - JIRA_EMAIL=${JIRA_EMAIL:-}
       - JIRA_API_TOKEN=${JIRA_API_TOKEN:-}
       - JIRA_PROJECT_KEY=${JIRA_PROJECT_KEY:-EITATI}
-
+      # Healthcheck configuration (can be overridden via environment)
+      - HEALTHCHECK_INTERVAL=${HEALTHCHECK_INTERVAL:-30s}
+      - HEALTHCHECK_TIMEOUT=${HEALTHCHECK_TIMEOUT:-10s}
+      - HEALTHCHECK_RETRIES=${HEALTHCHECK_RETRIES:-3}
+      - HEALTHCHECK_START_PERIOD=${HEALTHCHECK_START_PERIOD:-40s}
+    
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3000/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      interval: ${HEALTHCHECK_INTERVAL:-30s}
+      timeout: ${HEALTHCHECK_TIMEOUT:-10s}
+      retries: ${HEALTHCHECK_RETRIES:-3}
+      start_period: ${HEALTHCHECK_START_PERIOD:-40s}
+    
     restart: unless-stopped
 
 volumes:

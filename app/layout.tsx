@@ -4,6 +4,8 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { BrandingProvider } from "@/components/providers/BrandingProvider";
 import { getBranding } from "@/lib/branding";
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: "Medic Resume",
   description: "Medic Resume - Next.js Application",

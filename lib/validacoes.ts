@@ -37,49 +37,42 @@ export const schemaDispositivo = z.object({
 })
 
 export const schemaFormulario = z.object({
-  nomeClinica: z.string().optional(),
-  nomeEmpresa: z.string().optional(),
-  nomeTitular: z.string().min(10, 'O nome completo do titular deve ter no mínimo 10 caracteres'),
-  emailTitular: z.string().email('Email do titular inválido'),
-  celularTitular: z.string().refine((val) => val.replace(/\D/g, '').length === 11, 'Celular deve ser preenchido integralmente'),
-  documentoTitular: z.string().refine((val) => val.replace(/\D/g, '').length === 11, 'CPF do titular deve ser preenchido integralmente'),
-  cnpjEmpresa: z.string().optional().refine((val) => !val || val.replace(/\D/g, '').length === 14, 'CNPJ deve ser preenchido integralmente'),
-  cepClinica: z.string().refine((val) => val.replace(/\D/g, '').length === 8, 'CEP deve ser preenchido integralmente'),
-  enderecoClinica: z.string().min(1, 'Endereço é obrigatório'),
-  possuiCnpj: z.boolean().optional(),
-  cabecalhoLaudo: z.string().min(1, 'Cabeçalho do laudo é obrigatório'),
-  rodapeLaudo: z.string().min(1, 'Rodapé do laudo é obrigatório'),
-  quantidadeMedicos: z.number().int().min(1, 'Informe ao menos 1 médico'),
+  // Extend schemaClinica but override some fields for form-specific requirements
+  ...schemaClinica.shape,
+  nomeClinica: z.string().optional(), // Keep as optional from schemaClinica
+  nomeEmpresa: z.string().optional(), // Keep as optional from schemaClinica
+  nomeTitular: z.string().min(10, 'O nome completo do titular deve ter no mínimo 10 caracteres'), // Override to be required
+  emailTitular: z.string().email('Email do titular inválido'), // Keep same as schemaClinica
+  celularTitular: z.string().refine((val) => val.replace(/\D/g, '').length === 11, 'Celular deve ser preenchido integralmente'), // Keep same as schemaClinica
+  documentoTitular: z.string().refine((val) => val.replace(/\D/g, '').length === 11, 'CPF do titular deve ser preenchido integralmente'), // Keep same as schemaClinica
+  cnpjEmpresa: z.string().optional().refine((val) => !val || val.replace(/\D/g, '').length === 14, 'CNPJ deve ser preenchido integralmente'), // Keep same as schemaClinica
+  cepClinica: z.string().refine((val) => val.replace(/\D/g, '').length === 8, 'CEP deve ser preenchido integralmente'), // Make required (was optional in schemaClinica)
+  enderecoClinica: z.string().min(1, 'Endereço é obrigatório'), // Make required (was optional in schemaClinica)
+  possuiCnpj: z.boolean().optional(), // Keep same as schemaClinica
+  cabecalhoLaudo: z.string().min(1, 'Cabeçalho do laudo é obrigatório'), // New field
+  rodapeLaudo: z.string().min(1, 'Rodapé do laudo é obrigatório'), // New field
+  quantidadeMedicos: z.number().int().min(1, 'Informe ao menos 1 médico'), // Change from coerce.number() to number() and remove default
+  
+  // Reference schemaMedico but add temAssinatura field
   usuarios: z
     .array(
-      z.object({
-        nome: z.string().min(1, 'Nome do usuário é obrigatório'),
-        documento: z.string().min(1, 'Documento do usuário é obrigatório'),
-        email: z.string().email('Email do usuário inválido'),
-        tipo: z.enum(['examinador', 'solicitante', 'recepcao']).optional(),
+      schemaMedico.extend({
         temAssinatura: z.boolean(),
       }),
     )
     .min(1),
+  
+  // Directly reuse schemaExame
   exames: z
     .array(
-      z.object({
-        nome: z.string().min(1, 'Nome do exame é obrigatório'),
-        temLaudo: z.boolean().optional(),
-        temTopicos: z.boolean().optional(),
-        topicos: z.string().optional(),
-        laudo: z.any().optional(),
-      }),
+      schemaExame,
     )
     .min(1),
+  
+  // Directly reuse schemaDispositivo
   equipamentos: z
     .array(
-      z.object({
-        tipo: z.string().min(1, 'Tipo do dispositivo é obrigatório'),
-        marca: z.string().min(1, 'Marca do dispositivo é obrigatório'),
-        modelo: z.string().min(1, 'Modelo do dispositivo é obrigatório'),
-        numeroSerie: z.string().min(1, 'Número de série do dispositivo é obrigatório'),
-      }),
+      schemaDispositivo,
     )
     .min(1),
 })

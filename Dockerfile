@@ -9,12 +9,40 @@ COPY . .
 RUN pnpm exec prisma generate
 RUN pnpm build
 
-# Etapa 2: Execução (node_modules completo)
+# Etapa 2: Execução
 FROM node:22-alpine AS runner
 WORKDIR /app
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
+
+# Install only production dependencies (though we need all for this app due to native modules)
+# But we set the user anyway for security
 RUN apk add --no-cache openssl && corepack enable
+
+# Set environment variables
 ENV NODE_ENV=production
-# Tudo da etapa de build (incluindo todos os node_modules)
+ENV HOSTNAME=0.0.0.0
+
+# Copy only necessary files from builder
 COPY --from=builder /app ./
-RUN mkdir -p /app/data/branding && chmod +x scripts/*.sh
+
+# Set proper ownership for non-root user
+RUN chown -R nextjs:nodejs /app
+RUN mkdir -p /app/data/branding && chown -R nextjs:nodejs /app/data/branding
+RUN chmod +x scripts/*.sh
+
+# Switch to non-root user
+USER nextjs
+
+# Add metadata labels
+LABEL org.opencontainers.image.source="https://github.com/eitati/medic-resume"
+LABEL org.opencontainers.image.description="EitaTI Formulário - Sistema de cadastro e integração de clínicas médicas"
+LABEL org.opencontainers.image.licenses=MIT
+LABEL org.opencontainers.image.version="latest"
+LABEL org.opencontainers.image.created=${BUILD_DATE:-}
+
+C_DATE:-}
+
 CMD ["sh", "scripts/start.sh"]
