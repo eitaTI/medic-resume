@@ -85,12 +85,17 @@ async function anexarArquivo(client: Version3Client, issueKey: string, caminhoRe
 }
 
 export async function criarCardJira(clinica: ClinicaParaJira): Promise<string> {
+  // Validate required Jira configuration
+  if (!process.env.JIRA_BASE_URL || !process.env.JIRA_EMAIL || !process.env.JIRA_API_TOKEN) {
+    throw new Error('Jira configuration incomplete. Please set JIRA_BASE_URL, JIRA_EMAIL, and JIRA_API_TOKEN')
+  }
+
   const client = new Version3Client({
-    host: process.env.JIRA_BASE_URL || '',
+    host: process.env.JIRA_BASE_URL,
     authentication: {
       basic: {
-        email: process.env.JIRA_EMAIL || '',
-        apiToken: process.env.JIRA_API_TOKEN || '',
+        email: process.env.JIRA_EMAIL,
+        apiToken: process.env.JIRA_API_TOKEN,
       },
     },
   })
