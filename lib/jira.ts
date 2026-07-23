@@ -75,7 +75,7 @@ function montarDescricao(clinica: ClinicaParaJira): ADFParagraph[] {
 
 async function anexarArquivo(client: Version3Client, issueKey: string, caminhoRelativo: string | null | undefined) {
   if (!caminhoRelativo) return
-  const abs = path.join(process.cwd(), caminhoRelativo)
+  const abs = path.join(/* turbopackIgnore: true */ process.cwd(), caminhoRelativo)
   if (!existsSync(abs)) return
   const buffer = await readFile(abs)
   await client.issueAttachments.addAttachment({
@@ -90,8 +90,11 @@ export async function criarCardJira(clinica: ClinicaParaJira): Promise<string> {
     throw new Error('Jira configuration incomplete. Please set JIRA_BASE_URL, JIRA_EMAIL, and JIRA_API_TOKEN')
   }
 
+  // Remove trailing slash if present to avoid URL issues
+  const jiraBaseUrl = process.env.JIRA_BASE_URL.replace(/\/+$/, '')
+
   const client = new Version3Client({
-    host: process.env.JIRA_BASE_URL,
+    host: jiraBaseUrl,
     authentication: {
       basic: {
         email: process.env.JIRA_EMAIL,

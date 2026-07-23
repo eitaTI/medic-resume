@@ -42,7 +42,7 @@ async function salvarArquivo(
 ): Promise<string | null> {
   if (!file || file.size === 0) return null
 
-  const dir = path.join(process.cwd(), 'data', 'uploads', submissionFolder, tipo)
+  const dir = path.join(/* turbopackIgnore: true */ process.cwd(), 'data', 'uploads', submissionFolder, tipo)
   await mkdir(dir, { recursive: true })
 
   const ext = path.extname(file.name)
@@ -73,10 +73,10 @@ export async function submeterFormulario(formData: FormData) {
     )
 
     const quantidadeMedicosEnviada = Number(formData.get('quantidadeMedicos'))
-    const quantidadeMedicos =
-      Number.isInteger(quantidadeMedicosEnviada) && quantidadeMedicosEnviada >= 1
-        ? quantidadeMedicosEnviada
-        : quantidadeMedicosComputada
+    const quantidadeMedicos = Math.max(
+      quantidadeMedicosEnviada || 0,
+      quantidadeMedicosComputada
+    )
 
     const cnpjEmpresaRaw = formData.get('cnpjEmpresa') as string | null
     const cnpjEmpresa = cnpjEmpresaRaw && cnpjEmpresaRaw.trim() !== '' ? cnpjEmpresaRaw : undefined
@@ -84,7 +84,7 @@ export async function submeterFormulario(formData: FormData) {
     let nomeClinica = (formData.get('nomeClinica') as string) || ''
     const nomeTitular = (formData.get('nomeTitular') as string) || ''
 
-    if (!cnpjEmpresa || cnpjEmpresa.trim() === '') {
+    if (!cnpjEmpresa) {
       nomeClinica = nomeTitular
     }
 
