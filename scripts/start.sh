@@ -6,6 +6,22 @@ echo "Data: $(date)"
 echo "Ambiente: $NODE_ENV"
 echo "Hostname: $HOSTNAME"
 
+# Validar variáveis de ambiente críticas
+if [ -z "$DATABASE_URL" ]; then
+	echo "Erro: DATABASE_URL não está definida"
+	exit 1
+fi
+
+if [ -z "$BETTER_AUTH_SECRET" ]; then
+	echo "Erro: BETTER_AUTH_SECRET não está definida (obrigatória para produção)"
+	exit 1
+fi
+
+if [ -z "$BETTER_AUTH_URL" ]; then
+	echo "Erro: BETTER_AUTH_URL não está definida"
+	exit 1
+fi
+
 # Exibir algumas variáveis de ambiente (sem mostrar segredos)
 echo "DATABASE_URL: ${DATABASE_URL:-'não definido'}"
 echo "BETTER_AUTH_URL: ${BETTER_AUTH_URL:-'não definido'}"

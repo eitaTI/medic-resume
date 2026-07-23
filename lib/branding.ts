@@ -4,8 +4,8 @@ import path from 'node:path'
 // Server-only: resolve branding assets from data/branding (overrides) first,
 // then public/branding (defaults). Assets are served via /api/branding route.
 
-const OVERRIDE_DIR = path.join(process.cwd(), 'data', 'branding')
-const DEFAULT_DIR = path.join(process.cwd(), 'public', 'branding')
+const OVERRIDE_DIR = path.join(/* turbopackIgnore: true */ process.cwd(), 'data', 'branding')
+const DEFAULT_DIR = path.join(/* turbopackIgnore: true */ process.cwd(), 'public', 'branding')
 
 function findFile(dir: string, name: string): string | null {
   try {
