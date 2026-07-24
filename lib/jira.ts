@@ -93,6 +93,13 @@ export async function criarCardJira(clinica: ClinicaParaJira): Promise<string> {
   // Remove trailing slash if present to avoid URL issues
   const jiraBaseUrl = process.env.JIRA_BASE_URL.replace(/\/+$/, '')
 
+  console.log(`[Jira] Iniciando criação de card para: ${clinica.nomeClinica}`)
+  console.log(`[Jira] Base URL: ${jiraBaseUrl}`)
+  console.log(`[Jira] Project: ${process.env.JIRA_PROJECT_KEY || 'EITATI'}`)
+  console.log(`[Jira] Issue Type: ${process.env.JIRA_ISSUE_TYPE || 'Task'}`)
+  console.log(`[Jira] Labels: ${process.env.JIRA_LABELS || 'medic-resume'}`)
+  console.log(`[Jira] Email: ${process.env.JIRA_EMAIL}`)
+
   const client = new Version3Client({
     host: jiraBaseUrl,
     authentication: {
@@ -108,32 +115,61 @@ export async function criarCardJira(clinica: ClinicaParaJira): Promise<string> {
     .map((l) => l.trim())
     .filter(Boolean)
 
-  const issue = await client.issues.createIssue({
-    fields: {
-      summary: `Clínica aprovada: ${clinica.nomeClinica}`,
-      project: { key: process.env.JIRA_PROJECT_KEY || 'EITATI' },
-      issuetype: { name: process.env.JIRA_ISSUE_TYPE || 'Task' },
-      labels,
-      description: {
-        type: 'doc',
-        version: 1,
-        content: montarDescricao(clinica),
-      },
-    },
-  })
-
   try {
-    await anexarArquivo(client, issue.key, clinica.logoPath)
-    for (const m of clinica.medicos) {
-      await anexarArquivo(client, issue.key, m.assinaturaPath)
-    }
-    for (const e of clinica.exames) {
-      await anexarArquivo(client, issue.key, e.laudoPath)
-    }
-  } catch (err) {
-    console.error('Falha ao anexar arquivos ao card Jira:', err instanceof Error ? err.message : err)
-    if (err instanceof Error) console.error(err.stack)
-  }
+    const issue = await client.issues.createIssue({
+      fields: {
+        summary: `Clínica aprovada: ${clinica.nomeClinica}`,
+        project: { key: process.env.JIRA_PROJECT_KEY || 'EITATI' },
+        issuetype: { name: process.env.JIRA_ISSUE_TYPE || 'Task' },
+        labels,
+        description: {
+          type: 'doc',
+          version: 1,
+          content: montarDescricao(clinica),
+        },
+      },
+    })
 
-  return issue.key
+    console.log(`[Jira] Card criado com sucesso: ${issue.key}`)
+
+    try {
+      await anexarArquivo(client, issue.key, clinica.logoPath)
+      for (const m of clinica.medicos) {
+        await anexarArquivo(client, issue.key, m.assinaturaPath)
+      }
+      for (const e of clinica.exames) {
+        await anexarArquivo(client, issue.key, e.laudoPath)
+      }
+    } catch (err) {
+      console.error('[Jira] Falha ao anexar arquivos ao card:', err instanceof Error ? err.message : err)
+      if (err instanceof Error) console.error('[Jira] Stack:', err.stack)
+    }
+
+    return issue.key
+  } catch (err) {
+    // Log detailed error information for debugging
+    console.error('[Jira] ERRO ao criar card:')
+    console.error(`[Jira] Mensagem: ${err instanceof Error ? err.message : String(err)}`)
+    
+    if (err instanceof Error && err.stack) {
+      console.error(`[Jira] Stack: ${err.stack}`)
+    }
+
+    // Try to extract response details from axios/jira.js errors
+    const axiosErr = err as Record<string, unknown>
+    if (axiosErr.response) {
+      const response = axiosErr.response as Record<string, unknown>
+      console.error(`[Jira] Status HTTP: ${response.status}`)
+      console.error(`[Jira] Status Text: ${response.statusText}`)
+      if (response.data) {
+        console.error(`[Jira] Resposta do servidor: ${JSON.stringify(response.data, null, 2)}`)
+      }
+      if (response.headers) {
+        console.error(`[Jira] Headers: ${JSON.stringify(response.headers)}`)
+      }
+    }
+
+    // Re-throw the error to propagate to the caller
+    throw err
+  }
 }

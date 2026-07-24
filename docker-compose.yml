@@ -20,6 +20,8 @@ services:
       - JIRA_EMAIL=${JIRA_EMAIL:-}
       - JIRA_API_TOKEN=${JIRA_API_TOKEN:-}
       - JIRA_PROJECT_KEY=${JIRA_PROJECT_KEY:-EITATI}
+      - JIRA_ISSUE_TYPE=${JIRA_ISSUE_TYPE:-Task}
+      - JIRA_LABELS=${JIRA_LABELS:-medic-resume}
       # Healthcheck configuration (can be overridden via environment)
       - HEALTHCHECK_INTERVAL=${HEALTHCHECK_INTERVAL:-30s}
       - HEALTHCHECK_TIMEOUT=${HEALTHCHECK_TIMEOUT:-10s}
