@@ -33,9 +33,6 @@ RUN chown -R nextjs:nodejs /app
 RUN mkdir -p /app/data/branding && chown -R nextjs:nodejs /app/data/branding
 RUN chmod +x scripts/*.sh
 
-# Switch to non-root user
-USER nextjs
-
 # Add metadata labels
 LABEL org.opencontainers.image.source="https://github.com/eitati/medic-resume"
 LABEL org.opencontainers.image.description="EitaTI Formulário - Sistema de cadastro e integração de clínicas médicas"
@@ -43,4 +40,4 @@ LABEL org.opencontainers.image.licenses=MIT
 LABEL org.opencontainers.image.version="latest"
 LABEL org.opencontainers.image.created=${BUILD_DATE:-}
 
-CMD ["sh", "scripts/start.sh"]
+CMD ["sh", "scripts/entrypoint.sh"]
