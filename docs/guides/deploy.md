@@ -17,7 +17,7 @@ Um único serviço `app`. O gerenciamento do container pode ser feito de duas fo
 | **A — Imagem do GHCR (Deploy Simplificado)** | VPS / Produção (sem build) | Baixa apenas o `docker-compose.yml` e roda a imagem já compilada no CI, sem necessidade de clonar o repositório |
 | **B — Build local** | Máquina local / Desenvolvimento | Clona o repositório completo e constrói a imagem localmente a partir do `Dockerfile` utilizando o `docker-compose.local.yml` |
 
-A imagem (seja local ou do CI) é `node:22-alpine` com o `node_modules` completo.
+A imagem (seja local ou do CI) é `node:24-alpine` com o `node_modules` completo.
 Ao iniciar, `scripts/start.sh` executa `prisma migrate deploy` + seed do admin e
 sobe o servidor (`next start`) na porta `3000`. Healthcheck em `GET /api/health`.
 
@@ -26,7 +26,7 @@ Volumes persistidos (não remova ou perderá submissões e arquivos):
 | Volume        | Conteúdo                                |
 |---------------|-----------------------------------------|
 | `uploads`     | arquivos enviados (`/app/data/uploads`) |
-| `sqlite-data` | banco SQLite (`/data/db/dev.db`)      |
+| `sqlite-data` | banco SQLite (`/data/db/prod.db`)      |
 
 ## Modo A — Imagem do GHCR (Deploy Simplificado)
 
@@ -61,7 +61,7 @@ Verifique a saúde:
 
 ```bash
 docker compose ps
-curl -f http://localhost:3000/api/health
+curl -f http://localhost:3100/api/health
 ```
 
 ## Modo B — Build local (Desenvolvimento)
@@ -84,7 +84,7 @@ Isso fará com que o Docker utilize o arquivo `docker-compose.local.yml`, que ap
 ## Variáveis de ambiente
 
 Crie/edite o `.env` (baseie-se em `.env.example`) **antes** do deploy. O compose
-repassa as variáveis para o container e fixa `DATABASE_URL=file:/data/db/dev.db`
+repassa as variáveis para o container e fixa `DATABASE_URL=file:/data/db/prod.db`
 (volume persistido).
 
 ```bash
@@ -106,8 +106,8 @@ JIRA_PROJECT_KEY=EITATI
 ## Exposição (opcional)
 
 O ingresso em produção pode ser feito via **Cloudflare Tunnel**, sem abrir a porta
-`3000` no host. O tunnel aponta para `http://app:3000` (rede do compose). O
-`ports: "3000:3000"` serve para checagens locais (`curl`) e pode ser omitido se o
+`3100` no host. O tunnel aponta para `http://app:3000` (rede do compose). O
+`ports: "3100:3000"` serve para checagens locais (`curl`) e pode ser omitido se o
 túnel for o único ingress.
 
 ## Branding pós-deploy
@@ -155,7 +155,7 @@ Backup:
 
 ```bash
 docker compose exec app sh -c \
-  "DB_PATH=/data/db/dev.db UPLOADS_DIR=/app/data/uploads BACKUP_DIR=/backups sh /app/scripts/backup.sh /backups"
+  "DB_PATH=/data/db/prod.db UPLOADS_DIR=/app/data/uploads BACKUP_DIR=/backups sh /app/scripts/backup.sh /backups"
 ```
 
 > **Nota para o Modo B:** Se estiver utilizando o Modo B (Build local), lembre-se de adicionar `-f docker-compose.local.yml` antes do comando `exec` (ex: `docker compose -f docker-compose.local.yml exec app ...`).
@@ -167,7 +167,7 @@ Restauração (informe o `<TIMESTAMP>` do backup, visto no nome do arquivo):
 
 ```bash
 docker compose exec app sh -c \
-  "DB_PATH=/data/db/dev.db UPLOADS_DIR=/app/data/uploads BACKUP_DIR=/backups sh /app/scripts/restore.sh <TIMESTAMP>"
+  "DB_PATH=/data/db/prod.db UPLOADS_DIR=/app/data/uploads BACKUP_DIR=/backups sh /app/scripts/restore.sh <TIMESTAMP>"
 ```
 
 Detalhes do banco: [`docs/dev/BANCO-DE-DADOS.md`](../../docs/dev/BANCO-DE-DADOS.md).
@@ -202,7 +202,7 @@ As migrações rodam automaticamente no startup (`start.sh`). Os volumes (`uploa
 
 ## Notas técnicas
 
-- A imagem usa `node:22-alpine` e reconstrói `better-sqlite3` no build; o `.npmrc`
+- A imagem usa `node:24-alpine` e reconstrói `better-sqlite3` no build; o `.npmrc`
   com `shamefully-hoist=true` é necessário para os módulos nativos.
 - `next.config.ts` **não** usa `output: 'standalone'` — o container roda com o
   `node_modules` completo do projeto.

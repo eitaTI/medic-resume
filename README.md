@@ -40,7 +40,7 @@ O formulário de cadastro de clínicas é composto por 4 etapas estruturadas:
 ## 🛠️ Início Rápido (Desenvolvimento Local)
 
 ### Pré-requisitos
-- **Node.js 22+**
+- **Node.js 24+**
 - **pnpm** (gerenciador padrão recomendado)
 
 ```bash
@@ -182,7 +182,7 @@ Os scripts utilitários salvam uma cópia fria compactada e segura do banco de d
 ### Como rodar o Backup manualmente dentro do container Docker
 ```bash
 docker compose exec app sh -c \
-  "DB_PATH=/data/db/dev.db UPLOADS_DIR=/app/data/uploads BACKUP_DIR=/backups sh /app/scripts/backup.sh /backups"
+  "DB_PATH=/data/db/prod.db UPLOADS_DIR=/app/data/uploads BACKUP_DIR=/backups sh /app/scripts/backup.sh /backups"
 ```
 *Este script salva os pacotes no diretório `/backups` montado e configurado no host e remove de forma automatizada qualquer backup que exceda a retenção padrão de **30 dias**.*
 
@@ -190,7 +190,7 @@ docker compose exec app sh -c \
 ```bash
 # Identifique o timestamp desejado e execute:
 docker compose exec app sh -c \
-  "DB_PATH=/data/db/dev.db UPLOADS_DIR=/app/data/uploads BACKUP_DIR=/backups sh /app/scripts/restore.sh <TIMESTAMP>"
+  "DB_PATH=/data/db/prod.db UPLOADS_DIR=/app/data/uploads BACKUP_DIR=/backups sh /app/scripts/restore.sh <TIMESTAMP>"
 ```
 
 ---
