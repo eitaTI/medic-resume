@@ -119,17 +119,31 @@ export async function submeterFormulario(formData: FormData) {
       const laudo = formData.get(`exames[${i}].laudo`) as File | null
       const topicos = (formData.get(`exames[${i}].topicos`) as string | null)?.trim() || null
 
-      const temPdf = laudo instanceof File && laudo.size > 0
+      const temArquivo = laudo instanceof File && laudo.size > 0
       const temTopicos = !!topicos && topicos.length > 0
 
-      if (!temPdf && !temTopicos) {
-        return { erro: 'Cada exame precisa de um laudo (PDF) ou de tópicos de conteúdo.' }
+      if (!temArquivo && !temTopicos) {
+        return {
+          erro: 'Cada exame precisa de um laudo (PDF ou imagem) ou de tópicos de conteúdo.'
+        }
       }
 
-      if (temPdf) {
-        const isPdf = laudo!.type === 'application/pdf' || laudo!.name.toLowerCase().endsWith('.pdf')
-        if (!isPdf) {
-          return { erro: 'O laudo deve ser um arquivo PDF.' }
+      if (temArquivo) {
+        const tiposPermitidos = [
+          'application/pdf',
+          'image/png',
+          'image/jpeg',
+          'image/webp',
+        ]
+
+        const isArquivoValido =
+          tiposPermitidos.includes(laudo.type) ||
+          /\.(pdf|png|jpe?g|webp)$/i.test(laudo.name)
+
+        if (!isArquivoValido) {
+          return {
+            erro: 'O laudo deve ser um arquivo PDF, PNG, JPG, JPEG ou WEBP.'
+          }
         }
       }
     }
