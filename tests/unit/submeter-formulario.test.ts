@@ -98,7 +98,7 @@ describe('submeterFormulario (público)', () => {
     const fd = montarFormDataValido()
     fd.delete('exames[0].laudo')
     const r = await submeterFormulario(fd)
-    expect(r).toHaveProperty('erro', 'Cada exame precisa de um laudo (PDF) ou de tópicos de conteúdo.')
+    expect(r).toHaveProperty('erro', 'Cada exame precisa de um laudo (PDF ou imagem) ou de tópicos de conteúdo.')
   })
 
   it('aceita exame somente com tópicos (Gap 2)', async () => {
@@ -109,11 +109,11 @@ describe('submeterFormulario (público)', () => {
     expect(r).toEqual({ sucesso: true })
   })
 
-  it('retorna erro quando o laudo não é PDF (Gap 2)', async () => {
-    const fd = montarFormDataValido()
-    fd.set('exames[0].laudo', lerArquivoFixture('logo.png'))
-    const r = await submeterFormulario(fd)
-    expect(r).toHaveProperty('erro', 'O laudo deve ser um arquivo PDF.')
+  it('aceita laudo em PNG (Gap 2)', async () => {
+   const fd = montarFormDataValido()
+   fd.set('exames[0].laudo', lerArquivoFixture('logo.png'))
+   const r = await submeterFormulario(fd)
+   expect(r).toEqual({ sucesso: true })
   })
 
   it('respeita a quantidadeMedicos enviada pelo cliente (Gap 3)', async () => {
