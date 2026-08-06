@@ -242,6 +242,27 @@ export default async function DetalheSubmissaoPage({ params }: Props) {
                     </a>
                   )}
                 </div>
+                {exame.topicos && (
+                  <div className="mt-3">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">
+                      Tópicos de conteúdo
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {exame.topicos
+                        .split('-')
+                        .map((t) => t.trim())
+                        .filter(Boolean)
+                        .map((topico, ti) => (
+                          <span
+                            key={ti}
+                            className="inline-flex items-center rounded-full bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 dark:bg-blue-900/40 dark:text-blue-200"
+                          >
+                            {topico}
+                          </span>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>

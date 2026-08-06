@@ -51,6 +51,18 @@ describe('criarCardJira', () => {
     expect(Array.isArray(payload.fields.description.content)).toBe(true)
   })
 
+  it('inclui os tópicos de conteúdo dos exames na descrição', async () => {
+    createIssue.mockResolvedValue({ key: 'EITATI-3' })
+    await criarCardJira(
+      clinicaBase({ exames: [{ nome: 'Raio-X de Tórax', topicos: 'Tórax - Pulmão - Conclusão' }] }),
+    )
+    const payload = createIssue.mock.calls[0][0]
+    const textos = (payload.fields.description.content as { content: { text: string }[] }[])
+      .map((p) => p.content.map((t) => t.text).join(''))
+      .join('\n')
+    expect(textos).toContain('- Raio-X de Tórax | Tópicos: Tórax - Pulmão - Conclusão')
+  })
+
   it('propaga erro quando a API do Jira falha', async () => {
     createIssue.mockRejectedValue(new Error('boom'))
     await expect(criarCardJira(clinicaBase())).rejects.toThrow('boom')
