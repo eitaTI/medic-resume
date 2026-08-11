@@ -19,7 +19,7 @@ export interface ClinicaParaJira {
   cabecalhoLaudo?: string | null
   rodapeLaudo?: string | null
   medicos: { nome: string; documento: string; email: string; tipo: string; assinaturaPath?: string | null }[]
-  exames: { nome: string; laudoPath?: string | null }[]
+  exames: { nome: string; laudoPath?: string | null; topicos?: string | null }[]
   dispositivos: { tipo: string; marca: string; modelo: string; numeroSerie: string }[]
 }
 
@@ -59,7 +59,9 @@ function montarDescricao(clinica: ClinicaParaJira): ADFParagraph[] {
   if (clinica.exames.length > 0) {
     bloco.push(paragrafo('Exames:', true))
     for (const exame of clinica.exames) {
-      bloco.push(paragrafo(`- ${exame.nome}${exame.laudoPath ? ' (laudo anexo)' : ''}`))
+      const anexo = exame.laudoPath ? ' (laudo anexo)' : ''
+      const topicos = exame.topicos ? ` | Tópicos: ${exame.topicos}` : ''
+      bloco.push(paragrafo(`- ${exame.nome}${anexo}${topicos}`))
     }
   }
 

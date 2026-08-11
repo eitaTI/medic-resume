@@ -107,6 +107,13 @@ describe('submeterFormulario (público)', () => {
     fd.set('exames[0].topicos', 'Tópico A - Tópico B')
     const r = await submeterFormulario(fd)
     expect(r).toEqual({ sucesso: true })
+
+    const clinica = await prisma.clinica.findFirst({
+      orderBy: { id: 'desc' },
+      include: { exames: true },
+    })
+    expect(clinica?.exames[0]?.topicos).toBe('Tópico A - Tópico B')
+    expect(clinica?.exames[0]?.laudoPath).toBeNull()
   })
 
   it('aceita laudo em PNG (Gap 2)', async () => {
