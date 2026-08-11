@@ -68,7 +68,7 @@ export async function aprovarSubmissao(id: number) {
       },
       include: {
         medicos: { select: { nome: true, documento: true, email: true, tipo: true, assinaturaPath: true } },
-        exames: { select: { nome: true, laudoPath: true } },
+        exames: { select: { nome: true, laudoPath: true, topicos: true } },
         dispositivos: { select: { tipo: true, marca: true, modelo: true, numeroSerie: true } },
       },
     })
@@ -135,7 +135,7 @@ export async function sincronizarJira(id: number) {
       where: { id },
       include: {
         medicos: { select: { nome: true, documento: true, email: true, tipo: true, assinaturaPath: true } },
-        exames: { select: { nome: true, laudoPath: true } },
+        exames: { select: { nome: true, laudoPath: true, topicos: true } },
         dispositivos: { select: { tipo: true, marca: true, modelo: true, numeroSerie: true } },
       },
     })

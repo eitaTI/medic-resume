@@ -121,9 +121,9 @@ export function StepExames() {
               {temLaudo && (
                 <div className="space-y-1">
                   <FileUpload
-                    label="PDF do Laudo"
-                    accept=".pdf"
-                    acceptHint="Apenas arquivos PDF"
+                    label="Laudo"
+                    accept=".pdf,image/png,image/jpeg,image/webp"
+                    acceptHint="PDF, PNG, JPG, JPEG ou WEBP"
                     onFile={(file) => setValue(`exames.${index}.laudo`, file, { shouldValidate: true })}
                   />
                   {errors.exames?.[index]?.temLaudo?.message && (
