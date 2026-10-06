@@ -2,6 +2,7 @@
 
 import { useState, useRef, useId } from 'react'
 import Image from 'next/image'
+import { MAX_ARQUIVO_MB } from '@/lib/limites'
 
 interface FileUploadProps {
   label: string
@@ -11,7 +12,7 @@ interface FileUploadProps {
   onFile: (file: File) => void
 }
 
-export function FileUpload({ label, accept, acceptHint, maxSizeMB = 10, onFile }: FileUploadProps) {
+export function FileUpload({ label, accept, acceptHint, maxSizeMB = MAX_ARQUIVO_MB, onFile }: FileUploadProps) {
   const [preview, setPreview] = useState<string | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
   const [erro, setErro] = useState<string | null>(null)
@@ -26,7 +27,7 @@ export function FileUpload({ label, accept, acceptHint, maxSizeMB = 10, onFile }
 
     const maxBytes = maxSizeMB * 1024 * 1024
     if (file.size > maxBytes) {
-      setErro(`Arquivo muito grande. Máximo ${maxSizeMB}MB.`)
+      setErro(`O arquivo ultrapassou o limite de ${maxSizeMB}MB. Selecione um arquivo menor.`)
       return
     }
 

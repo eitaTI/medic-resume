@@ -15,6 +15,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { submeterFormulario } from '@/actions/submeter-formulario'
 import { schemaFormulario } from '@/lib/validacoes'
 import type { FormularioValues } from '@/lib/validacoes'
+import { MAX_SUBMISSAO_MB, paraMegabytes } from '@/lib/limites'
 import { useDraftPersistence } from '@/hooks/useDraftPersistence'
 import { useBranding } from '@/components/providers/BrandingProvider'
 const LABELS = ['Clínica', 'Usuários', 'Exames', 'Equipamentos']
@@ -111,9 +112,32 @@ export default function FormularioPage() {
 
   const [resultado, formAction, isPending] = useActionState(
     async () => {
-      const res = await submeterFormulario(montarFormData())
-      if (res && 'sucesso' in res) limparRascunho()
-      return res
+      const fd = montarFormData()
+
+      const bytesDosArquivos = [...fd.values()].reduce(
+        (total, entry) => total + (entry instanceof File ? entry.size : 0),
+        0,
+      )
+
+      if (bytesDosArquivos > MAX_SUBMISSAO_MB * 1024 * 1024) {
+        return {
+          erro: `A submissão ultrapassou o limite de ${MAX_SUBMISSAO_MB}MB: os arquivos somam ${paraMegabytes(bytesDosArquivos)}MB. Remova ou reduza os arquivos antes de enviar.`,
+        }
+      }
+
+      try {
+        const res = await submeterFormulario(fd)
+        if (res && 'sucesso' in res) limparRascunho()
+        return res
+      } catch (e) {
+        const mensagem = e instanceof Error ? e.message : ''
+        if (/body|payload|413|exceed|size/i.test(mensagem)) {
+          return {
+            erro: `A submissão ultrapassou o limite de ${MAX_SUBMISSAO_MB}MB. Remova ou reduza os arquivos e tente novamente.`,
+          }
+        }
+        return { erro: 'Não foi possível enviar o cadastro. Verifique sua conexão e tente novamente.' }
+      }
     },
     null,
   )
