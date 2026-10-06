@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { MAX_SUBMISSAO_MB } from "./lib/limites";
 
 const nextConfig: NextConfig = {
   typescript: {
@@ -6,7 +7,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     serverActions: {
-      bodySizeLimit: "35mb",
+      bodySizeLimit: `${MAX_SUBMISSAO_MB}mb`,
     },
   },
   async rewrites() {
