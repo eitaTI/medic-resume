@@ -28,11 +28,13 @@ Compact guidance for OpenCode sessions. For full context read `docs/dev/ARQUITET
 ## Build / deploy quirks
 - `next.config.ts` must not remove `rewrites` (branding cache-busting). The Docker build copies full `node_modules` (no standalone output).
 - `.npmrc` has `shamefully-hoist=true` (required for native deps like `better-sqlite3`/`prisma`). Keep it.
+- `pnpm-workspace.yaml` holds the `overrides` pinning patched versions for transitive deps (sec). The `Dockerfile` copies it into the build context — keep that COPY line or `pnpm install --frozen-lockfile` fails with `ERR_PNPM_LOCKFILE_CONFIG_MISMATCH`.
+- Uploads: `lib/limites.ts` defines `MAX_ARQUIVO_MB` (10) and `MAX_SUBMISSAO_MB` (35); the server side enforces the submission cap via `next.config.ts` `experimental.serverActions.bodySizeLimit`.
 - Uploads live in `data/uploads/` (outside `public/`, LGPD) and are served via `/api/uploads`.
 
 ## Git / workflow
 - Branches: `tipo/tarefa-curta` (e.g. `feat/jira`). Commits: `tipo(escopo): descrição`.
-- Per-phase implementation status lives in `docs/projeto/fases/index.md` and `docs/projeto/fases/fase-N/` — consult before assuming a feature is implemented or pending.
+- The old per-phase docs (`docs/projeto/fases/`) were removed in `64b0942` — don't expect them to exist.
 
 ## Skills (auto-loaded on demand)
 OpenCode discovers skills in `.opencode/skills/<name>/SKILL.md` at session start and lists
@@ -40,6 +42,5 @@ them in `<available_skills>`. **Load the relevant one via the `skill` tool whene
 matches its description** — no manual/user command needed. Current skills:
 - `prisma-workflow` — Prisma v7 + SQLite (better-sqlite3) schema/migration/seed.
 - `server-action` — Server Actions (`'use server'`, result objects) and `useActionState` UI.
-- `fase-status` — check `docs/projeto/fases/` before assuming a feature is implemented.
 - `jira-integration` — Fase 5 Jira scope (fail-open, `jiraSyncStatus`, `sincronizarJira`).
 - `admin-management` — manage admin users via Better Auth `User` (`actions/admins.ts`, no `Admin` model).
