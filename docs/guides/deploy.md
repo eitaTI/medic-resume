@@ -204,6 +204,23 @@ As migrações rodam automaticamente no startup (`start.sh`). Os volumes (`uploa
 
 - A imagem usa `node:24-alpine` e reconstrói `better-sqlite3` no build; o `.npmrc`
   com `shamefully-hoist=true` é necessário para os módulos nativos.
+- O `pnpm-workspace.yaml` (no repo) concentra os `overrides` de dependências
+  transitivas e **deve** ser copiado junto no build — o `Dockerfile` já faz isso
+  (`COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./`). Remover essa linha
+  quebra o `pnpm install --frozen-lockfile` com `ERR_PNPM_LOCKFILE_CONFIG_MISMATCH`.
 - `next.config.ts` **não** usa `output: 'standalone'` — o container roda com o
   `node_modules` completo do projeto.
 - O app escuta em `0.0.0.0:3000` dentro do container.
+
+## Limites de upload
+
+Os envios de arquivos obedecem a dois limites (`lib/limites.ts`):
+
+| Limite | Valor | Onde é aplicado |
+|--------|-------|-----------------|
+| Tamanho por arquivo | **10 MB** | Validação no cliente (`FileUpload`) e no servidor |
+| Tamanho total da submissão | **35 MB** | Enforced no servidor: `next.config.ts` → `experimental.serverActions.bodySizeLimit: "35mb"` |
+
+> Quando um arquivo individual passa de 10 MB, o cliente mostra erro inline e impede o envio.
+> Se a soma dos arquivos ultrapassar 35 MB, a submissão é recusada com mensagem no próprio formulário.
+> Ajustes nesses limites exigem alterar `lib/limites.ts` e o `bodySizeLimit` em `next.config.ts` (e rebuild da imagem).
