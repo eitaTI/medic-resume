@@ -2,7 +2,7 @@
 FROM node:24-alpine AS builder
 WORKDIR /app
 RUN apk add --no-cache openssl python3 make g++
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN corepack enable && pnpm install --frozen-lockfile --ignore-scripts
 RUN pnpm rebuild better-sqlite3
 COPY . .
