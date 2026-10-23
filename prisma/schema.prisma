@@ -70,6 +70,8 @@ model Clinica {
   cepClinica        String?
   enderecoClinica   String?
   quantidadeMedicos Int @default(1)
+  vendedor          String?
+  tipoProcesso      String?
   logoPath          String?
   cabecalhoLaudo    String?   @default("")
   rodapeLaudo       String?   @default("")
@@ -112,7 +114,7 @@ model Dispositivo {
   tipo        String
   marca       String
   modelo      String
-  numeroSerie String
+  numeroSerie String?
 }
 
 model AuditLog {

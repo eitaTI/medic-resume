@@ -124,9 +124,21 @@ describe('schemaFormulario (agregado client-side)', () => {
     cabecalhoLaudo: 'Cabeçalho',
     rodapeLaudo: 'Rodapé',
     quantidadeMedicos: 1,
+    vendedor: 'Alyson Alves',
+    tipoProcesso: 'Implantação nova Zscan',
     usuarios: [{ nome: 'Dr. A', documento: '123', email: 'a@b.com', tipo: 'examinador', temAssinatura: false }],
     equipamentos: [{ tipo: 'Ultrassom', marca: 'M', modelo: 'X', numeroSerie: 'SN' }],
   }
+
+  it('aceita equipamento sem número de série (vira S/N no MCP)', () => {
+    const r = schemaFormulario.safeParse({
+      ...base,
+      usuarios: [{ nome: 'Dr. B', documento: '456', email: 'b@b.com', tipo: 'examinador', temAssinatura: false }],
+      equipamentos: [{ tipo: 'Ultrassom', marca: 'M', modelo: 'X' }],
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A' }],
+    })
+    expect(r.success).toBe(true)
+  })
 
   it('aceita exame com laudo PDF (File)', () => {
     const r = schemaFormulario.safeParse({
@@ -166,6 +178,94 @@ describe('schemaFormulario (agregado client-side)', () => {
       usuarios: [],
       equipamentos: [],
       exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A' }],
+    })
+    expect(r.success).toBe(false)
+  })
+
+  it('dispensa CPF do titular quando há CNPJ válido', () => {
+    const r = schemaFormulario.safeParse({
+      ...base,
+      documentoTitular: '',
+      cnpjEmpresa: '09.587.107/0002-33',
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A' }],
+    })
+    expect(r.success).toBe(true)
+  })
+
+  it('exige CPF do titular sem CNPJ (pessoa física)', () => {
+    const r = schemaFormulario.safeParse({
+      ...base,
+      documentoTitular: '',
+      cnpjEmpresa: '',
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A' }],
+    })
+    expect(r.success).toBe(false)
+    if (!r.success) {
+      expect(r.error.issues.some((i) => String(i.path).includes('documentoTitular'))).toBe(true)
+    }
+  })
+
+  it('rejeita CPF zerado como documento', () => {
+    const r = schemaFormulario.safeParse({
+      ...base,
+      documentoTitular: '000.000.000-00',
+      cnpjEmpresa: '',
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A' }],
+    })
+    expect(r.success).toBe(false)
+  })
+
+  it('exige vendedor e tipo de processo', () => {
+    const r = schemaFormulario.safeParse({
+      ...base,
+      vendedor: '',
+      tipoProcesso: '',
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A' }],
+    })
+    expect(r.success).toBe(false)
+  })
+
+  it('exige nome livre quando vendedor é Outros', () => {
+    const semOutro = schemaFormulario.safeParse({
+      ...base,
+      vendedor: 'Outros',
+      tipoProcesso: 'Implantação nova Zscan',
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A' }],
+    })
+    expect(semOutro.success).toBe(false)
+    const comOutro = schemaFormulario.safeParse({
+      ...base,
+      vendedor: 'Outros',
+      vendedorOutro: 'Parceiro Local',
+      tipoProcesso: 'Implantação nova Zscan',
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A' }],
+    })
+    expect(comOutro.success).toBe(true)
+  })
+
+  it('rejeita mesma pessoa cadastrada 2 vezes (superRefine)', () => {
+    const r = schemaFormulario.safeParse({
+      ...base,
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A' }],
+      usuarios: [
+        { nome: 'Evah Lumi', documento: '24034-SC', email: 'a@b.com', tipo: 'examinador', temAssinatura: false },
+        { nome: 'evah  lumi', documento: '24034-SC', email: 'a@b.com', tipo: 'solicitante', temAssinatura: false },
+      ],
+    })
+    expect(r.success).toBe(false)
+    if (!r.success) {
+      expect(r.error.issues.some((i) => String(i.message).includes('apenas um cadastro por pessoa'))).toBe(true)
+    }
+  })
+
+  it('rejeita nomes iguais mesmo com documentos diferentes', () => {
+    const r = schemaFormulario.safeParse({
+      ...base,
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A' }],
+      usuarios: [
+        { nome: 'Maria Silva', documento: '111', email: 'a@b.com', tipo: 'examinador', temAssinatura: false },
+        { nome: 'Maria Silva', documento: '222', email: 'b@b.com', tipo: 'recepcao', temAssinatura: false },
+      ],
     })
     expect(r.success).toBe(false)
   })

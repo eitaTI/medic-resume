@@ -4,8 +4,10 @@ import { useState, useCallback, useEffect } from 'react'
 import type { ChangeEvent } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { Input } from '@/components/ui/Input'
+import { Select } from '@/components/ui/Select'
 import { FileUpload } from '@/components/ui/FileUpload'
 import type { FormularioValues } from '@/lib/validacoes'
+import { VENDEDORES_PADRAO, TIPOS_PROCESSO_PADRAO } from '@/lib/listas'
 
 function formatCPF(value: string): string {
   const digits = value.replace(/\D/g, '').slice(0, 11)
@@ -98,6 +100,19 @@ export function StepClinica() {
 
   const watchPossuiCnpj = watch('possuiCnpj') as boolean | undefined
   const possuiCnpj = watchPossuiCnpj ?? null
+  const watchVendedor = watch('vendedor') as string | undefined
+  const [vendedores, setVendedores] = useState<string[]>(VENDEDORES_PADRAO)
+  const [tiposProcesso, setTiposProcesso] = useState<string[]>(TIPOS_PROCESSO_PADRAO)
+
+  useEffect(() => {
+    fetch('/api/opcoes-cadastro')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d && Array.isArray(d.vendedores) && d.vendedores.length > 0) setVendedores(d.vendedores)
+        if (d && Array.isArray(d.tiposProcesso) && d.tiposProcesso.length > 0) setTiposProcesso(d.tiposProcesso)
+      })
+      .catch(() => {})
+  }, [])
   const watchCepClinica = watch('cepClinica') as string | undefined
   const watchCnpjEmpresa = watch('cnpjEmpresa') as string | undefined
 
@@ -226,6 +241,33 @@ export function StepClinica() {
       <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Dados do Titular</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Select
+          label="Vendedor responsável"
+          {...register('vendedor')}
+          opcoes={[{ value: '', label: 'Selecione...' }, ...vendedores.map((v) => ({ value: v, label: v }))]}
+          erro={errors.vendedor?.message as string | undefined}
+          required
+        />
+        <Select
+          label="Tipo de processo"
+          {...register('tipoProcesso')}
+          opcoes={[{ value: '', label: 'Selecione...' }, ...tiposProcesso.map((t) => ({ value: t, label: t }))]}
+          erro={errors.tipoProcesso?.message as string | undefined}
+          required
+        />
+      </div>
+
+      {watchVendedor?.trim().toLowerCase() === 'outros' && (
+        <Input
+          label="Outro vendedor (nome)"
+          placeholder="Nome do vendedor"
+          {...register('vendedorOutro')}
+          erro={errors.vendedorOutro?.message as string | undefined}
+          required
+        />
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input
           label="Nome do Titular (completo)"
           {...register('nomeTitular')}
@@ -253,13 +295,13 @@ export function StepClinica() {
           required
         />
         <Input
-          label="CPF do Titular"
+          label={possuiCnpj === true ? 'CPF do Titular (opcional com CNPJ)' : 'CPF do Titular'}
           placeholder="000.000.000-00"
           {...register('documentoTitular')}
           value={formatCPF(watch('documentoTitular') ?? '')}
           onChange={(e) => handleMaskedChange(e, 'documentoTitular', 11, formatCPF)}
           erro={errors.documentoTitular?.message}
-          required
+          required={possuiCnpj !== true}
         />
       </div>
 

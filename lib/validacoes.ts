@@ -6,12 +6,27 @@ export const schemaClinica = z.object({
   nomeTitular: z.string().min(10, 'O nome completo do titular deve ter no mínimo 10 caracteres'),
   emailTitular: z.string().email('Email do titular inválido'),
   celularTitular: z.string().refine((val) => val.replace(/\D/g, '').length === 11, 'Celular deve ser preenchido integralmente'),
-  documentoTitular: z.string().refine((val) => val.replace(/\D/g, '').length === 11, 'CPF do titular deve ser preenchido integralmente'),
+  documentoTitular: z.string().optional(),
   cnpjEmpresa: z.string().optional().refine((val) => !val || val.replace(/\D/g, '').length === 14, 'CNPJ deve ser preenchido integralmente'),
   cepClinica: z.string().optional(),
   enderecoClinica: z.string().optional(),
   possuiCnpj: z.boolean().optional(),
   quantidadeMedicos: z.coerce.number().int().min(1, 'Informe ao menos 1 médico').default(1),
+  vendedor: z.string().optional(),
+  tipoProcesso: z.string().optional(),
+}).superRefine((data, ctx) => {
+  // CPF obrigatório só para pessoa física (sem CNPJ válido): com CNPJ, o
+  // documento do titular é opcional (zeros = não informado).
+  const temCnpj = !!data.cnpjEmpresa && data.cnpjEmpresa.replace(/\D/g, '').length === 14
+  const cpfDigitos = (data.documentoTitular ?? '').replace(/\D/g, '')
+  const cpfZerado = cpfDigitos.length > 0 && /^0+$/.test(cpfDigitos)
+  if (!temCnpj && (cpfDigitos.length !== 11 || cpfZerado)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'CPF do titular deve ser preenchido integralmente (11 dígitos).',
+      path: ['documentoTitular'],
+    })
+  }
 })
 
 export const schemaMedico = z.object({
@@ -33,7 +48,7 @@ export const schemaDispositivo = z.object({
   tipo: z.string().min(1, 'Tipo do dispositivo é obrigatório'),
   marca: z.string().min(1, 'Marca do dispositivo é obrigatório'),
   modelo: z.string().min(1, 'Modelo do dispositivo é obrigatório'),
-  numeroSerie: z.string().min(1, 'Número de série do dispositivo é obrigatório'),
+  numeroSerie: z.string().optional(), // Opcional: vazio vira S/N no MCP
 })
 
 export const schemaFormulario = z.object({
@@ -44,7 +59,7 @@ export const schemaFormulario = z.object({
   nomeTitular: z.string().min(10, 'O nome completo do titular deve ter no mínimo 10 caracteres'), // Override to be required
   emailTitular: z.string().email('Email do titular inválido'), // Keep same as schemaClinica
   celularTitular: z.string().refine((val) => val.replace(/\D/g, '').length === 11, 'Celular deve ser preenchido integralmente'), // Keep same as schemaClinica
-  documentoTitular: z.string().refine((val) => val.replace(/\D/g, '').length === 11, 'CPF do titular deve ser preenchido integralmente'), // Keep same as schemaClinica
+  documentoTitular: z.string().optional(), // Obrigatório só p/ pessoa física (regra no superRefine: dispensado com CNPJ)
   cnpjEmpresa: z.string().optional().refine((val) => !val || val.replace(/\D/g, '').length === 14, 'CNPJ deve ser preenchido integralmente'), // Keep same as schemaClinica
   cepClinica: z.string().refine((val) => val.replace(/\D/g, '').length === 8, 'CEP deve ser preenchido integralmente'), // Make required (was optional in schemaClinica)
   enderecoClinica: z.string().min(1, 'Endereço é obrigatório'), // Make required (was optional in schemaClinica)
@@ -52,6 +67,9 @@ export const schemaFormulario = z.object({
   cabecalhoLaudo: z.string().min(1, 'Cabeçalho do laudo é obrigatório'), // New field
   rodapeLaudo: z.string().min(1, 'Rodapé do laudo é obrigatório'), // New field
   quantidadeMedicos: z.number().int().min(1, 'Informe ao menos 1 médico'), // Change from coerce.number() to number() and remove default
+  vendedor: z.string().min(1, 'Selecione o vendedor responsável'),
+  vendedorOutro: z.string().optional(),
+  tipoProcesso: z.string().min(1, 'Selecione o tipo de processo'),
   
   // Reference schemaMedico but add temAssinatura field
   usuarios: z
@@ -77,6 +95,53 @@ export const schemaFormulario = z.object({
     .min(1),
 })
   .superRefine((data, ctx) => {
+    // CPF obrigatório só para pessoa física: com CNPJ válido, é opcional
+    // (zeros = não informado, nunca um documento real).
+    const temCnpj = !!data.cnpjEmpresa && data.cnpjEmpresa.replace(/\D/g, '').length === 14
+    const cpfDigitos = (data.documentoTitular ?? '').replace(/\D/g, '')
+    const cpfZerado = cpfDigitos.length > 0 && /^0+$/.test(cpfDigitos)
+    if (!temCnpj && (cpfDigitos.length !== 11 || cpfZerado)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'CPF do titular deve ser preenchido integralmente (11 dígitos).',
+        path: ['documentoTitular'],
+      })
+    }
+
+    // "Outros" exige o nome livre do vendedor.
+    if (typeof data.vendedor === 'string' && data.vendedor.trim().toLowerCase() === 'outros' && !data.vendedorOutro?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Informe o nome do vendedor em "Outro vendedor".',
+        path: ['vendedorOutro'],
+      })
+    }
+
+    // Mesma pessoa cadastrada N vezes: o Zscan aceita 1 login por cadastro e
+    // rejeita nomes exatamente iguais — manter duplicata quebra a criação do
+    // ambiente. Uma entrada por pessoa (o MCP elege o papel de maior prioridade).
+    const normalizar = (nome: string) =>
+      nome
+        .normalize('NFD')
+        .replace(/[̀-ͯ]/g, '')
+        .toLowerCase()
+        .replace(/\s+/g, ' ')
+        .trim()
+    const vistos = new Map<string, number>()
+    ;(data.usuarios ?? []).forEach((u, i) => {
+      const chave = normalizar(u.nome ?? '')
+      if (!chave) return
+      if (vistos.has(chave)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Médico "${u.nome}" aparece mais de uma vez — mantenha apenas um cadastro por pessoa (o papel principal vale; os demais são do mesmo login).`,
+          path: ['usuarios', i, 'nome'],
+        })
+      } else {
+        vistos.set(chave, i)
+      }
+    })
+
     data.exames?.forEach((exame, i) => {
       const temPdf = exame.temLaudo === true
       const temTop = exame.temTopicos === true

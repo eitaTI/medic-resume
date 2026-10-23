@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs'
-import { readFile } from 'node:fs/promises'
+import { mkdir, readFile, writeFile, rm } from 'node:fs/promises'
 import path from 'node:path'
 import { Version3Client } from 'jira.js'
 
@@ -15,16 +15,35 @@ export interface ClinicaParaJira {
   cepClinica: string | null
   enderecoClinica: string | null
   quantidadeMedicos: number
+  vendedor?: string | null
+  tipoProcesso?: string | null
   logoPath?: string | null
   cabecalhoLaudo?: string | null
   rodapeLaudo?: string | null
   medicos: { nome: string; documento: string; email: string; tipo: string; assinaturaPath?: string | null }[]
   exames: { nome: string; laudoPath?: string | null; topicos?: string | null }[]
-  dispositivos: { tipo: string; marca: string; modelo: string; numeroSerie: string }[]
+  dispositivos: { tipo: string; marca: string; modelo: string; numeroSerie: string | null }[]
 }
 
 type ADFText = { type: 'text'; text: string; marks?: { type: 'strong' }[] }
 type ADFParagraph = { type: 'paragraph'; content: ADFText[] }
+
+/** Rótulo curto para o título do card: primeira palavra do tipo ("Implantação", "Atualização"). */
+function rotuloTipoProcesso(tipoProcesso: string | null | undefined): string {
+  const primeira = (tipoProcesso ?? '').trim().split(/\s+/)[0]
+  return primeira ? `[${primeira}] ` : ''
+}
+
+/** Slug seguro para label do Jira (sem espaços/acentos): "Amanda Araújo" -> "vendedor-amanda-araujo". */
+function slugifyLabel(valor: string | null | undefined, prefixo: string): string | null {
+  const slug = (valor ?? '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+  return slug ? `${prefixo}-${slug}` : null
+}
 
 function paragrafo(texto: string, negrito = false): ADFParagraph {
   const node: ADFText = { type: 'text', text: texto }
@@ -59,7 +78,7 @@ function montarDescricao(clinica: ClinicaParaJira): ADFParagraph[] {
   if (clinica.exames.length > 0) {
     bloco.push(paragrafo('Exames:', true))
     for (const exame of clinica.exames) {
-      const anexo = exame.laudoPath ? ' (laudo anexo)' : ''
+      const anexo = exame.laudoPath ? ` (laudo anexo: ${path.basename(exame.laudoPath)})` : ''
       const topicos = exame.topicos ? ` | Tópicos: ${exame.topicos}` : ''
       bloco.push(paragrafo(`- ${exame.nome}${anexo}${topicos}`))
     }
@@ -68,8 +87,16 @@ function montarDescricao(clinica: ClinicaParaJira): ADFParagraph[] {
   if (clinica.dispositivos.length > 0) {
     bloco.push(paragrafo('Equipamentos:', true))
     for (const d of clinica.dispositivos) {
-      bloco.push(paragrafo(`- ${d.tipo} | ${d.marca} | ${d.modelo} | Série: ${d.numeroSerie}`))
+      const serie = d.numeroSerie?.trim() ? d.numeroSerie : 'S/N (não informada)'
+      bloco.push(paragrafo(`- ${d.tipo} | ${d.marca} | ${d.modelo} | Série: ${serie}`))
     }
+  }
+
+  // Controle interno: relevante para os técnicos, mas NÃO vai para o Zscan.
+  if (clinica.vendedor || clinica.tipoProcesso) {
+    bloco.push(paragrafo('Controle interno (não vai para o Zscan):', true))
+    if (clinica.vendedor) bloco.push(paragrafo(`Vendedor: ${clinica.vendedor}`))
+    if (clinica.tipoProcesso) bloco.push(paragrafo(`Tipo de processo: ${clinica.tipoProcesso}`))
   }
 
   return bloco
@@ -84,6 +111,46 @@ async function anexarArquivo(client: Version3Client, issueKey: string, caminhoRe
     issueIdOrKey: issueKey,
     attachment: { file: buffer, filename: path.basename(abs) },
   })
+}
+
+/**
+ * Espelha os dados estruturados da clínica num JSON anexado ao card.
+ *
+ * PORQUÊ: a descrição do Jira é texto livre para o técnico ler, mas o agente
+ * (MCP `jira_manage get_issue`) precisa dos dados de forma determinística —
+ * sem parsear PT-BR. O JSON viaja junto dos PDFs/logos e é baixado no mesmo lote.
+ */
+function pastaDaSubmissao(clinica: ClinicaParaJira): string | null {
+  const rel = clinica.logoPath
+    ?? clinica.exames.find((e) => e.laudoPath)?.laudoPath
+    ?? clinica.medicos.find((m) => m.assinaturaPath)?.assinaturaPath
+  // data/uploads/<submission>/<tipo>/<arquivo> -> usa o diretório do arquivo
+  if (!rel) return null
+  const dir = path.dirname(rel)
+  return dir && dir !== '.' ? dir : null
+}
+
+async function anexarDadosEstruturados(
+  client: Version3Client,
+  issueKey: string,
+  clinica: ClinicaParaJira,
+): Promise<void> {
+  const pasta = pastaDaSubmissao(clinica) ?? `data/uploads/dados-cliente-${clinica.id}-${Date.now()}`
+  const dir = path.join(process.cwd(), pasta)
+  await mkdir(dir, { recursive: true })
+  const nome = 'dados-cliente.json'
+  const abs = path.join(dir, nome)
+  const payload = JSON.stringify({ ...clinica, geradoEm: new Date().toISOString() }, null, 2)
+  await writeFile(abs, payload, 'utf-8')
+  try {
+    await client.issueAttachments.addAttachment({
+      issueIdOrKey: issueKey,
+      attachment: { file: Buffer.from(payload, 'utf-8'), filename: nome },
+    })
+  } finally {
+    // O JSON vive no Jira a partir daqui; não duplica no disco do servidor.
+    await rm(abs, { force: true }).catch(() => {})
+  }
 }
 
 export async function criarCardJira(clinica: ClinicaParaJira): Promise<string> {
@@ -117,10 +184,15 @@ export async function criarCardJira(clinica: ClinicaParaJira): Promise<string> {
     .map((l) => l.trim())
     .filter(Boolean)
 
+  // Etiquetas de controle: filtram o backlog por vendedor/tipo no Jira.
+  for (const extra of [slugifyLabel(clinica.vendedor, 'vendedor'), slugifyLabel(clinica.tipoProcesso, 'tipo')]) {
+    if (extra && !labels.includes(extra)) labels.push(extra)
+  }
+
   try {
     const issue = await client.issues.createIssue({
       fields: {
-        summary: `Clínica aprovada: ${clinica.nomeClinica}`,
+        summary: `${rotuloTipoProcesso(clinica.tipoProcesso)}Clínica aprovada: ${clinica.nomeClinica}`,
         project: { key: process.env.JIRA_PROJECT_KEY || 'EITATI' },
         issuetype: { name: process.env.JIRA_ISSUE_TYPE || 'Task' },
         labels,
@@ -142,6 +214,7 @@ export async function criarCardJira(clinica: ClinicaParaJira): Promise<string> {
       for (const e of clinica.exames) {
         await anexarArquivo(client, issue.key, e.laudoPath)
       }
+      await anexarDadosEstruturados(client, issue.key, clinica)
     } catch (err) {
       console.error('[Jira] Falha ao anexar arquivos ao card:', err instanceof Error ? err.message : err)
       if (err instanceof Error) console.error('[Jira] Stack:', err.stack)

@@ -27,6 +27,8 @@ function clinicaBase(overrides: Partial<ClinicaParaJira> = {}): ClinicaParaJira 
     cepClinica: '12345678',
     enderecoClinica: 'Rua A',
     quantidadeMedicos: 1,
+    vendedor: 'Alyson Alves',
+    tipoProcesso: 'Implantação nova Zscan',
     medicos: [{ nome: 'Dr', documento: '1', email: 'a@b.com', tipo: 'examinador' }],
     exames: [{ nome: 'Raio-X' }],
     dispositivos: [{ tipo: 'U', marca: 'M', modelo: 'X', numeroSerie: 'SN' }],
@@ -63,6 +65,31 @@ describe('criarCardJira', () => {
     expect(textos).toContain('- Raio-X de Tórax | Tópicos: Tórax - Pulmão - Conclusão')
   })
 
+  it('inclui vendedor, tipo de processo e labels de controle', async () => {
+    createIssue.mockResolvedValue({ key: 'EITATI-5' })
+    await criarCardJira(clinicaBase({}))
+    const payload = createIssue.mock.calls[0][0]
+    const textos = (payload.fields.description.content as { content: { text: string }[] }[])
+      .map((p) => p.content.map((t) => t.text).join(''))
+      .join('\n')
+    expect(textos).toContain('Vendedor: Alyson Alves')
+    expect(textos).toContain('Tipo de processo: Implantação nova Zscan')
+    expect(textos).toContain('Controle interno (não vai para o Zscan)')
+    expect(payload.fields.summary).toBe('[Implantação] Clínica aprovada: Clínica Teste')
+    expect(payload.fields.labels).toContain('vendedor-alyson-alves')
+    expect(payload.fields.labels).toContain('tipo-implantacao-nova-zscan')
+  })
+
+  it('mostra S/N quando o equipamento não tem série', async () => {
+    createIssue.mockResolvedValue({ key: 'EITATI-6' })
+    await criarCardJira(clinicaBase({ dispositivos: [{ tipo: 'U', marca: 'M', modelo: 'X', numeroSerie: null }] }))
+    const payload = createIssue.mock.calls[0][0]
+    const textos = (payload.fields.description.content as { content: { text: string }[] }[])
+      .map((p) => p.content.map((t) => t.text).join(''))
+      .join('\n')
+    expect(textos).toContain('Série: S/N (não informada)')
+  })
+
   it('propaga erro quando a API do Jira falha', async () => {
     createIssue.mockRejectedValue(new Error('boom'))
     await expect(criarCardJira(clinicaBase())).rejects.toThrow('boom')
@@ -73,7 +100,22 @@ describe('criarCardJira', () => {
     addAttachment.mockResolvedValue({})
     const logo = path.join('tests', 'fixtures', 'logo.png')
     await criarCardJira(clinicaBase({ logoPath: logo, medicos: [{ nome: 'Dr', documento: '1', email: 'a@b.com', tipo: 'examinador', assinaturaPath: logo }] }))
-    // anexa logo + assinatura (mesmo arquivo) -> 2 chamadas
-    expect(addAttachment).toHaveBeenCalledTimes(2)
+    // anexa logo + assinatura (mesmo arquivo) + dados-cliente.json -> 3 chamadas
+    expect(addAttachment).toHaveBeenCalledTimes(3)
+    const nomes = addAttachment.mock.calls.map((c) => (c[0] as { attachment: { filename: string } }).attachment.filename)
+    expect(nomes).toContain('logo.png')
+    expect(nomes).toContain('dados-cliente.json')
+  })
+
+  it('inclui o nome do arquivo no marcador de laudo anexo', async () => {
+    createIssue.mockResolvedValue({ key: 'EITATI-4' })
+    await criarCardJira(
+      clinicaBase({ exames: [{ nome: 'Colonoscopia', laudoPath: 'data/uploads/x/laudos/abc.pdf', topicos: 'A - B' }] }),
+    )
+    const payload = createIssue.mock.calls[0][0]
+    const textos = (payload.fields.description.content as { content: { text: string }[] }[])
+      .map((p) => p.content.map((t) => t.text).join(''))
+      .join('\n')
+    expect(textos).toContain('- Colonoscopia (laudo anexo: abc.pdf) | Tópicos: A - B')
   })
 })

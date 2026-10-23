@@ -5,6 +5,7 @@ import path from 'path'
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { schemaClinica, schemaMedico, schemaExame, schemaDispositivo } from '@/lib/validacoes'
+import { getVendedores, getTiposProcesso } from '@/lib/listas'
 
 function extrairArray(formData: FormData, prefix: string): Record<number, Record<string, FormDataEntryValue>> {
   const resultado: Record<number, Record<string, FormDataEntryValue>> = {}
@@ -78,6 +79,27 @@ export async function submeterFormulario(formData: FormData) {
       quantidadeMedicosComputada
     )
 
+    const vendedorSelecionado = ((formData.get('vendedor') as string | null) ?? '').trim()
+    const vendedorOutro = ((formData.get('vendedorOutro') as string | null) ?? '').trim()
+    const tipoProcesso = ((formData.get('tipoProcesso') as string | null) ?? '').trim()
+
+    if (!vendedorSelecionado) return { erro: 'Selecione o vendedor responsável.' }
+    const vendedoresValidos = getVendedores()
+    if (!vendedoresValidos.includes(vendedorSelecionado)) {
+      return { erro: 'Vendedor inválido. Selecione uma das opções da lista.' }
+    }
+    const vendedorFinal = vendedorSelecionado.toLowerCase() === 'outros'
+      ? (vendedorOutro || 'Outros')
+      : vendedorSelecionado
+    if (vendedorSelecionado.toLowerCase() === 'outros' && !vendedorOutro) {
+      return { erro: 'Informe o nome do vendedor em "Outro vendedor".' }
+    }
+
+    if (!tipoProcesso) return { erro: 'Selecione o tipo de processo.' }
+    if (!getTiposProcesso().includes(tipoProcesso)) {
+      return { erro: 'Tipo de processo inválido. Selecione uma das opções da lista.' }
+    }
+
     const cnpjEmpresaRaw = formData.get('cnpjEmpresa') as string | null
     const cnpjEmpresa = cnpjEmpresaRaw && cnpjEmpresaRaw.trim() !== '' ? cnpjEmpresaRaw : undefined
 
@@ -94,11 +116,13 @@ export async function submeterFormulario(formData: FormData) {
       nomeTitular,
       emailTitular: (formData.get('emailTitular') as string) || '',
       celularTitular: (formData.get('celularTitular') as string) || '',
-      documentoTitular: (formData.get('documentoTitular') as string) || '',
+      documentoTitular: (formData.get('documentoTitular') as string) || undefined,
       cnpjEmpresa,
       cepClinica: (formData.get('cepClinica') as string) || undefined,
       enderecoClinica: (formData.get('enderecoClinica') as string) || undefined,
       quantidadeMedicos,
+      vendedor: vendedorFinal,
+      tipoProcesso,
     }
 
     const validacao = schemaClinica.safeParse(dadosClinica)
@@ -152,8 +176,12 @@ export async function submeterFormulario(formData: FormData) {
     const dispositivoIndices = Object.keys(dispositivosRaw).map(Number).sort()
 
     for (const i of dispositivoIndices) {
-      const v = schemaDispositivo.safeParse(dispositivosRaw[i])
+      // Serial vazio = desconhecido (o MCP grava o default S/N).
+      const numeroSerieRaw = (dispositivosRaw[i]?.numeroSerie as string | undefined)?.trim() || undefined
+      const v = schemaDispositivo.safeParse({ ...dispositivosRaw[i], numeroSerie: numeroSerieRaw })
       if (!v.success) return { erro: v.error.issues[0].message }
+      if (numeroSerieRaw) dispositivosRaw[i].numeroSerie = numeroSerieRaw
+      else delete dispositivosRaw[i].numeroSerie
     }
 
     const submissionFolder = `${slugify(validacao.data.nomeClinica)}-${Date.now()}`
@@ -203,7 +231,7 @@ export async function submeterFormulario(formData: FormData) {
               tipo: d.tipo as string,
               marca: d.marca as string,
               modelo: d.modelo as string,
-              numeroSerie: d.numeroSerie as string,
+              numeroSerie: (d.numeroSerie as string | undefined) ?? null,
             }
           }),
         },

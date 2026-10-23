@@ -28,6 +28,10 @@ function montarFormDataValido(): FormData {
   fd.set('cabecalhoLaudo', 'Cabeçalho do laudo')
   fd.set('rodapeLaudo', 'Rodapé do laudo')
   fd.set('quantidadeMedicos', '1')
+  fd.set('vendedor', 'Alyson Alves')
+  fd.set('tipoProcesso', 'Implantação nova Zscan')
+  fd.set('vendedor', 'Alyson Alves')
+  fd.set('tipoProcesso', 'Implantação nova Zscan')
 
   fd.set('medicos[0].nome', 'Dr. Exame')
   fd.set('medicos[0].documento', '12345678901')

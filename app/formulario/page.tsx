@@ -33,6 +33,9 @@ const defaultValues: FormularioValues = {
   cabecalhoLaudo: '',
   rodapeLaudo: '',
   quantidadeMedicos: 1,
+  vendedor: '',
+  vendedorOutro: '',
+  tipoProcesso: '',
   usuarios: [{ nome: '', documento: '', email: '', tipo: 'examinador', temAssinatura: false }],
   exames: [{ nome: '', temLaudo: false, temTopicos: false }],
   equipamentos: [{ tipo: '', marca: '', modelo: '', numeroSerie: '' }],
@@ -77,6 +80,9 @@ export default function FormularioPage() {
     fd.append('cabecalhoLaudo', dados.cabecalhoLaudo || '')
     fd.append('rodapeLaudo', dados.rodapeLaudo || '')
     fd.append('quantidadeMedicos', String(dados.quantidadeMedicos ?? 1))
+    fd.append('vendedor', dados.vendedor || '')
+    fd.append('vendedorOutro', dados.vendedorOutro || '')
+    fd.append('tipoProcesso', dados.tipoProcesso || '')
 
     const raw = dados as Record<string, unknown>
     const logoField = raw.logo
@@ -104,7 +110,7 @@ export default function FormularioPage() {
       fd.append(`dispositivos[${i}].tipo`, equipamento.tipo)
       fd.append(`dispositivos[${i}].marca`, equipamento.marca)
       fd.append(`dispositivos[${i}].modelo`, equipamento.modelo)
-      fd.append(`dispositivos[${i}].numeroSerie`, equipamento.numeroSerie)
+      fd.append(`dispositivos[${i}].numeroSerie`, equipamento.numeroSerie ?? '')
     })
 
     return fd
@@ -144,13 +150,15 @@ export default function FormularioPage() {
 
   const proximoPasso = async () => {
     const camposPorPasso: Record<number, (keyof FormularioValues)[]> = {
-      0: ['nomeTitular', 'emailTitular', 'celularTitular', 'documentoTitular', 'cepClinica', 'enderecoClinica'],
+      0: ['nomeTitular', 'emailTitular', 'celularTitular', 'cepClinica', 'enderecoClinica', 'vendedor', 'tipoProcesso'],
       1: ['usuarios'],
        2: ['exames', 'cabecalhoLaudo', 'rodapeLaudo'],
       3: ['equipamentos'],
     }
     const campos = [...camposPorPasso[passoAtual]]
     if (passoAtual === 0 && getValues('possuiCnpj') === true) campos.push('cnpjEmpresa')
+    if (passoAtual === 0 && getValues('possuiCnpj') !== true) campos.push('documentoTitular')
+    if (passoAtual === 0 && (getValues('vendedor') ?? '').trim().toLowerCase() === 'outros') campos.push('vendedorOutro')
     const valido = await formMethods.trigger(campos)
     if (valido && passoAtual < 3) setPassoAtual(passoAtual + 1)
   }

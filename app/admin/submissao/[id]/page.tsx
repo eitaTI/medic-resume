@@ -92,6 +92,18 @@ export default async function DetalheSubmissaoPage({ params }: Props) {
               {clinica.cnpjEmpresa ? 'Pessoa Jurídica (CNPJ)' : 'Pessoa Física'}
             </p>
           </div>
+          {clinica.vendedor && (
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Vendedor</p>
+              <p className="text-sm text-gray-900 dark:text-gray-100 mt-0.5">{clinica.vendedor}</p>
+            </div>
+          )}
+          {clinica.tipoProcesso && (
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Tipo de Processo</p>
+              <p className="text-sm text-gray-900 dark:text-gray-100 mt-0.5">{clinica.tipoProcesso}</p>
+            </div>
+          )}
           {clinica.cnpjEmpresa && (
             <>
               <div>

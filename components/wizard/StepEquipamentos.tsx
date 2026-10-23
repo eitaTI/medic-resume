@@ -54,11 +54,10 @@ export function StepEquipamentos() {
               required
             />
             <Input
-              label="Nº de Série"
+              label="Nº de Série (opcional)"
               {...register(`equipamentos.${index}.numeroSerie`)}
               erro={errors.equipamentos?.[index]?.numeroSerie?.message}
-              placeholder="Ex: SN123456789"
-              required
+              placeholder="Opcional — deixe em branco se não houver"
             />
           </div>
         </div>
