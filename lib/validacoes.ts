@@ -44,6 +44,11 @@ export const schemaExame = z.object({
   laudo: z.any().optional(),
 })
 
+/** O modelo do exame só é extraível de PDF — foto de cabeçalho/logo não serve. */
+export function ehPdf(arquivo: File): boolean {
+  return arquivo.type === 'application/pdf' || /\.pdf$/i.test(arquivo.name)
+}
+
 export const schemaDispositivo = z.object({
   tipo: z.string().min(1, 'Tipo do dispositivo é obrigatório'),
   marca: z.string().min(1, 'Marca do dispositivo é obrigatório'),
@@ -148,7 +153,7 @@ export const schemaFormulario = z.object({
       if (!temPdf && !temTop) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Selecione "PDF do Laudo" ou "Tópicos de conteúdo"',
+          message: 'Selecione "PDF do laudo" ou "Títulos das seções"',
           path: ['exames', i, 'temTopicos'],
         })
       }
@@ -156,17 +161,23 @@ export const schemaFormulario = z.object({
         if (!(exame.laudo instanceof File)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: 'Envie o arquivo PDF do Laudo',
+            message: 'Envie o PDF de um laudo pronto',
+            path: ['exames', i, 'temLaudo'],
+          })
+        } else if (!ehPdf(exame.laudo)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'O modelo do exame deve ser um PDF (foto de cabeçalho ou logo não serve)',
             path: ['exames', i, 'temLaudo'],
           })
         }
       }
       if (temTop) {
         const nomes = (exame.topicos ?? '').split('-').map((t) => t.trim()).filter(Boolean)
-        if (nomes.length < 1) {
+        if (nomes.length < 2) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: 'Informe ao menos 1 tópico',
+            message: 'Informe ao menos 2 títulos de seção separados por - (ex: Indicação - Esôfago - Estômago - Duodeno - Biópsia - Resumo)',
             path: ['exames', i, 'topicos'],
           })
         }

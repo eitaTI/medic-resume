@@ -135,7 +135,7 @@ describe('schemaFormulario (agregado client-side)', () => {
       ...base,
       usuarios: [{ nome: 'Dr. B', documento: '456', email: 'b@b.com', tipo: 'examinador', temAssinatura: false }],
       equipamentos: [{ tipo: 'Ultrassom', marca: 'M', modelo: 'X' }],
-      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A' }],
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A - B' }],
     })
     expect(r.success).toBe(true)
   })
@@ -154,6 +154,28 @@ describe('schemaFormulario (agregado client-side)', () => {
       exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A - B - C' }],
     })
     expect(r.success).toBe(true)
+  })
+
+  it('rejeita título único de seção (ex: "EDA")', () => {
+    const r = schemaFormulario.safeParse({
+      ...base,
+      exames: [{ nome: 'Endoscopia', temTopicos: true, topicos: 'EDA' }],
+    })
+    expect(r.success).toBe(false)
+    if (!r.success) {
+      expect(r.error.issues.some((i) => i.message.includes('ao menos 2 títulos'))).toBe(true)
+    }
+  })
+
+  it('rejeita laudo que não é PDF (ex: foto de cabeçalho)', () => {
+    const r = schemaFormulario.safeParse({
+      ...base,
+      exames: [{ nome: 'Raio-X', temLaudo: true, laudo: new File([Buffer.from('x')], 'cabecalho.png', { type: 'image/png' }) }],
+    })
+    expect(r.success).toBe(false)
+    if (!r.success) {
+      expect(r.error.issues.some((i) => i.message.includes('deve ser um PDF'))).toBe(true)
+    }
   })
 
   it('rejeita exame sem laudo e sem tópicos (superRefine)', () => {
@@ -177,7 +199,7 @@ describe('schemaFormulario (agregado client-side)', () => {
       ...base,
       usuarios: [],
       equipamentos: [],
-      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A' }],
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A - B' }],
     })
     expect(r.success).toBe(false)
   })
@@ -187,7 +209,7 @@ describe('schemaFormulario (agregado client-side)', () => {
       ...base,
       documentoTitular: '',
       cnpjEmpresa: '09.587.107/0002-33',
-      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A' }],
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A - B' }],
     })
     expect(r.success).toBe(true)
   })
@@ -197,7 +219,7 @@ describe('schemaFormulario (agregado client-side)', () => {
       ...base,
       documentoTitular: '',
       cnpjEmpresa: '',
-      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A' }],
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A - B' }],
     })
     expect(r.success).toBe(false)
     if (!r.success) {
@@ -210,7 +232,7 @@ describe('schemaFormulario (agregado client-side)', () => {
       ...base,
       documentoTitular: '000.000.000-00',
       cnpjEmpresa: '',
-      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A' }],
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A - B' }],
     })
     expect(r.success).toBe(false)
   })
@@ -220,7 +242,7 @@ describe('schemaFormulario (agregado client-side)', () => {
       ...base,
       vendedor: '',
       tipoProcesso: '',
-      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A' }],
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A - B' }],
     })
     expect(r.success).toBe(false)
   })
@@ -230,7 +252,7 @@ describe('schemaFormulario (agregado client-side)', () => {
       ...base,
       vendedor: 'Outros',
       tipoProcesso: 'Implantação nova Zscan',
-      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A' }],
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A - B' }],
     })
     expect(semOutro.success).toBe(false)
     const comOutro = schemaFormulario.safeParse({
@@ -238,7 +260,7 @@ describe('schemaFormulario (agregado client-side)', () => {
       vendedor: 'Outros',
       vendedorOutro: 'Parceiro Local',
       tipoProcesso: 'Implantação nova Zscan',
-      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A' }],
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A - B' }],
     })
     expect(comOutro.success).toBe(true)
   })
@@ -246,7 +268,7 @@ describe('schemaFormulario (agregado client-side)', () => {
   it('rejeita mesma pessoa cadastrada 2 vezes (superRefine)', () => {
     const r = schemaFormulario.safeParse({
       ...base,
-      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A' }],
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A - B' }],
       usuarios: [
         { nome: 'Evah Lumi', documento: '24034-SC', email: 'a@b.com', tipo: 'examinador', temAssinatura: false },
         { nome: 'evah  lumi', documento: '24034-SC', email: 'a@b.com', tipo: 'solicitante', temAssinatura: false },
@@ -261,7 +283,7 @@ describe('schemaFormulario (agregado client-side)', () => {
   it('rejeita nomes iguais mesmo com documentos diferentes', () => {
     const r = schemaFormulario.safeParse({
       ...base,
-      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A' }],
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A - B' }],
       usuarios: [
         { nome: 'Maria Silva', documento: '111', email: 'a@b.com', tipo: 'examinador', temAssinatura: false },
         { nome: 'Maria Silva', documento: '222', email: 'b@b.com', tipo: 'recepcao', temAssinatura: false },

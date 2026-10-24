@@ -19,7 +19,7 @@ O formulário de cadastro de clínicas é composto por 4 etapas estruturadas:
 
 1. **Clínica**: Dados corporativos (Nome, Titular, E-mail, Celular, CPF do Titular, CEP, Endereço e CNPJ opcional) e configurações visuais para laudo (Cabeçalho e Rodapé de laudo).
 2. **Usuários**: Cadastro de funcionários e médicos da clínica, contendo nome, documento, e-mail, tipo do usuário (**Médico Examinador**, **Médico Solicitante** ou **Recepção**) e upload opcional da imagem de assinatura do médico.
-3. **Exames**: Coleta os exames oferecidos pela clínica, permitindo escolher entre anexar um arquivo PDF do Laudo ou inserir tópicos de conteúdo em formato textual.
+3. **Exames**: Coleta os exames oferecidos pela clínica, permitindo anexar o PDF de um laudo pronto (só PDF — é dele que sai o modelo) ou informar os títulos (máscaras) das seções do laudo separados por " - ".
 4. **Equipamentos**: Coleta os dados de equipamentos e dispositivos (Tipo, Marca, Modelo e Número de Série).
 
 ---

@@ -148,26 +148,34 @@ export async function submeterFormulario(formData: FormData) {
 
       if (!temArquivo && !temTopicos) {
         return {
-          erro: 'Cada exame precisa de um laudo (PDF ou imagem) ou de tópicos de conteúdo.'
+          erro: 'Cada exame precisa do PDF de um laudo pronto ou dos títulos das seções.'
         }
       }
 
       if (temArquivo) {
-        const tiposPermitidos = [
-          'application/pdf',
-          'image/png',
-          'image/jpeg',
-          'image/webp',
-        ]
+        // Só PDF gera modelo de laudo (extração de texto); foto de cabeçalho
+        // ou logo não serve — o logo tem campo próprio no formulário.
+        const nomePdf = /\.pdf$/i.test(laudo.name)
+        const tipoPdf = laudo.type === 'application/pdf'
+        let cabecalhoPdf = false
+        try {
+          const inicio = Buffer.from(await (laudo as File).slice(0, 5).arrayBuffer()).toString('ascii')
+          cabecalhoPdf = inicio === '%PDF-'
+        } catch {
+          cabecalhoPdf = false
+        }
 
-        const isArquivoValido =
-          tiposPermitidos.includes(laudo.type) ||
-          /\.(pdf|png|jpe?g|webp)$/i.test(laudo.name)
-
-        if (!isArquivoValido) {
+        if (!nomePdf || !tipoPdf || !cabecalhoPdf) {
           return {
-            erro: 'O laudo deve ser um arquivo PDF, PNG, JPG, JPEG ou WEBP.'
+            erro: 'O modelo do exame deve ser um PDF de laudo válido (foto de cabeçalho ou logo não serve).'
           }
+        }
+      }
+
+      const titulos = (topicos ?? '').split('-').map((t) => t.trim()).filter(Boolean)
+      if (temTopicos && titulos.length < 2) {
+        return {
+          erro: `Exame "${examesRaw[i].nome}": informe ao menos 2 títulos de seção separados por - (ex: Indicação - Esôfago - Estômago - Duodeno - Biópsia - Resumo).`
         }
       }
     }

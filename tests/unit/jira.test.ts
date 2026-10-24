@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import path from 'node:path'
 
 const createIssue = vi.fn()
@@ -38,8 +38,17 @@ function clinicaBase(overrides: Partial<ClinicaParaJira> = {}): ClinicaParaJira 
 
 describe('criarCardJira', () => {
   beforeEach(() => {
+    // A lib exige JIRA_BASE_URL/EMAIL/API_TOKEN mesmo com o client mockado —
+    // stuba valores dummy para o teste não depender do ambiente do shell.
+    vi.stubEnv('JIRA_BASE_URL', 'https://dummy.atlassian.net')
+    vi.stubEnv('JIRA_EMAIL', 'teste@teste.com')
+    vi.stubEnv('JIRA_API_TOKEN', 'dummy-token')
     createIssue.mockReset()
     addAttachment.mockReset()
+  })
+
+  afterEach(() => {
+    vi.unstubAllEnvs()
   })
 
   it('cria o card e retorna a chave no sucesso', async () => {
@@ -53,7 +62,7 @@ describe('criarCardJira', () => {
     expect(Array.isArray(payload.fields.description.content)).toBe(true)
   })
 
-  it('inclui os tópicos de conteúdo dos exames na descrição', async () => {
+  it('inclui os títulos das seções dos exames na descrição', async () => {
     createIssue.mockResolvedValue({ key: 'EITATI-3' })
     await criarCardJira(
       clinicaBase({ exames: [{ nome: 'Raio-X de Tórax', topicos: 'Tórax - Pulmão - Conclusão' }] }),
@@ -62,7 +71,7 @@ describe('criarCardJira', () => {
     const textos = (payload.fields.description.content as { content: { text: string }[] }[])
       .map((p) => p.content.map((t) => t.text).join(''))
       .join('\n')
-    expect(textos).toContain('- Raio-X de Tórax | Tópicos: Tórax - Pulmão - Conclusão')
+    expect(textos).toContain('- Raio-X de Tórax | Títulos do laudo: Tórax - Pulmão - Conclusão')
   })
 
   it('inclui vendedor, tipo de processo e labels de controle', async () => {
@@ -116,6 +125,6 @@ describe('criarCardJira', () => {
     const textos = (payload.fields.description.content as { content: { text: string }[] }[])
       .map((p) => p.content.map((t) => t.text).join(''))
       .join('\n')
-    expect(textos).toContain('- Colonoscopia (laudo anexo: abc.pdf) | Tópicos: A - B')
+    expect(textos).toContain('- Colonoscopia (laudo anexo: abc.pdf) | Títulos do laudo: A - B')
   })
 })

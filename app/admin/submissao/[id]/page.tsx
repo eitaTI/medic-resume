@@ -257,7 +257,7 @@ export default async function DetalheSubmissaoPage({ params }: Props) {
                 {exame.topicos && (
                   <div className="mt-3">
                     <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">
-                      Tópicos de conteúdo
+                      Títulos (máscaras) das seções
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {exame.topicos

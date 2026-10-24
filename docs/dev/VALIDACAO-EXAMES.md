@@ -126,7 +126,7 @@ mas poderia ser mais explícita usando os booleans recebidos:
 const temPdf = laudo instanceof File && laudo.size > 0
 const temTopicos = !!topicos && topicos.length > 0
 if (!temPdf && !temTopicos) {
-  return { erro: 'Cada exame precisa de um laudo (PDF) ou de tópicos de conteúdo.' }
+  return { erro: 'Cada exame precisa do PDF de um laudo pronto ou dos títulos das seções.' }
 }
 
 // Reforçado — valida também que o boolean confere com o conteúdo
@@ -137,10 +137,10 @@ if (temLaudoBool && !temPdf) {
   return { erro: `Exame "${examesRaw[i].nome}": marcado como PDF mas nenhum arquivo foi anexado.` }
 }
 if (temTopicosBool && !temTopicos) {
-  return { erro: `Exame "${examesRaw[i].nome}": marcado como Tópicos mas nenhum tópico foi informado.` }
+  return { erro: `Exame "${examesRaw[i].nome}": marcado como Títulos mas nenhum título foi informado.` }
 }
 if (!temLaudoBool && !temTopicosBool && !temPdf && !temTopicos) {
-  return { erro: `Exame "${examesRaw[i].nome}": selecione um PDF ou informe os tópicos.` }
+  return { erro: `Exame "${examesRaw[i].nome}": selecione o PDF ou informe os títulos das seções.` }
 }
 ```
 

@@ -79,7 +79,7 @@ function montarDescricao(clinica: ClinicaParaJira): ADFParagraph[] {
     bloco.push(paragrafo('Exames:', true))
     for (const exame of clinica.exames) {
       const anexo = exame.laudoPath ? ` (laudo anexo: ${path.basename(exame.laudoPath)})` : ''
-      const topicos = exame.topicos ? ` | Tópicos: ${exame.topicos}` : ''
+      const topicos = exame.topicos ? ` | Títulos do laudo: ${exame.topicos}` : ''
       bloco.push(paragrafo(`- ${exame.nome}${anexo}${topicos}`))
     }
   }

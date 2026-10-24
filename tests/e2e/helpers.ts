@@ -8,7 +8,7 @@ export const FIXTURE_LOGO = path.join(__dirname, '../fixtures/logo.png')
 
 /**
  * Preenche o wizard de 4 passos e envia o formulário público.
- * Usa a opção "Tópicos de conteúdo" (sem upload de PDF) para evitar
+ * Usa a opção "Títulos (máscaras) das seções do laudo" (sem upload de PDF) para evitar
  * dependência de inputs de arquivo ocultos e de rede (Consulta CEP).
  * `identificador` deve ser único por execução — vira parte do nome do
  * titular/clínica, permitindo localizar a submissão no painel admin.
@@ -38,11 +38,11 @@ export async function preencherEEnviarFormulario(page: Page, identificador: stri
   // Passo 2 — Exames
   await page.getByLabel('Nome do Exame').fill(`Exame ${identificador}`)
   await page
-    .getByText('Possui Tópicos de conteúdo?')
+    .getByText('Sabe os títulos (máscaras) das seções do laudo?')
     .locator('xpath=..')
     .getByRole('button', { name: 'Sim', exact: true })
     .click()
-  await page.getByLabel('Tópicos de conteúdo').fill('Topico1 - Topico2')
+  await page.getByLabel('Títulos (máscaras) das seções do laudo').fill('Indicação - Esôfago - Estômago')
   await page.getByLabel('Cabeçalho do Laudo').fill(`Cabecalho ${identificador}`)
   await page.getByLabel('Rodapé do Laudo').fill(`Rodape ${identificador}`)
   await page.getByRole('button', { name: 'Próximo →', exact: true }).click()

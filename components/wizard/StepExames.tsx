@@ -78,7 +78,7 @@ export function StepExames() {
 
               <div className="flex flex-wrap items-center gap-6">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600 dark:text-gray-300">Possui PDF do Laudo?</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-300">Possui o PDF de um laudo pronto?</span>
                   <div className="inline-flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
                     <button
                       type="button"
@@ -98,7 +98,7 @@ export function StepExames() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600 dark:text-gray-300">Possui Tópicos de conteúdo?</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-300">Sabe os títulos (máscaras) das seções do laudo?</span>
                   <div className="inline-flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
                     <button
                       type="button"
@@ -121,9 +121,9 @@ export function StepExames() {
               {temLaudo && (
                 <div className="space-y-1">
                   <FileUpload
-                    label="Laudo"
-                    accept=".pdf,image/png,image/jpeg,image/webp"
-                    acceptHint="PDF, PNG, JPG, JPEG ou WEBP"
+                    label="PDF do laudo (modelo)"
+                    accept=".pdf"
+                    acceptHint="Só PDF — os títulos do modelo saem dele. Pode ser qualquer laudo já emitido pela clínica (se preferir, tarje os dados do paciente). Foto de cabeçalho ou logo não serve."
                     onFile={(file) => setValue(`exames.${index}.laudo`, file, { shouldValidate: true })}
                   />
                   {errors.exames?.[index]?.temLaudo?.message && (
@@ -135,11 +135,14 @@ export function StepExames() {
               {temTopicos && (
                 <div className="space-y-2">
                   <Input
-                    label="Tópicos de conteúdo"
+                    label="Títulos (máscaras) das seções do laudo"
                     {...register(`exames.${index}.topicos`)}
                     erro={errors.exames?.[index]?.topicos?.message}
-                    placeholder="Descrição - Biopsia - Duodeno - Conclusão - etc"
+                    placeholder="Ex: Indicação - Esôfago - Estômago - Duodeno - Biópsia - Resumo"
                   />
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Informe os títulos das partes que aparecem no laudo, separados por <strong>-</strong> (são os campos do modelo, não um resumo). Esses nomes viram os campos que o médico preenche na hora do laudo — escreva igualzinho ao laudo, sem abreviar.
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     {watch(`exames.${index}.topicos`)?.split('-').map((t) => t.trim()).filter(Boolean).map((topico, ti) => (
                       <span
@@ -149,6 +152,33 @@ export function StepExames() {
                         {topico}
                       </span>
                     ))}
+                  </div>
+                  <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3 mt-1" aria-hidden="true">
+                    <p className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+                      Como vai ficar no laudo
+                    </p>
+                    <div className="rounded border border-gray-200 dark:border-gray-700 overflow-hidden text-left">
+                      <div className="bg-gray-100 dark:bg-gray-700 px-2 py-1 text-[11px] font-medium text-gray-600 dark:text-gray-300">
+                        Cabeçalho do laudo
+                      </div>
+                      <div className="px-2 py-1.5 space-y-1">
+                        {(watch(`exames.${index}.topicos`)?.split('-').map((t) => t.trim()).filter(Boolean) ?? []).length === 0 ? (
+                          <p className="text-[11px] italic text-gray-400 dark:text-gray-500">
+                            Os títulos digitados acima aparecem aqui como campos do laudo…
+                          </p>
+                        ) : (
+                          watch(`exames.${index}.topicos`)!.split('-').map((t) => t.trim()).filter(Boolean).map((topico, ti) => (
+                            <div key={ti} className="rounded border border-dashed border-gray-300 dark:border-gray-600 px-2 py-1">
+                              <p className="text-[11px] font-semibold text-gray-700 dark:text-gray-200">{topico}</p>
+                              <p className="text-[11px] text-gray-400 dark:text-gray-500">···</p>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                      <div className="bg-gray-100 dark:bg-gray-700 px-2 py-1 text-[11px] font-medium text-gray-600 dark:text-gray-300">
+                        Rodapé do laudo
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}

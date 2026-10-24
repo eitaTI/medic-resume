@@ -157,7 +157,7 @@ playwright.config.ts
 ### Camada 2 — Playwright (E2E)
 
 - **auth.spec** — `/` redireciona para `/formulario`; acesso `/admin` sem sessão → `/login`; login válido → `/admin`; logout → `/login`.
-- **formulario.spec** — validação client-side bloqueia avanço com passo 0 vazio; preenche 4 passos (Clínica→Usuários→Exames→Equipamentos, via "Tópicos de conteúdo") e envia com sucesso.
+- **formulario.spec** — validação client-side bloqueia avanço com passo 0 vazio; preenche 4 passos (Clínica→Usuários→Exames→Equipamentos, via "Títulos (máscaras) das seções do laudo") e envia com sucesso.
 - **admin-submissoes.spec** — listar, filtrar por status, abrir detalhe, **aprovar** (→ APROVADA + fail-open Jira), **sincronizar Jira** (erro fail-closed), **rejeitar** com motivo (→ REJEITADA).
 - **branding.spec** — upload de slot PNG + sucesso; tipo não permitido → erro; Restaurar Padrão.
 - **auditoria.spec** — lista logs; filtra por ação LOGIN.
