@@ -49,6 +49,15 @@ Get-Process -Name node | Stop-Process -Force
 pnpm install
 ```
 
+### `ERR_DLOPEN_FAILED` (better-sqlite3, NODE_MODULE_VERSION)
+
+Causa: Node diferente do 24. O módulo nativo foi compilado para a ABI 137
+(Node 24); o `tests/setup.ts` e o `lib/prisma.ts` abortam cedo com a mensagem
+acionável se o Node não for o 24.
+Solução: use o Node do projeto (`mise.toml` fixa `node 24`; `mise install`).
+Nunca rode os testes com outro major — rebuild local (`pnpm rebuild
+better-sqlite3`) só mascara a divergência com o CI (que usa Node 24).
+
 ### Build funciona mas `pnpm dev` falha
 
 Verificar se o Prisma Client foi gerado:

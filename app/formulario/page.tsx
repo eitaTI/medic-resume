@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useState, useActionState, useEffect, type CSSProperties } from 'react'
+import { useState, useActionState, useEffect, startTransition, type CSSProperties } from 'react'
 import { useFormStatus } from 'react-dom'
 import { FormProvider, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -10,6 +10,7 @@ import { StepClinica } from '@/components/wizard/StepClinica'
 import { StepUsuarios } from '@/components/wizard/StepUsuarios'
 import { StepExames } from '@/components/wizard/StepExames'
 import { StepEquipamentos } from '@/components/wizard/StepEquipamentos'
+import { StepConfirmacoes } from '@/components/wizard/StepConfirmacoes'
 import { Button } from '@/components/ui/Button'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { submeterFormulario } from '@/actions/submeter-formulario'
@@ -18,7 +19,7 @@ import type { FormularioValues } from '@/lib/validacoes'
 import { MAX_SUBMISSAO_MB, paraMegabytes } from '@/lib/limites'
 import { useDraftPersistence } from '@/hooks/useDraftPersistence'
 import { useBranding } from '@/components/providers/BrandingProvider'
-const LABELS = ['Clínica', 'Usuários', 'Exames', 'Equipamentos']
+const LABELS = ['Clínica', 'Usuários', 'Exames', 'Equipamentos', 'Confirmações']
 
 const defaultValues: FormularioValues = {
   nomeClinica: '',
@@ -37,8 +38,12 @@ const defaultValues: FormularioValues = {
   vendedorOutro: '',
   tipoProcesso: '',
   usuarios: [{ nome: '', documento: '', email: '', tipo: 'examinador', temAssinatura: false }],
-  exames: [{ nome: '', temLaudo: false, temTopicos: false }],
+  exames: [{ nome: '', temLaudo: false, temTopicos: false, usarModeloPadrao: false }],
   equipamentos: [{ tipo: '', marca: '', modelo: '', numeroSerie: '' }],
+  cienteRequisitosPc: false,
+  cienteProblemasPcFraco: false,
+  autorizaUsoDados: false,
+  pcInfo: undefined,
 }
 
 export default function FormularioPage() {
@@ -50,7 +55,7 @@ export default function FormularioPage() {
     defaultValues,
   })
 
-  const { handleSubmit, getValues, reset, setFocus, watch } = formMethods
+  const { handleSubmit, getValues, reset, setFocus, watch, formState: { errors } } = formMethods
 
   useEffect(() => {
     const campos = {
@@ -58,6 +63,7 @@ export default function FormularioPage() {
       1: 'usuarios.0.nome' as const,
       2: 'cabecalhoLaudo' as const,
       3: 'equipamentos.0.tipo' as const,
+      4: 'cienteRequisitosPc' as const,
     }
     const campo = campos[passoAtual as keyof typeof campos]
     setTimeout(() => setFocus(campo), 100)
@@ -98,9 +104,12 @@ export default function FormularioPage() {
       if (ass instanceof File) fd.append(`medicos[${i}].assinatura`, ass)
     })
 
-    const examesArr = raw.exames as (Record<string, unknown> & { nome: string; topicos?: string })[]
+    const examesArr = raw.exames as (Record<string, unknown> & { nome: string; topicos?: string; temLaudo?: boolean; temTopicos?: boolean; usarModeloPadrao?: boolean })[]
     examesArr.forEach((exame, i) => {
       fd.append(`exames[${i}].nome`, exame.nome)
+      fd.append(`exames[${i}].temLaudo`, String(exame.temLaudo ?? false))
+      fd.append(`exames[${i}].temTopicos`, String(exame.temTopicos ?? false))
+      fd.append(`exames[${i}].usarModeloPadrao`, String(exame.usarModeloPadrao ?? false))
       if (exame.topicos) fd.append(`exames[${i}].topicos`, exame.topicos)
       const laudoFile = exame.laudo
       if (laudoFile instanceof File) fd.append(`exames[${i}].laudo`, laudoFile)
@@ -112,6 +121,11 @@ export default function FormularioPage() {
       fd.append(`dispositivos[${i}].modelo`, equipamento.modelo)
       fd.append(`dispositivos[${i}].numeroSerie`, equipamento.numeroSerie ?? '')
     })
+
+    fd.append('cienteRequisitosPc', String(dados.cienteRequisitosPc ?? false))
+    fd.append('cienteProblemasPcFraco', String(dados.cienteProblemasPcFraco ?? false))
+    fd.append('autorizaUsoDados', String(dados.autorizaUsoDados ?? false))
+    if (dados.pcInfo) fd.append('pcInfo', JSON.stringify(dados.pcInfo))
 
     return fd
   }
@@ -154,14 +168,37 @@ export default function FormularioPage() {
       1: ['usuarios'],
        2: ['exames', 'cabecalhoLaudo', 'rodapeLaudo'],
       3: ['equipamentos'],
+      4: ['cienteRequisitosPc', 'cienteProblemasPcFraco', 'autorizaUsoDados'],
     }
     const campos = [...camposPorPasso[passoAtual]]
-    if (passoAtual === 0 && getValues('possuiCnpj') === true) campos.push('cnpjEmpresa')
+    if (passoAtual === 0 && getValues('possuiCnpj') === true) campos.push('cnpjEmpresa', 'nomeClinica')
     if (passoAtual === 0 && getValues('possuiCnpj') !== true) campos.push('documentoTitular')
     if (passoAtual === 0 && (getValues('vendedor') ?? '').trim().toLowerCase() === 'outros') campos.push('vendedorOutro')
     const valido = await formMethods.trigger(campos)
-    if (valido && passoAtual < 3) setPassoAtual(passoAtual + 1)
+    if (valido && passoAtual < 4) setPassoAtual(passoAtual + 1)
   }
+
+  const irParaPassoComErro = (errs: typeof errors) => {
+    if (errs.cienteRequisitosPc || errs.cienteProblemasPcFraco || errs.autorizaUsoDados) {
+      setPassoAtual(4)
+    } else if (errs.exames || errs.cabecalhoLaudo || errs.rodapeLaudo) {
+      setPassoAtual(2)
+    } else if (errs.usuarios) {
+      setPassoAtual(1)
+    } else if (
+      errs.nomeTitular || errs.emailTitular || errs.celularTitular ||
+      errs.documentoTitular || errs.cnpjEmpresa || errs.nomeClinica ||
+      errs.cepClinica || errs.enderecoClinica || errs.vendedor ||
+      errs.vendedorOutro || errs.tipoProcesso
+    ) {
+      setPassoAtual(0)
+    }
+  }
+
+  const handleSubmitComNavegacao = handleSubmit(
+    () => startTransition(() => { formAction() }),
+    (errs) => irParaPassoComErro(errs),
+  )
 
   const passoAnterior = () => {
     if (passoAtual > 0) setPassoAtual(passoAtual - 1)
@@ -201,8 +238,11 @@ export default function FormularioPage() {
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
               Cadastro enviado com sucesso!
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 mb-8">
-              Agradecemos pelo cadastro. Sua clínica será revisada em breve.
+            <p className="text-gray-500 dark:text-gray-400">
+              Recebemos seu cadastro com todos os dados e confirmações.
+            </p>
+            <p className="text-gray-500 dark:text-gray-400 mt-2 mb-8">
+              Agora é só aguardar o contato do time responsável, que vai revisar tudo e dar os próximos passos.
             </p>
           </div>
         </div>
@@ -263,13 +303,42 @@ export default function FormularioPage() {
           </div>
 
           <FormProvider {...formMethods}>
-            <Stepper passoAtual={passoAtual} totalPassos={4} labels={LABELS} />
+            <Stepper passoAtual={passoAtual} totalPassos={5} labels={LABELS} />
+
+            {passoAtual !== 4 && (errors.cienteRequisitosPc || errors.cienteProblemasPcFraco || errors.autorizaUsoDados) && (
+              <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg text-amber-700 dark:text-amber-400 text-sm">
+                Existem confirmações pendentes na etapa de <strong>Confirmações</strong>. Volte ao Passo 4 para concluir antes de enviar.
+              </div>
+            )}
+
+            {passoAtual !== 2 && (errors.exames || errors.cabecalhoLaudo || errors.rodapeLaudo) && (
+              <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg text-amber-700 dark:text-amber-400 text-sm">
+                Existem erros na etapa de <strong>Exames</strong>. Volte ao Passo 2 para corrigir antes de enviar.
+              </div>
+            )}
+
+            {passoAtual !== 1 && errors.usuarios && (
+              <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg text-amber-700 dark:text-amber-400 text-sm">
+                Existem erros na etapa de <strong>Usuários</strong>. Volte ao Passo 1 para corrigir antes de enviar.
+              </div>
+            )}
+
+            {passoAtual !== 0 && (
+              errors.nomeTitular || errors.emailTitular || errors.celularTitular ||
+              errors.documentoTitular || errors.cnpjEmpresa || errors.nomeClinica ||
+              errors.cepClinica || errors.enderecoClinica
+            ) && (
+              <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg text-amber-700 dark:text-amber-400 text-sm">
+                Existem erros na etapa de <strong>Clínica</strong>. Volte ao Passo 0 para corrigir antes de enviar.
+              </div>
+            )}
 
             <div className="mt-8">
               {passoAtual === 0 && <StepClinica />}
               {passoAtual === 1 && <StepUsuarios />}
               {passoAtual === 2 && <StepExames />}
               {passoAtual === 3 && <StepEquipamentos />}
+              {passoAtual === 4 && <StepConfirmacoes />}
             </div>
 
             {resultado && 'erro' in resultado && (
@@ -287,8 +356,8 @@ export default function FormularioPage() {
                   ← Anterior
                 </Button>
               </div>
-              {passoAtual === 3 ? (
-                <SubmitButton onClick={handleSubmit(() => formAction())} isPending={isPending} />
+              {passoAtual === 4 ? (
+                <SubmitButton onClick={handleSubmitComNavegacao} isPending={isPending} />
               ) : (
                 <Button onClick={proximoPasso}>
                   Próximo →

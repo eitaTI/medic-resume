@@ -4,7 +4,7 @@ import { writeFile, mkdir } from 'fs/promises'
 import path from 'path'
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
-import { schemaClinica, schemaMedico, schemaExame, schemaDispositivo } from '@/lib/validacoes'
+import { schemaClinica, schemaMedico, schemaExame, schemaDispositivo, schemaConfirmacoes, schemaPcInfo } from '@/lib/validacoes'
 import { getVendedores, getTiposProcesso } from '@/lib/listas'
 
 function extrairArray(formData: FormData, prefix: string): Record<number, Record<string, FormDataEntryValue>> {
@@ -103,11 +103,37 @@ export async function submeterFormulario(formData: FormData) {
     const cnpjEmpresaRaw = formData.get('cnpjEmpresa') as string | null
     const cnpjEmpresa = cnpjEmpresaRaw && cnpjEmpresaRaw.trim() !== '' ? cnpjEmpresaRaw : undefined
 
+    const cienteRequisitosPc = formData.get('cienteRequisitosPc') === 'true'
+    const cienteProblemasPcFraco = formData.get('cienteProblemasPcFraco') === 'true'
+    const autorizaUsoDados = formData.get('autorizaUsoDados') === 'true'
+
+    let pcInfo: unknown = undefined
+    const pcInfoRaw = formData.get('pcInfo') as string | null
+    if (pcInfoRaw) {
+      try {
+        pcInfo = JSON.parse(pcInfoRaw)
+      } catch {
+        pcInfo = undefined
+      }
+    }
+
+    const validacaoConfirmacoes = schemaConfirmacoes.safeParse({
+      cienteRequisitosPc,
+      cienteProblemasPcFraco,
+      autorizaUsoDados,
+      pcInfo: schemaPcInfo.safeParse(pcInfo).success ? pcInfo : undefined,
+    })
+    if (!validacaoConfirmacoes.success) return { erro: validacaoConfirmacoes.error.issues[0].message }
+
     let nomeClinica = (formData.get('nomeClinica') as string) || ''
     const nomeTitular = (formData.get('nomeTitular') as string) || ''
 
     if (!cnpjEmpresa) {
       nomeClinica = nomeTitular
+    }
+
+    if (cnpjEmpresa && !nomeClinica.trim()) {
+      return { erro: 'Informe o Nome Fantasia da empresa — a busca automática não encontrou dados, preencha manualmente.' }
     }
 
     const dadosClinica = {
@@ -137,18 +163,36 @@ export async function submeterFormulario(formData: FormData) {
     const exameIndices = Object.keys(examesRaw).map(Number).sort()
 
     for (const i of exameIndices) {
-      const v = schemaExame.safeParse(examesRaw[i])
-      if (!v.success) return { erro: v.error.issues[0].message }
-
       const laudo = formData.get(`exames[${i}].laudo`) as File | null
       const topicos = (formData.get(`exames[${i}].topicos`) as string | null)?.trim() || null
+      // FormData trafega tudo como string — normaliza antes do Zod (booleano
+      // real no client, 'true'/'false' aqui).
+      const temLaudoMarcado = formData.get(`exames[${i}].temLaudo`) === 'true'
+      const temTopicosMarcado = formData.get(`exames[${i}].temTopicos`) === 'true'
+      const usarModeloPadrao = formData.get(`exames[${i}].usarModeloPadrao`) === 'true'
+
+      const v = schemaExame.safeParse({
+        nome: examesRaw[i].nome,
+        topicos: topicos ?? undefined,
+        temLaudo: temLaudoMarcado,
+        temTopicos: temTopicosMarcado,
+        usarModeloPadrao,
+        laudo: laudo instanceof File && laudo.size > 0 ? laudo : undefined,
+      })
+      if (!v.success) return { erro: v.error.issues[0].message }
 
       const temArquivo = laudo instanceof File && laudo.size > 0
       const temTopicos = !!topicos && topicos.length > 0
 
-      if (!temArquivo && !temTopicos) {
+      if (usarModeloPadrao && (temArquivo || temTopicos || temLaudoMarcado || temTopicosMarcado)) {
         return {
-          erro: 'Cada exame precisa do PDF de um laudo pronto ou dos títulos das seções.'
+          erro: `Exame "${examesRaw[i].nome}": para usar o modelo padrão, desmarque o PDF e os títulos das seções.`
+        }
+      }
+
+      if (!temArquivo && !temTopicos && !usarModeloPadrao) {
+        return {
+          erro: 'Cada exame precisa do PDF de um laudo pronto, dos títulos das seções ou do modelo padrão.'
         }
       }
 
@@ -201,6 +245,7 @@ export async function submeterFormulario(formData: FormData) {
         logoPath,
         cabecalhoLaudo,
         rodapeLaudo,
+        confirmacoes: validacaoConfirmacoes.data as unknown as object,
         medicos: {
           create: await Promise.all(
             medicoIndices.map(async (i) => {
@@ -224,10 +269,12 @@ export async function submeterFormulario(formData: FormData) {
               const laudo = formData.get(`exames[${i}].laudo`) as File | null
               const laudoPath = await salvarArquivo(laudo, submissionFolder, 'laudos')
               const topicos = (formData.get(`exames[${i}].topicos`) as string | null)?.trim() || null
+              const usarModeloPadrao = formData.get(`exames[${i}].usarModeloPadrao`) === 'true'
               return {
                 nome: e.nome as string,
                 laudoPath,
                 topicos,
+                usarModeloPadrao,
               }
             })
           ),

@@ -29,7 +29,7 @@ Guia completo em [`docs/dev/DEV-WORKFLOW.md`](docs/dev/DEV-WORKFLOW.md):
 
 ## Padrões de Código
 
-Consulte os guias em `docs/dev/`:
+Guie-se pelos guias em `docs/dev/`:
 
 | Guia | O que cobre |
 |------|-------------|
@@ -44,6 +44,20 @@ Consulte os guias em `docs/dev/`:
 
 - [ ] Compila sem erros (`pnpm build`)
 - [ ] Lint passa (`pnpm lint`)
-- [ ] Server Actions em `actions/`, componentes na pasta correta
+- [ ] Testes passam (`pnpm test` + `pnpm test:e2e`)
+- [ ] Server Actions em `actions/`, componentes na pasta correta, novos passos do wizard registrados em `LABELS`, `camposPorPasso`, `irParaPassoComErro`, banner cross-step e `defaultValues`
 - [ ] Documentação atualizada se necessário
 - [ ] PR com descrição clara do que foi feito
+
+## Contrato dos helpers E2E (`tests/e2e/helpers.ts`)
+
+Campo obrigatório novo no wizard? Atualize **junto** o helper, ou o fluxo
+feliz quebra sem erro claro:
+
+- Preencha vendedor + tipo via `selecionarVendedorETipo(page)` (nunca
+  `selectOption` direto — as opções chegam async via `/api/opcoes-cadastro`).
+- Chamadas de rede externa precisam de mock via `page.route` em
+  `mockBrasilApi(page)` **antes** do `goto` (CEP/CNPJ). Teste E2E não depende
+  de internet.
+- Todo campo com validação no passo 0 deve ter cobertura no helper — o `trigger`
+  bloqueia o avanço silenciosamente se algo faltar.

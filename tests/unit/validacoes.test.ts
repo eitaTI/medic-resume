@@ -126,6 +126,9 @@ describe('schemaFormulario (agregado client-side)', () => {
     quantidadeMedicos: 1,
     vendedor: 'Alyson Alves',
     tipoProcesso: 'Implantação nova Zscan',
+    cienteRequisitosPc: true,
+    cienteProblemasPcFraco: true,
+    autorizaUsoDados: true,
     usuarios: [{ nome: 'Dr. A', documento: '123', email: 'a@b.com', tipo: 'examinador', temAssinatura: false }],
     equipamentos: [{ tipo: 'Ultrassom', marca: 'M', modelo: 'X', numeroSerie: 'SN' }],
   }
@@ -178,6 +181,36 @@ describe('schemaFormulario (agregado client-side)', () => {
     }
   })
 
+  it('aceita exame com modelo padrão sem PDF nem tópicos', () => {
+    const r = schemaFormulario.safeParse({
+      ...base,
+      exames: [{ nome: 'Raio-X', temLaudo: false, temTopicos: false, usarModeloPadrao: true }],
+    })
+    expect(r.success).toBe(true)
+  })
+
+  it('rejeita exame sem laudo, sem tópicos e sem modelo padrão', () => {
+    const r = schemaFormulario.safeParse({
+      ...base,
+      exames: [{ nome: 'Raio-X' }],
+    })
+    expect(r.success).toBe(false)
+  })
+
+  it('rejeita modelo padrão combinado com PDF ou tópicos', () => {
+    const comPdf = schemaFormulario.safeParse({
+      ...base,
+      exames: [{ nome: 'Raio-X', temLaudo: true, temTopicos: false, usarModeloPadrao: true, laudo: new File([Buffer.from('x')], 'l.pdf') }],
+    })
+    expect(comPdf.success).toBe(false)
+
+    const comTopicos = schemaFormulario.safeParse({
+      ...base,
+      exames: [{ nome: 'Raio-X', temLaudo: false, temTopicos: true, topicos: 'A - B', usarModeloPadrao: true }],
+    })
+    expect(comTopicos.success).toBe(false)
+  })
+
   it('rejeita exame sem laudo e sem tópicos (superRefine)', () => {
     const r = schemaFormulario.safeParse({
       ...base,
@@ -202,6 +235,66 @@ describe('schemaFormulario (agregado client-side)', () => {
       exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A - B' }],
     })
     expect(r.success).toBe(false)
+  })
+
+  it('aceita confirmações completas com leitura do PC', () => {
+    const r = schemaFormulario.safeParse({
+      ...base,
+      nomeClinica: 'Clínica Teste',
+      possuiCnpj: true,
+      cnpjEmpresa: '09.587.107/0002-33',
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A - B' }],
+      cienteRequisitosPc: true,
+      cienteProblemasPcFraco: true,
+      autorizaUsoDados: true,
+      pcInfo: { nucleos: 8, memoriaGb: 8, benchmarkMbps: 45.5, benchmarkEstado: 'ok' },
+    })
+    expect(r.success).toBe(true)
+  })
+
+  it('rejeita sem os 3 aceites das confirmações', () => {
+    const r = schemaFormulario.safeParse({
+      ...base,
+      nomeClinica: 'Clínica Teste',
+      possuiCnpj: true,
+      cnpjEmpresa: '09.587.107/0002-33',
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A - B' }],
+      cienteRequisitosPc: false,
+      cienteProblemasPcFraco: true,
+      autorizaUsoDados: true,
+    })
+    expect(r.success).toBe(false)
+    if (!r.success) {
+      expect(r.error.issues.some((i) => String(i.path).includes('cienteRequisitosPc'))).toBe(true)
+    }
+  })
+
+  it('rejeita sem autorização de uso dos dados', () => {
+    const r = schemaFormulario.safeParse({
+      ...base,
+      nomeClinica: 'Clínica Teste',
+      possuiCnpj: true,
+      cnpjEmpresa: '09.587.107/0002-33',
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A - B' }],
+      cienteRequisitosPc: true,
+      cienteProblemasPcFraco: true,
+      autorizaUsoDados: false,
+    })
+    expect(r.success).toBe(false)
+  })
+
+  it('exige Nome Fantasia quando PJ marcada (busca pode falhar)', () => {
+    const r = schemaFormulario.safeParse({
+      ...base,
+      possuiCnpj: true,
+      cnpjEmpresa: '09.587.107/0002-33',
+      nomeClinica: '',
+      exames: [{ nome: 'Raio-X', temTopicos: true, topicos: 'A - B' }],
+    })
+    expect(r.success).toBe(false)
+    if (!r.success) {
+      expect(r.error.issues.some((i) => String(i.path).includes('nomeClinica'))).toBe(true)
+    }
   })
 
   it('dispensa CPF do titular quando há CNPJ válido', () => {

@@ -12,7 +12,6 @@ vi.mock('jira.js', () => ({
 }))
 
 import { criarCardJira, type ClinicaParaJira } from '@/lib/jira'
-import { TEST_DB_PATH } from '@/tests/helpers/db'
 
 function clinicaBase(overrides: Partial<ClinicaParaJira> = {}): ClinicaParaJira {
   return {
@@ -97,6 +96,39 @@ describe('criarCardJira', () => {
       .map((p) => p.content.map((t) => t.text).join(''))
       .join('\n')
     expect(textos).toContain('Série: S/N (não informada)')
+  })
+
+  it('inclui o marcador de modelo padrão quando sem laudo e sem tópicos', async () => {
+    createIssue.mockResolvedValue({ key: 'EITATI-7' })
+    await criarCardJira(
+      clinicaBase({ exames: [{ nome: 'Colonoscopia', usarModeloPadrao: true }] }),
+    )
+    const payload = createIssue.mock.calls[0][0]
+    const textos = (payload.fields.description.content as { content: { text: string }[] }[])
+      .map((p) => p.content.map((t) => t.text).join(''))
+      .join('\n')
+    expect(textos).toContain('- Colonoscopia | Modelo: padrão do sistema (texto livre único)')
+  })
+
+  it('inclui confirmações e leitura do PC na descrição', async () => {
+    createIssue.mockResolvedValue({ key: 'EITATI-8' })
+    await criarCardJira(
+      clinicaBase({
+        confirmacoes: {
+          cienteRequisitosPc: true,
+          cienteProblemasPcFraco: true,
+          autorizaUsoDados: true,
+          pcInfo: { nucleos: 8, memoriaGb: 8, benchmarkMbps: 45.5 },
+        },
+      }),
+    )
+    const payload = createIssue.mock.calls[0][0]
+    const textos = (payload.fields.description.content as { content: { text: string }[] }[])
+      .map((p) => p.content.map((t) => t.text).join(''))
+      .join('\n')
+    expect(textos).toContain('Ciente dos requisitos do PC: sim')
+    expect(textos).toContain('Autoriza uso dos dados enviados: sim')
+    expect(textos).toContain('8 núcleos')
   })
 
   it('propaga erro quando a API do Jira falha', async () => {

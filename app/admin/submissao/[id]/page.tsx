@@ -179,6 +179,48 @@ export default async function DetalheSubmissaoPage({ params }: Props) {
         </div>
       )}
 
+      {(() => {
+        const c = (clinica.confirmacoes ?? null) as unknown as {
+          cienteRequisitosPc?: boolean
+          cienteProblemasPcFraco?: boolean
+          autorizaUsoDados?: boolean
+          pcInfo?: Record<string, unknown>
+        } | null
+        if (!c) return null
+        const p = (c.pcInfo ?? {}) as Record<string, unknown>
+        const partes = [
+          typeof p.nucleos === 'number' ? `${p.nucleos} núcleos` : null,
+          typeof p.memoriaGb === 'number' ? `~${p.memoriaGb} GB RAM` : null,
+          typeof p.discoEstimadoGb === 'number' ? `disco estimado ~${p.discoEstimadoGb} GB` : null,
+          typeof p.benchmarkMbps === 'number' ? `benchmark ${p.benchmarkMbps} MB/s` : null,
+        ].filter(Boolean) as string[]
+        return (
+          <div className={cardClass}>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Confirmações</h2>
+            <div className="space-y-3">
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Requisitos do computador</p>
+                <p className="text-sm text-gray-900 dark:text-gray-100 mt-0.5">{c.cienteRequisitosPc ? 'Ciente — sim' : 'Ciente — não'}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Problemas em PC abaixo dos requisitos</p>
+                <p className="text-sm text-gray-900 dark:text-gray-100 mt-0.5">{c.cienteProblemasPcFraco ? 'Ciente — sim' : 'Ciente — não'}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Autoriza uso dos dados enviados</p>
+                <p className="text-sm text-gray-900 dark:text-gray-100 mt-0.5">{c.autorizaUsoDados ? 'Sim' : 'Não'}</p>
+              </div>
+              {partes.length > 0 && (
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Leitura automática do aparelho</p>
+                  <p className="text-sm text-gray-900 dark:text-gray-100 mt-0.5">{partes.join(' • ')} (indício, não prova)</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )
+      })()}
+
       <div className={cardClass}>
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
           Usuários ({clinica.medicos.length})
@@ -241,8 +283,15 @@ export default async function DetalheSubmissaoPage({ params }: Props) {
           <div className="space-y-3">
             {clinica.exames.map((exame) => (
               <div key={exame.id} className="border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{exame.nome}</p>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{exame.nome}</p>
+                    {exame.usarModeloPadrao && !exame.laudoPath && !exame.topicos && (
+                      <span className="inline-flex items-center rounded-full bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 dark:bg-blue-900/40 dark:text-blue-200">
+                        Modelo padrão do sistema
+                      </span>
+                    )}
+                  </div>
                   {exame.laudoPath && (
                     <a
                       href={getSecureUrl(exame.laudoPath) || '#'}

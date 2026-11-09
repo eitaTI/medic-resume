@@ -17,8 +17,8 @@ function lerArquivoFixture(nome: string): File {
 function montarFormDataValido(): FormData {
   const fd = new FormData()
   fd.set('nomeClinica', 'Clínica Saúde LTDA')
-  fd.set('cnpjEmpresa', '12345678000195')
   fd.set('nomeEmpresa', 'Empresa SA')
+  fd.set('cnpjEmpresa', '12345678000195')
   fd.set('nomeTitular', 'Titular Completo da Silva')
   fd.set('emailTitular', 'titular@clinica.com')
   fd.set('celularTitular', '11999998888')
@@ -30,8 +30,10 @@ function montarFormDataValido(): FormData {
   fd.set('quantidadeMedicos', '1')
   fd.set('vendedor', 'Alyson Alves')
   fd.set('tipoProcesso', 'Implantação nova Zscan')
-  fd.set('vendedor', 'Alyson Alves')
-  fd.set('tipoProcesso', 'Implantação nova Zscan')
+  fd.set('cienteRequisitosPc', 'true')
+  fd.set('cienteProblemasPcFraco', 'true')
+  fd.set('autorizaUsoDados', 'true')
+  fd.set('pcInfo', JSON.stringify({ nucleos: 8, memoriaGb: 8, benchmarkMbps: 45.5, benchmarkEstado: 'ok' }))
 
   fd.set('medicos[0].nome', 'Dr. Exame')
   fd.set('medicos[0].documento', '12345678901')
@@ -91,6 +93,42 @@ describe('submeterFormulario (público)', () => {
     expect(r).toHaveProperty('erro')
   })
 
+  it('aceita confirmações com leitura do PC salva em JSON', async () => {
+    const fd = montarFormDataValido()
+    const r = await submeterFormulario(fd)
+    expect(r).toEqual({ sucesso: true })
+
+    const clinica = await prisma.clinica.findFirst({
+      orderBy: { id: 'desc' },
+    })
+    const c = (clinica?.confirmacoes ?? null) as unknown as {
+      cienteRequisitosPc?: boolean
+      cienteProblemasPcFraco?: boolean
+      autorizaUsoDados?: boolean
+      pcInfo?: Record<string, unknown>
+    } | null
+    expect(c?.cienteRequisitosPc).toBe(true)
+    expect(c?.cienteProblemasPcFraco).toBe(true)
+    expect(c?.autorizaUsoDados).toBe(true)
+    expect((c?.pcInfo as Record<string, unknown> | undefined)?.nucleos).toBe(8)
+  })
+
+  it('rejeita sem aceite dos requisitos do PC', async () => {
+    const fd = montarFormDataValido()
+    fd.set('cienteRequisitosPc', 'false')
+    const r = await submeterFormulario(fd)
+    expect(r).toHaveProperty('erro')
+    expect(String((r as { erro: string }).erro)).toContain('requisitos')
+  })
+
+  it('rejeita sem autorização de uso dos dados', async () => {
+    const fd = montarFormDataValido()
+    fd.delete('autorizaUsoDados')
+    const r = await submeterFormulario(fd)
+    expect(r).toHaveProperty('erro')
+    expect(String((r as { erro: string }).erro)).toContain('autorizar')
+  })
+
   it('retorna erro quando exame não tem nome', async () => {
     const fd = montarFormDataValido()
     fd.set('exames[0].nome', '')
@@ -98,11 +136,11 @@ describe('submeterFormulario (público)', () => {
     expect(r).toHaveProperty('erro')
   })
 
-  it('retorna erro quando exame não tem laudo nem tópicos (Gap 2)', async () => {
+  it('retorna erro quando exame não tem laudo, tópicos nem modelo padrão', async () => {
     const fd = montarFormDataValido()
     fd.delete('exames[0].laudo')
     const r = await submeterFormulario(fd)
-    expect(r).toHaveProperty('erro', 'Cada exame precisa do PDF de um laudo pronto ou dos títulos das seções.')
+    expect(r).toHaveProperty('erro', 'Cada exame precisa do PDF de um laudo pronto, dos títulos das seções ou do modelo padrão.')
   })
 
   it('aceita exame somente com tópicos (Gap 2)', async () => {
@@ -118,6 +156,39 @@ describe('submeterFormulario (público)', () => {
     })
     expect(clinica?.exames[0]?.topicos).toBe('Tópico A - Tópico B')
     expect(clinica?.exames[0]?.laudoPath).toBeNull()
+  })
+
+  it('aceita exame com modelo padrão sem laudo nem tópicos', async () => {
+    const fd = montarFormDataValido()
+    fd.delete('exames[0].laudo')
+    fd.set('exames[0].usarModeloPadrao', 'true')
+    const r = await submeterFormulario(fd)
+    expect(r).toEqual({ sucesso: true })
+
+    const clinica = await prisma.clinica.findFirst({
+      orderBy: { id: 'desc' },
+      include: { exames: true },
+    })
+    expect(clinica?.exames[0]?.usarModeloPadrao).toBe(true)
+    expect(clinica?.exames[0]?.laudoPath).toBeNull()
+  })
+
+  it('rejeita modelo padrão combinado com PDF', async () => {
+    const fd = montarFormDataValido()
+    fd.set('exames[0].usarModeloPadrao', 'true')
+    fd.set('exames[0].temLaudo', 'true')
+    const r = await submeterFormulario(fd)
+    expect(r).toHaveProperty('erro')
+    expect(String((r as { erro: string }).erro)).toContain('modelo padrão')
+  })
+
+  it('rejeita PJ sem Nome Fantasia (busca automática falhou)', async () => {
+    const fd = montarFormDataValido()
+    fd.set('cnpjEmpresa', '12345678000195')
+    fd.set('nomeClinica', '')
+    const r = await submeterFormulario(fd)
+    expect(r).toHaveProperty('erro')
+    expect(String((r as { erro: string }).erro)).toContain('Nome Fantasia')
   })
 
   it('rejeita laudo em PNG (só PDF gera modelo)', async () => {

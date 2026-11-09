@@ -20,8 +20,9 @@ export interface ClinicaParaJira {
   logoPath?: string | null
   cabecalhoLaudo?: string | null
   rodapeLaudo?: string | null
+  confirmacoes?: { cienteRequisitosPc?: boolean; cienteProblemasPcFraco?: boolean; autorizaUsoDados?: boolean; pcInfo?: Record<string, unknown> } | null
   medicos: { nome: string; documento: string; email: string; tipo: string; assinaturaPath?: string | null }[]
-  exames: { nome: string; laudoPath?: string | null; topicos?: string | null }[]
+  exames: { nome: string; laudoPath?: string | null; topicos?: string | null; usarModeloPadrao?: boolean | null }[]
   dispositivos: { tipo: string; marca: string; modelo: string; numeroSerie: string | null }[]
 }
 
@@ -68,6 +69,30 @@ function montarDescricao(clinica: ClinicaParaJira): ADFParagraph[] {
   if (clinica.cabecalhoLaudo) bloco.push(paragrafo(`Cabeçalho do laudo: ${clinica.cabecalhoLaudo}`))
   if (clinica.rodapeLaudo) bloco.push(paragrafo(`Rodapé do laudo: ${clinica.rodapeLaudo}`))
 
+  if (clinica.confirmacoes) {
+    const c = clinica.confirmacoes
+    bloco.push(paragrafo('Confirmações do cliente:', true))
+    if (typeof c.cienteRequisitosPc === 'boolean') {
+      bloco.push(paragrafo(`Ciente dos requisitos do PC: ${c.cienteRequisitosPc ? 'sim' : 'não'}`))
+    }
+    if (typeof c.cienteProblemasPcFraco === 'boolean') {
+      bloco.push(paragrafo(`Ciente dos problemas em PC abaixo dos requisitos: ${c.cienteProblemasPcFraco ? 'sim' : 'não'}`))
+    }
+    if (typeof c.autorizaUsoDados === 'boolean') {
+      bloco.push(paragrafo(`Autoriza uso dos dados enviados: ${c.autorizaUsoDados ? 'sim' : 'não'}`))
+    }
+    if (c.pcInfo && typeof c.pcInfo === 'object') {
+      const p = c.pcInfo as Record<string, unknown>
+      const partes = [
+        typeof p.nucleos === 'number' ? `${p.nucleos} núcleos` : null,
+        typeof p.memoriaGb === 'number' ? `~${p.memoriaGb} GB RAM` : null,
+        typeof p.discoEstimadoGb === 'number' ? `disco estimado ~${p.discoEstimadoGb} GB` : null,
+        typeof p.benchmarkMbps === 'number' ? `benchmark ${p.benchmarkMbps} MB/s` : null,
+      ].filter(Boolean)
+      if (partes.length > 0) bloco.push(paragrafo(`Leitura automática do aparelho: ${partes.join(' • ')} (indício, não prova)`))
+    }
+  }
+
   if (clinica.medicos.length > 0) {
     bloco.push(paragrafo('Médicos:', true))
     for (const m of clinica.medicos) {
@@ -80,7 +105,10 @@ function montarDescricao(clinica: ClinicaParaJira): ADFParagraph[] {
     for (const exame of clinica.exames) {
       const anexo = exame.laudoPath ? ` (laudo anexo: ${path.basename(exame.laudoPath)})` : ''
       const topicos = exame.topicos ? ` | Títulos do laudo: ${exame.topicos}` : ''
-      bloco.push(paragrafo(`- ${exame.nome}${anexo}${topicos}`))
+      const modelo = exame.usarModeloPadrao && !exame.laudoPath && !exame.topicos
+        ? ' | Modelo: padrão do sistema (texto livre único)'
+        : ''
+      bloco.push(paragrafo(`- ${exame.nome}${anexo}${topicos}${modelo}`))
     }
   }
 

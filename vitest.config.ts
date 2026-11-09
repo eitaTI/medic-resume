@@ -15,10 +15,9 @@ export default defineConfig({
     globals: true,
     include: ['tests/unit/**/*.test.ts', 'tests/api/**/*.test.ts', 'tests/integration/**/*.test.ts'],
     setupFiles: ['tests/setup.ts'],
-    // Test files share a single `test.db`. Each file resets the DB via
-    // `prisma db push --force-reset`, which drops/recreates the file.
-    // Running files in parallel corrupts the shared DB, so run them sequentially.
-    fileParallelism: false,
+    // Cada arquivo usa seu próprio banco (`test-<pid>.db`, ver tests/setup.ts),
+    // então o paralelismo por arquivo é seguro. Se um teste voltar a tocar um
+    // caminho compartilhado, volte a `fileParallelism: false` antes de depurar.
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],

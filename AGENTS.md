@@ -4,7 +4,9 @@ Compact guidance for OpenCode sessions. For full context read `docs/dev/ARQUITET
 
 ## Commands
 - Package manager is **pnpm** (not npm). Use `pnpm install`, `pnpm dev`, `pnpm build`, `pnpm lint`.
-- Tests: Vitest (unit/api) via `pnpm test` / `pnpm test:unit`, Playwright e2e via `pnpm test:e2e`. Live Jira test is gated by `RUN_JIRA_LIVE=1`.
+- Toolchain is pinned: `mise.toml` (`node 24`, `pnpm 11`) + `engines` in `package.json`. Always run with the project Node — `tests/setup.ts` and `lib/prisma.ts` fail fast otherwise (better-sqlite3 ABI 137).
+- Tests: Vitest (unit/api) via `pnpm test` / `pnpm test:unit` (parallel, one `test-w<id>.db` per worker), Playwright e2e via `pnpm test:e2e` (external network mocked via `page.route`, never real BrasilAPI). Live Jira test is gated by `RUN_JIRA_LIVE=1`.
+- Test CLIs run via local binaries (`tests/helpers/run.ts`) — never `pnpm exec` inside tests (breaks on Windows/mise), stdio inherited so real errors surface.
 - First-run setup: `cp .env.example .env` → `pnpm prisma migrate dev` → `pnpm prisma db seed` (seed admin: `admin@eitati.com` / `admin123`).
 - Before committing: `pnpm build && pnpm lint`.
 
@@ -44,3 +46,13 @@ matches its description** — no manual/user command needed. Current skills:
 - `server-action` — Server Actions (`'use server'`, result objects) and `useActionState` UI.
 - `jira-integration` — Fase 5 Jira scope (fail-open, `jiraSyncStatus`, `sincronizarJira`).
 - `admin-management` — manage admin users via Better Auth `User` (`actions/admins.ts`, no `Admin` model).
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

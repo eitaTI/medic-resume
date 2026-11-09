@@ -52,6 +52,7 @@ export function StepExames() {
         {fields.map((field, index) => {
           const temLaudo = watch(`exames.${index}.temLaudo`)
           const temTopicos = watch(`exames.${index}.temTopicos`)
+          const usaPadrao = watch(`exames.${index}.usarModeloPadrao`)
 
           return (
             <div key={field.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3 bg-gray-50 dark:bg-gray-800/50">
@@ -82,7 +83,10 @@ export function StepExames() {
                   <div className="inline-flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
                     <button
                       type="button"
-                      onClick={() => setValue(`exames.${index}.temLaudo`, true, { shouldValidate: true })}
+                      onClick={() => {
+                        setValue(`exames.${index}.temLaudo`, true, { shouldValidate: true })
+                        setValue(`exames.${index}.usarModeloPadrao`, false, { shouldValidate: true })
+                      }}
                       className={`px-3 py-1 text-sm font-medium transition-colors ${temLaudo ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'}`}
                     >
                       Sim
@@ -102,7 +106,10 @@ export function StepExames() {
                   <div className="inline-flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
                     <button
                       type="button"
-                      onClick={() => setValue(`exames.${index}.temTopicos`, true, { shouldValidate: true })}
+                      onClick={() => {
+                        setValue(`exames.${index}.temTopicos`, true, { shouldValidate: true })
+                        setValue(`exames.${index}.usarModeloPadrao`, false, { shouldValidate: true })
+                      }}
                       className={`px-3 py-1 text-sm font-medium transition-colors ${temTopicos ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'}`}
                     >
                       Sim
@@ -118,6 +125,28 @@ export function StepExames() {
                 </div>
               </div>
 
+              {!temLaudo && !temTopicos && (
+                <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-900/20">
+                  <p className="text-sm text-blue-900 dark:text-blue-200">
+                    Sem PDF e sem títulos, o sistema utiliza um modelo se encontrado para este exame, ou cria um novo apenas com 1 campo de texto rico.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setValue(`exames.${index}.usarModeloPadrao`, !usaPadrao, { shouldValidate: true })}
+                    aria-pressed={!!usaPadrao}
+                    className={`mt-2 inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${usaPadrao ? 'border-blue-600 bg-blue-600 text-white' : 'border-blue-300 bg-white text-blue-800 hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-900/40 dark:text-blue-200 dark:hover:bg-blue-900/60'}`}
+                  >
+                    <span aria-hidden="true" className={`inline-flex h-4 w-4 items-center justify-center rounded border ${usaPadrao ? 'border-white bg-white text-blue-700' : 'border-current'}`}>
+                      {usaPadrao ? '✓' : ''}
+                    </span>
+                    Concordo em utilizar o modelo padrão do sistema
+                  </button>
+                  {errors.exames?.[index]?.usarModeloPadrao?.message && (
+                    <p className="text-red-500 text-xs mt-1" role="alert">{errors.exames?.[index]?.usarModeloPadrao?.message}</p>
+                  )}
+                </div>
+              )}
+
               {temLaudo && (
                 <div className="space-y-1">
                   <FileUpload
@@ -125,6 +154,7 @@ export function StepExames() {
                     accept=".pdf"
                     acceptHint="Só PDF — os títulos do modelo saem dele. Pode ser qualquer laudo já emitido pela clínica (se preferir, tarje os dados do paciente). Foto de cabeçalho ou logo não serve."
                     onFile={(file) => setValue(`exames.${index}.laudo`, file, { shouldValidate: true })}
+                    onRemove={() => setValue(`exames.${index}.laudo`, undefined, { shouldValidate: true })}
                   />
                   {errors.exames?.[index]?.temLaudo?.message && (
                     <p className="text-red-500 text-xs mt-1" role="alert">{errors.exames?.[index]?.temLaudo?.message}</p>
@@ -192,7 +222,7 @@ export function StepExames() {
 
         <Button
           variante="secundario"
-          onClick={() => append({ nome: '', temLaudo: false, temTopicos: false })}
+          onClick={() => append({ nome: '', temLaudo: false, temTopicos: false, usarModeloPadrao: false })}
         >
           + Adicionar Exame
         </Button>

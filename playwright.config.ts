@@ -1,5 +1,5 @@
 import { defineConfig, devices } from '@playwright/test'
-import { E2E_DB } from './tests/e2e/global-setup'
+import { E2E_DB } from './tests/e2e/e2e-constants'
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -27,7 +27,9 @@ export default defineConfig({
   webServer: {
     // Usa um banco isolado (e2e.db) para não destruir o dev.db do desenvolvedor.
     // O globalSetup popula esse banco (schema + seed do admin) antes de subir o servidor.
-    command: 'pnpm dev',
+    // Executa o Next com o próprio Node (`process.execPath` + JS real do pacote) —
+    // sem `pnpm` hardcoded e sem `.CMD` (que o Node não interpreta como script).
+    command: `"${process.execPath}" node_modules/next/dist/bin/next dev --port 3000`,
     env: { DATABASE_URL: E2E_DB },
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,

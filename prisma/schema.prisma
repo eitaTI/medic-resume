@@ -75,6 +75,7 @@ model Clinica {
   logoPath          String?
   cabecalhoLaudo    String?   @default("")
   rodapeLaudo       String?   @default("")
+  confirmacoes      Json?
   status            String    @default("PENDENTE")
   motivoRejeicao    String?
   jiraIssueKey      String?
@@ -99,12 +100,13 @@ model Medico {
 }
 
 model Exame {
-  id         Int     @id @default(autoincrement())
-  clinicaId  Int
-  clinica    Clinica @relation(fields: [clinicaId], references: [id])
-  nome       String
-  laudoPath  String?
-  topicos    String?
+  id              Int     @id @default(autoincrement())
+  clinicaId       Int
+  clinica         Clinica @relation(fields: [clinicaId], references: [id])
+  nome            String
+  laudoPath       String?
+  topicos         String?
+  usarModeloPadrao Boolean @default(false)
 }
 
 model Dispositivo {

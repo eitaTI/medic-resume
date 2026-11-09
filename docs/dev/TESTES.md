@@ -119,12 +119,19 @@ playwright.config.ts
 
 - **Vitest** (`vitest.config.ts`): alias `@`→raiz, ambiente `node`,
   `setupFiles: tests/setup.ts`, cobertura via `@vitest/coverage-v8` sobre
-  `actions/lib/app/api`. `fileParallelism: false` — os arquivos compartilham
-  `test.db`; rodar em paralelo corrompia o banco via `prisma db push
-  --force-reset`.
-- **Playwright** (`playwright.config.ts`): `webServer` sobe `pnpm dev` na
-  porta 3000; `workers: 1` (dev-server único compartilhado — paralelismo
-  causava timeout na compilação a frio) e `timeout: 90s`.
+  `actions/lib/app/api`. Cada worker usa seu próprio banco (`test-w<id>.db`,
+  definido em `tests/setup.ts` via `VITEST_WORKER_ID`), então arquivos de
+  teste rodam **em paralelo** sem se corromper. `resetTestDb()` recria o
+  arquivo por `beforeAll` (binários locais via `tests/helpers/run.ts`, sem
+  `pnpm exec`, stdio herdado). Não volte a `fileParallelism: false` sem antes
+  verificar se algum teste toca caminho compartilhado (`data/branding`,
+  `data/uploads`).
+- **Playwright** (`playwright.config.ts`): `webServer` sobe o Next local
+  (`node_modules/.bin/next dev --port 3000`, sem `pnpm` hardcoded) com
+  `DATABASE_URL=e2e.db` (populado pelo `global-setup` via `tests/helpers/run.ts`);
+  `workers: 1` (dev-server único compartilhado — paralelismo causava timeout
+  na compilação a frio) e `timeout: 90s`. Rede externa (BrasilAPI) é mockada
+  via `page.route` em `mockBrasilApi` — teste E2E nunca depende de internet.
 
 ### Estratégia de mock nos testes unit/API
 
@@ -133,8 +140,12 @@ playwright.config.ts
   para isolar a lógica da action + banco real. A autenticação real (cookie/
   sessão) é coberta pelo Playwright E2E.
 - `tests/helpers/db.ts#resetTestDb()` roda `prisma db push --force-reset`
-  + `prisma/seed.ts` e garante um `User` admin de teste (`admin-test-id`)
-  para que os `auditLog` com FK não quebrem.
+  (via `tests/helpers/run.ts`, sem `pnpm`) + `prisma/seed.ts` e garante um
+  `User` admin de teste (`admin-test-id`) para que os `auditLog` com FK não
+  quebrem. Erros do CLI aparecem no log (stdio herdado), nunca `ignore`.
+- `tests/setup.ts` aborta cedo se o Node não for o 24 (ABI do better-sqlite3),
+  com mensagem acionável em vez de `ERR_DLOPEN_FAILED` críptico. Toolchain
+  fixada em `mise.toml` (`node 24`, `pnpm 11`) + `engines` no `package.json`.
 
 ## 5. O que é coberto
 
@@ -142,8 +153,8 @@ playwright.config.ts
 
 | Arquivo | O que cobre |
 |---|---|
-| `validacoes.test.ts` | `schemaClinica` (email, CPF 11, CNPJ 14/vazio, `quantidadeMedicos>=1`), `schemaMedico`, `schemaExame`, `schemaDispositivo`, `schemaFormulario` (superRefine: exame precisa laudo PDF OU tópicos; laudo `instanceof File`). |
-| `submeter-formulario.test.ts` | Submissão pública válida cria `Clinica`+`Medicos`+`Exames`+`Dispositivos` e `revalidatePath`; inválida retorna `{ erro }`; arquivos em `data/uploads/<folder>`; fallback `nomeClinica`←`nomeTitular` quando `cnpjEmpresa` vazio; **validação server-side** de exame (laudo PDF ou tópicos — Gap 2); **respeita `quantidadeMedicos` enviada** (Gap 3). |
+| `validacoes.test.ts` | `schemaClinica` (email, CPF 11, CNPJ 14/vazio, `quantidadeMedicos>=1`), `schemaMedico`, `schemaExame`, `schemaDispositivo`, `schemaFormulario` (superRefine: exame precisa laudo PDF OU tópicos OU modelo padrão consentido; PJ exige Nome Fantasia; etapa Confirmações exige os 3 aceites; laudo `instanceof File`). |
+| `submeter-formulario.test.ts` | Submissão pública válida cria `Clinica`+`Medicos`+`Exames`+`Dispositivos` e `revalidatePath`; inválida retorna `{ erro }`; arquivos em `data/uploads/<folder>`; fallback `nomeClinica`←`nomeTitular` quando `cnpjEmpresa` vazio; PJ sem Nome Fantasia retorna erro orientando preenchimento manual; **validação server-side** de exame (laudo PDF, tópicos ou `usarModeloPadrao` — Gap 2; modelo padrão rejeitado se combinado com PDF/tópicos); confirmações exigidas (sem aceite → erro; `pcInfo` salvo em `confirmacoes` JSON); **respeita `quantidadeMedicos` enviada** (Gap 3). |
 | `submissoes.test.ts` | `listarSubmissoes` (filtro status), `detalharSubmissao` (404), `aprovarSubmissao` (APROVADA, revalidate, audit APROVAR, **Jira mock sucesso** → SINCRONIZADO + `jiraIssueKey`, **Jira mock falha** → ERRO mantendo `{sucesso:true}` *fail-open*), `sincronizarJira` (guardas, **falha retorna `{erro}`** *fail-closed*), `rejeitarSubmissao`. |
 | `admins.test.ts` | `criarAdmin` (duplicado, senha<6, hash `Account`), `excluirAdmin` (auto-exclusão e último admin bloqueados), `alterarSenha` (regex 8+/letra/número/especial, mismatch). |
 | `auditoria.test.ts` | `listarAuditoria` respeita `userId`/`acao`/`dataInicio`/`dataFim` e limita 50. |
@@ -157,7 +168,7 @@ playwright.config.ts
 ### Camada 2 — Playwright (E2E)
 
 - **auth.spec** — `/` redireciona para `/formulario`; acesso `/admin` sem sessão → `/login`; login válido → `/admin`; logout → `/login`.
-- **formulario.spec** — validação client-side bloqueia avanço com passo 0 vazio; preenche 4 passos (Clínica→Usuários→Exames→Equipamentos, via "Títulos (máscaras) das seções do laudo") e envia com sucesso.
+- **formulario.spec** — validação client-side bloqueia avanço com passo 0 vazio; preenche 5 passos (Clínica→Usuários→Exames→Equipamentos→Confirmações, via "Títulos (máscaras) das seções do laudo") e envia com sucesso; envia exame com **modelo padrão** (Não+Não+consentimento, sem PDF nem títulos); vendedor/tipo aguardados via `attached` + re-select até o RHF confirmar.
 - **admin-submissoes.spec** — listar, filtrar por status, abrir detalhe, **aprovar** (→ APROVADA + fail-open Jira), **sincronizar Jira** (erro fail-closed), **rejeitar** com motivo (→ REJEITADA).
 - **branding.spec** — upload de slot PNG + sucesso; tipo não permitido → erro; Restaurar Padrão.
 - **auditoria.spec** — lista logs; filtra por ação LOGIN.

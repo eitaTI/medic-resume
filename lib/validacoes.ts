@@ -42,6 +42,7 @@ export const schemaExame = z.object({
   temTopicos: z.boolean().optional(),
   topicos: z.string().optional(),
   laudo: z.any().optional(),
+  usarModeloPadrao: z.boolean().optional(),
 })
 
 /** O modelo do exame só é extraível de PDF — foto de cabeçalho/logo não serve. */
@@ -54,6 +55,24 @@ export const schemaDispositivo = z.object({
   marca: z.string().min(1, 'Marca do dispositivo é obrigatório'),
   modelo: z.string().min(1, 'Modelo do dispositivo é obrigatório'),
   numeroSerie: z.string().optional(), // Opcional: vazio vira S/N no MCP
+})
+
+export const schemaPcInfo = z.object({
+  nucleos: z.number().int().positive().nullable().optional(),
+  memoriaGb: z.number().positive().nullable().optional(),
+  gpu: z.string().nullable().optional(),
+  plataforma: z.string().nullable().optional(),
+  discoEstimadoGb: z.number().positive().nullable().optional(),
+  discoEstimadoOrigem: z.string().nullable().optional(),
+  benchmarkMbps: z.number().positive().nullable().optional(),
+  benchmarkEstado: z.enum(['pendente', 'rodando', 'ok', 'indisponivel']).optional(),
+})
+
+export const schemaConfirmacoes = z.object({
+  cienteRequisitosPc: z.literal(true, { error: 'Confirme que está ciente dos requisitos do computador.' }),
+  cienteProblemasPcFraco: z.literal(true, { error: 'Confirme que está ciente dos problemas em PCs abaixo dos requisitos.' }),
+  autorizaUsoDados: z.literal(true, { error: 'É necessário autorizar o uso dos dados enviados para concluir o cadastro.' }),
+  pcInfo: schemaPcInfo.optional(),
 })
 
 export const schemaFormulario = z.object({
@@ -98,6 +117,12 @@ export const schemaFormulario = z.object({
       schemaDispositivo,
     )
     .min(1),
+
+  // Etapa de confirmações: 3 aceites obrigatórios + leitura automática do PC
+  cienteRequisitosPc: z.boolean(),
+  cienteProblemasPcFraco: z.boolean(),
+  autorizaUsoDados: z.boolean(),
+  pcInfo: schemaPcInfo.optional(),
 })
   .superRefine((data, ctx) => {
     // CPF obrigatório só para pessoa física: com CNPJ válido, é opcional
@@ -119,6 +144,39 @@ export const schemaFormulario = z.object({
         code: z.ZodIssueCode.custom,
         message: 'Informe o nome do vendedor em "Outro vendedor".',
         path: ['vendedorOutro'],
+      })
+    }
+
+    // Etapa de confirmações: os 3 aceites são obrigatórios para concluir.
+    if (data.cienteRequisitosPc !== true) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Confirme que está ciente dos requisitos do computador.',
+        path: ['cienteRequisitosPc'],
+      })
+    }
+    if (data.cienteProblemasPcFraco !== true) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Confirme que está ciente dos problemas em PCs abaixo dos requisitos.',
+        path: ['cienteProblemasPcFraco'],
+      })
+    }
+    if (data.autorizaUsoDados !== true) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'É necessário autorizar o uso dos dados enviados para concluir o cadastro.',
+        path: ['autorizaUsoDados'],
+      })
+    }
+
+    // PJ sem Nome Fantasia: a busca de CNPJ pode falhar (404/timeout) e o
+    // cliente precisa preencher manualmente — nunca travar sem mensagem no passo.
+    if (data.possuiCnpj === true && !(data.nomeClinica ?? '').trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Informe o Nome Fantasia — a busca automática não encontrou dados, preencha manualmente.',
+        path: ['nomeClinica'],
       })
     }
 
@@ -150,11 +208,19 @@ export const schemaFormulario = z.object({
     data.exames?.forEach((exame, i) => {
       const temPdf = exame.temLaudo === true
       const temTop = exame.temTopicos === true
-      if (!temPdf && !temTop) {
+      const usaPadrao = exame.usarModeloPadrao === true
+      if (!temPdf && !temTop && !usaPadrao) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Selecione "PDF do laudo" ou "Títulos das seções"',
-          path: ['exames', i, 'temTopicos'],
+          message: 'Selecione o PDF do laudo, os títulos das seções ou use o modelo padrão',
+          path: ['exames', i, 'usarModeloPadrao'],
+        })
+      }
+      if (usaPadrao && (temPdf || temTop)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Para usar o modelo padrão, desmarque o PDF e os títulos das seções',
+          path: ['exames', i, 'usarModeloPadrao'],
         })
       }
       if (temPdf) {

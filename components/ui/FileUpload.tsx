@@ -10,9 +10,10 @@ interface FileUploadProps {
   acceptHint?: string
   maxSizeMB?: number
   onFile: (file: File) => void
+  onRemove?: () => void
 }
 
-export function FileUpload({ label, accept, acceptHint, maxSizeMB = MAX_ARQUIVO_MB, onFile }: FileUploadProps) {
+export function FileUpload({ label, accept, acceptHint, maxSizeMB = MAX_ARQUIVO_MB, onFile, onRemove }: FileUploadProps) {
   const [preview, setPreview] = useState<string | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
   const [erro, setErro] = useState<string | null>(null)
@@ -89,7 +90,7 @@ export function FileUpload({ label, accept, acceptHint, maxSizeMB = MAX_ARQUIVO_
           </div>
           <button
             type="button"
-            onClick={() => { setPreview(null); setFileName(null); setErro(null); if (inputRef.current) inputRef.current.value = '' }}
+            onClick={() => { setPreview(null); setFileName(null); setErro(null); if (inputRef.current) inputRef.current.value = ''; onRemove?.() }}
             className="text-sm text-red-600 hover:text-red-700 dark:text-red-400"
           >
             Remover

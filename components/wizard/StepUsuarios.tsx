@@ -111,6 +111,7 @@ export function StepUsuarios() {
                 accept="image/*"
                 acceptHint="PNG, JPG ou JPEG"
                 onFile={(file) => setValue(`usuarios.${index}.assinatura`, file)}
+                onRemove={() => setValue(`usuarios.${index}.assinatura`, undefined)}
               />
             )}
           </div>

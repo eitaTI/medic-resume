@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import type { ChangeEvent } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { Input } from '@/components/ui/Input'
@@ -92,11 +92,16 @@ function CampoComLapis({
 }
 
 export function StepClinica() {
-  const { register, setValue, watch, formState: { errors } } = useFormContext<FormularioValues>()
+  const { register, setValue, setFocus, watch, formState: { errors } } = useFormContext<FormularioValues>()
   const [isAddressEditable, setIsAddressEditable] = useState(false)
   const [isNomeFantasiaEditable, setIsNomeFantasiaEditable] = useState(false)
   const [cepError, setCepError] = useState<string | null>(null)
   const [cnpjError, setCnpjError] = useState<string | null>(null)
+  const [cnpjAviso, setCnpjAviso] = useState<string | null>(null)
+  const [buscandoCnpj, setBuscandoCnpj] = useState(false)
+  const [modoManualCnpj, setModoManualCnpj] = useState(false)
+  const ultimoCnpjBuscado = useRef<string | null>(null)
+  const cnpjAbort = useRef<AbortController | null>(null)
 
   const watchPossuiCnpj = watch('possuiCnpj') as boolean | undefined
   const possuiCnpj = watchPossuiCnpj ?? null
@@ -146,20 +151,47 @@ export function StepClinica() {
     }
   }, [setValue])
 
-  const fetchCNPJ = useCallback(async (cnpj: string) => {
-    const digits = cnpj.replace(/\D/g, '')
-    if (digits.length !== 14) {
-      setCnpjError('CNPJ deve ter 14 dígitos')
-      return
-    }
-
+  const habilitarPreenchimentoManualCnpj = useCallback(() => {
+    cnpjAbort.current?.abort()
+    setBuscandoCnpj(false)
+    setModoManualCnpj(true)
+    setIsAddressEditable(true)
+    setIsNomeFantasiaEditable(true)
+    setCnpjAviso('Não encontramos os dados desse CNPJ — confira o número e preencha Nome Fantasia, CEP e Endereço manualmente para continuar.')
     setCnpjError(null)
+    requestAnimationFrame(() => {
+      try {
+        setFocus('nomeClinica')
+      } catch {
+        /* ignore */
+      }
+    })
+  }, [setFocus])
+
+  const tentarBuscarCnpjNovamente = useCallback(() => {
+    ultimoCnpjBuscado.current = null
+    setCnpjAviso(null)
+    setCnpjError(null)
+    setModoManualCnpj(false)
+  }, [])
+
+  const fetchCNPJ = useCallback(async (digits: string, signal: AbortSignal) => {
+    setBuscandoCnpj(true)
+    setCnpjError(null)
+    setCnpjAviso(null)
 
     try {
-      const response = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${digits}`)
+      const response = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${digits}`, { signal })
 
       if (!response.ok) {
-        setCnpjError(response.status === 404 ? 'CNPJ não encontrado' : 'Erro ao buscar CNPJ')
+        if (response.status === 404) {
+          habilitarPreenchimentoManualCnpj()
+        } else {
+          setCnpjError('Erro ao buscar CNPJ — verifique a conexão ou preencha manualmente')
+          setModoManualCnpj(true)
+          setIsAddressEditable(true)
+          setIsNomeFantasiaEditable(true)
+        }
         return
       }
 
@@ -178,10 +210,18 @@ export function StepClinica() {
       setValue('nomeClinica', nomeFantasia, { shouldValidate: true })
       setValue('cepClinica', cep, { shouldValidate: true })
       setValue('enderecoClinica', endereco, { shouldValidate: true })
-    } catch {
-      setCnpjError('Erro ao buscar CNPJ')
+      ultimoCnpjBuscado.current = digits
+      setModoManualCnpj(false)
+      setIsAddressEditable(false)
+      setIsNomeFantasiaEditable(false)
+      setCnpjAviso(null)
+    } catch (e) {
+      if (e instanceof DOMException && e.name === 'AbortError') return
+      habilitarPreenchimentoManualCnpj()
+    } finally {
+      setBuscandoCnpj(false)
     }
-  }, [setValue])
+  }, [setValue, habilitarPreenchimentoManualCnpj])
 
   useEffect(() => {
     const cep = watchCepClinica
@@ -191,11 +231,24 @@ export function StepClinica() {
   }, [watchCepClinica, isAddressEditable, fetchCEP])
 
   useEffect(() => {
-    const cnpj = watchCnpjEmpresa
-    if (cnpj && !isAddressEditable && cnpj.replace(/\D/g, '').length === 14) {
-      fetchCNPJ(cnpj)
+    const digits = (watchCnpjEmpresa ?? '').replace(/\D/g, '')
+    if (digits.length !== 14 || modoManualCnpj) return
+    if (ultimoCnpjBuscado.current === digits) return
+
+    const t = setTimeout(() => {
+      cnpjAbort.current?.abort()
+      const controller = new AbortController()
+      cnpjAbort.current = controller
+      const timeout = setTimeout(() => controller.abort(), 8000)
+      fetchCNPJ(digits, controller.signal).finally(() => clearTimeout(timeout))
+    }, 500)
+
+    return () => {
+      clearTimeout(t)
     }
-  }, [watchCnpjEmpresa, isAddressEditable, fetchCNPJ])
+  }, [watchCnpjEmpresa, modoManualCnpj, fetchCNPJ])
+
+  useEffect(() => () => cnpjAbort.current?.abort(), [])
 
   const handleMaskedChange = useCallback((
     e: ChangeEvent<HTMLInputElement>,
@@ -230,11 +283,26 @@ export function StepClinica() {
 
   const handleCnpjToggle = (value: boolean) => {
     setValue('possuiCnpj', value)
+    if (value) {
+      ultimoCnpjBuscado.current = null
+      setCnpjAviso(null)
+      setCnpjError(null)
+      setModoManualCnpj(false)
+    }
   }
 
   const handleEditAddress = () => {
     setIsAddressEditable(true)
   }
+
+  const handleCnpjChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    ultimoCnpjBuscado.current = null
+    setModoManualCnpj(false)
+    setCnpjAviso(null)
+    setCnpjError(null)
+    cnpjAbort.current?.abort()
+    handleMaskedChange(e, 'cnpjEmpresa', 14, formatCNPJ)
+  }, [handleMaskedChange])
 
   return (
     <div className="space-y-4">
@@ -335,7 +403,7 @@ export function StepClinica() {
               placeholder="00.000.000/0000-00"
               {...register('cnpjEmpresa')}
               value={formatCNPJ(watch('cnpjEmpresa') ?? '')}
-              onChange={(e) => handleMaskedChange(e, 'cnpjEmpresa', 14, formatCNPJ)}
+              onChange={handleCnpjChange}
               erro={errors.cnpjEmpresa?.message}
               required
             />
@@ -349,8 +417,45 @@ export function StepClinica() {
             />
           </div>
 
-          {cnpjError && (
-            <p className="text-red-500 text-sm" role="alert">{cnpjError}</p>
+          {buscandoCnpj && (
+            <p className="text-sm text-gray-500 dark:text-gray-400" role="status">Buscando dados do CNPJ…</p>
+          )}
+
+          {cnpjAviso && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-300" role="alert">
+              <p>{cnpjAviso}</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={habilitarPreenchimentoManualCnpj}
+                  className="rounded-md bg-amber-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-700"
+                >
+                  Preencher endereço manualmente
+                </button>
+                <button
+                  type="button"
+                  onClick={tentarBuscarCnpjNovamente}
+                  className="rounded-md border border-amber-300 px-3 py-1.5 text-xs font-medium text-amber-800 hover:bg-amber-100 dark:border-amber-700 dark:text-amber-200 dark:hover:bg-amber-900/40"
+                >
+                  Tentar buscar novamente
+                </button>
+              </div>
+            </div>
+          )}
+
+          {cnpjError && !cnpjAviso && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-300" role="alert">
+              <p>{cnpjError}</p>
+              <div className="mt-2">
+                <button
+                  type="button"
+                  onClick={habilitarPreenchimentoManualCnpj}
+                  className="rounded-md bg-amber-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-700"
+                >
+                  Preencher endereço manualmente
+                </button>
+              </div>
+            </div>
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -412,6 +517,7 @@ export function StepClinica() {
         accept="image/*"
         acceptHint="PNG, JPG ou JPEG"
         onFile={(file) => setValue('logo', file)}
+        onRemove={() => setValue('logo', undefined)}
       />
     </div>
   )

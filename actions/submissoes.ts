@@ -83,8 +83,9 @@ export async function aprovarSubmissao(id: number) {
         logoPath: true,
         cabecalhoLaudo: true,
         rodapeLaudo: true,
+        confirmacoes: true,
         medicos: { select: { nome: true, documento: true, email: true, tipo: true, assinaturaPath: true } },
-        exames: { select: { nome: true, laudoPath: true, topicos: true } },
+        exames: { select: { nome: true, laudoPath: true, topicos: true, usarModeloPadrao: true } },
         dispositivos: { select: { tipo: true, marca: true, modelo: true, numeroSerie: true } },
       },
     })
@@ -110,6 +111,7 @@ export async function aprovarSubmissao(id: number) {
         logoPath: clinica.logoPath,
         cabecalhoLaudo: clinica.cabecalhoLaudo,
         rodapeLaudo: clinica.rodapeLaudo,
+        confirmacoes: (clinica.confirmacoes ?? null) as { cienteRequisitosPc?: boolean; cienteProblemasPcFraco?: boolean; autorizaUsoDados?: boolean; pcInfo?: Record<string, unknown> } | null,
         medicos: clinica.medicos,
         exames: clinica.exames,
         dispositivos: clinica.dispositivos,
@@ -153,7 +155,7 @@ export async function sincronizarJira(id: number) {
       where: { id },
       include: {
         medicos: { select: { nome: true, documento: true, email: true, tipo: true, assinaturaPath: true } },
-        exames: { select: { nome: true, laudoPath: true, topicos: true } },
+        exames: { select: { nome: true, laudoPath: true, topicos: true, usarModeloPadrao: true } },
         dispositivos: { select: { tipo: true, marca: true, modelo: true, numeroSerie: true } },
       },
     })
@@ -179,6 +181,7 @@ export async function sincronizarJira(id: number) {
       logoPath: clinica.logoPath,
       cabecalhoLaudo: clinica.cabecalhoLaudo,
       rodapeLaudo: clinica.rodapeLaudo,
+      confirmacoes: (clinica.confirmacoes ?? null) as { cienteRequisitosPc?: boolean; cienteProblemasPcFraco?: boolean; autorizaUsoDados?: boolean; pcInfo?: Record<string, unknown> } | null,
       medicos: clinica.medicos,
       exames: clinica.exames,
       dispositivos: clinica.dispositivos,

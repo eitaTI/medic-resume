@@ -1,27 +1,19 @@
-import { execSync } from 'node:child_process'
-import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '@/lib/prisma'
+import { dbPush, dbSeed } from './run'
 
 /**
- * Recria o banco de testes do zero (schema + seed) usando `prisma db push`.
- * O caminho do banco vem de DATABASE_URL (definido em tests/setup.ts como
- * absolute path -> test.db na raiz), compartilhado entre o CLI e o client.
+ * Recria o banco de testes do zero (schema + seed) via binários locais
+ * (`node_modules/.bin/prisma|tsx`) — sem passar por `pnpm exec`, que quebra
+ * em setups Windows/mise. Roda `setupFiles: tests/setup.ts` antes (define
+ * DATABASE_URL por worker em `test-<pid>.db`), então cada arquivo de teste
+ * tem seu próprio banco e o Vitest pode paralelizar.
  */
 export async function resetTestDb() {
   const env = { ...process.env, DATABASE_URL: process.env.DATABASE_URL! }
 
-  execSync('pnpm exec prisma db push --force-reset --accept-data-loss', {
-    cwd: process.cwd(),
-    stdio: 'ignore',
-    env,
-  })
-
-  execSync('pnpm exec tsx prisma/seed.ts', {
-    cwd: process.cwd(),
-    stdio: 'ignore',
-    env,
-  })
+  dbPush(env)
+  dbSeed(env)
 
   // Usuário fixo usado como autor das ações de auditoria nos testes
   // (registrarAcao grava auditLog.userId, que é FK obrigatória para User).
@@ -57,6 +49,3 @@ export async function criarSessaoAdmin(): Promise<string> {
   })
   return token
 }
-
-/** Caminho absoluto do banco de testes (mesmo usado por setup.ts). */
-export const TEST_DB_PATH = path.resolve(process.cwd(), 'test.db')
